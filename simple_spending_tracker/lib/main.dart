@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/route_manager.dart';
-import 'package:simple_spending_tracker/VM/dashboard.dart';
+import 'package:simple_spending_tracker/view/dashboard.dart';
 
 void main() {
   runApp(const MyApp());

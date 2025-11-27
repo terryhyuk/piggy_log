@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/route_manager.dart';
 import 'package:simple_spending_tracker/view/dashboard.dart';
+import 'package:simple_spending_tracker/view/transactions.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const Dashboard(),
+      home: const Transactions(),
     );
   }
 }

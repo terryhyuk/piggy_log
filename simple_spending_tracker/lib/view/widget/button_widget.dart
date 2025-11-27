@@ -1,6 +1,4 @@
-import 'package:get_x/get.dart';
 import 'package:flutter/material.dart';
-import 'package:simple_spending_tracker/view/add_transactions.dart';
 
 class ButtonWidget extends StatelessWidget {
   const ButtonWidget({super.key, required this.onTap});
@@ -14,13 +12,20 @@ class ButtonWidget extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: Colors.white, // Match category card background
           borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 12,
+              offset: Offset(4, 4),
+            ),
+          ],
         ),
-        child: const Center(child: Icon(Icons.add, size: 32)),
+        child: const Center(
+          child: Icon(Icons.add, size: 32, color: Colors.black87),
+        ),
       ),
     );
   }
 }// END
-
-

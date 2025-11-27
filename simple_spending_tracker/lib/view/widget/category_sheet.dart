@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:simple_spending_tracker/VM/category_handler.dart';
+import 'package:simple_spending_tracker/model/category.dart';
+import 'package:simple_spending_tracker/view/widget/color_picker_sheet.dart';
 import 'icon_picker_sheet.dart';
 
 /// CategorySheet
@@ -14,19 +17,24 @@ class CategorySheet extends StatefulWidget {
 }
 
 class _CategoryEditSheetState extends State<CategorySheet> {
-
   // Property
   late IconData selectedIcon = Icons.category;
   late Color selectedColor = Colors.grey;
-  late TextEditingController nameController = TextEditingController();
+  late TextEditingController c_nameController = TextEditingController();
+  late String selectedHexColor; // For saving to DB
 
   @override
   void initState() {
     super.initState();
     // Load existing category data (edit mode)
     if (widget.initialData != null) {
-      nameController.text = widget.initialData!['name'];
+      c_nameController.text = widget.initialData!['c_name'];
       selectedColor = Color(int.parse(widget.initialData!['color']));
+
+      selectedHexColor = selectedColor.value
+          .toRadixString(16)
+          .padLeft(8, '0'); // ← 추가
+
       selectedIcon = IconData(
         widget.initialData!['icon_codepoint'],
         fontFamily: widget.initialData!['icon_font_family'],
@@ -73,7 +81,8 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                           builder: (_) => const IconPickerSheet(),
                         );
                         if (result != null) {
-                          setState(() => selectedIcon = result['icon']);
+                          selectedIcon = result['icon'];
+                          setState(() {});
                         }
                       },
                       child: Container(
@@ -86,7 +95,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                         child: Icon(
                           selectedIcon,
                           size: iconSize,
-                          color: Colors.black87,
+                          color: selectedColor,
                         ),
                       ),
                     ),
@@ -94,7 +103,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                     // --- Category Name Input ---
                     Expanded(
                       child: TextField(
-                        controller: nameController,
+                        controller: c_nameController,
                         decoration: InputDecoration(
                           labelText: "Category Name",
                           border: OutlineInputBorder(
@@ -107,22 +116,40 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                 ),
                 const SizedBox(height: 32),
                 // ---------- Color Row ----------
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Color", style: TextStyle(fontSize: 16)),
-                    SizedBox(width: maxW * 0.07), // responsive spacing
-                    // --- Color Preview Circle ---
-                    Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: selectedColor,
-                        shape: BoxShape.circle,
+                GestureDetector(
+                  onTap: () async {
+                    final Color? picked = await showModalBottomSheet<Color>(
+                      context: context,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => const ColorPickerSheet(),
+                    );
+
+                    if (picked != null) {
+                      selectedColor = picked;
+                      selectedHexColor = picked.value
+                          .toRadixString(16)
+                          .padLeft(8, '0');
+                      setState(() {});
+                    }
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Color", style: TextStyle(fontSize: 16)),
+                      SizedBox(width: maxW * 0.07), // responsive spacing
+                      // --- Color Preview Circle ---
+                      Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: selectedColor,
+                          shape: BoxShape.circle,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+
                 const SizedBox(height: 38),
                 // ---------- Buttons ----------
                 Row(
@@ -142,11 +169,8 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                     // Save
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context, {
-                          'name': nameController.text,
-                          'icon': selectedIcon,
-                          'color': selectedColor.toString(),
-                        });
+                        addCategory();
+                        Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black87,
@@ -165,8 +189,18 @@ class _CategoryEditSheetState extends State<CategorySheet> {
   }
 
   //--- Fuunctions---
-  addCategory(){
-    //
+  addCategory() async {
+    Category category = Category(
+      iconCodePoint: selectedIcon.codePoint,
+      iconFontFamily: selectedIcon.fontFamily,
+      iconFontPackage: selectedIcon.fontPackage,
+      color: selectedHexColor,
+      c_name: c_nameController.text,
+    );
+    await CategoryHandler().insertCategory(category);
+
   }
 
-}// END
+
+
+} // END

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get_x/get.dart';
 import 'package:simple_spending_tracker/VM/category_handler.dart';
+import 'package:simple_spending_tracker/view/detail_category.dart';
 import 'package:simple_spending_tracker/view/widget/button_widget.dart';
 import 'package:simple_spending_tracker/view/widget/category_sheet.dart';
 import 'package:simple_spending_tracker/view/widget/category_card.dart';
@@ -36,11 +38,7 @@ class _TransactionsState extends State<Transactions> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Transaction',
-            ),
-          ),
+        appBar: AppBar(title: const Text('Transaction')),
         body: GridView.builder(
           padding: const EdgeInsets.all(16),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -62,22 +60,20 @@ class _TransactionsState extends State<Transactions> {
               isEditMode: isEditMode,
               // Normal tap → open edit sheet
               onTap: () {
-                if (!isEditMode) {
-                  openCategorySheet(category: category);
-                }
+                Get.to(() => DetailCategory(), arguments: category);
               },
               // Long press → enter edit mode
               onLongPress: () {
                 isEditMode = true;
-                setState((){});
+                setState(() {});
               },
               // Edit button (currently placeholder)
               onEditPress: () {
-                // TODO: Connect edit functionality
+                openCategorySheet(category: category);
               },
               // Delete button (currently placeholder)
               onDeletePress: () {
-                // TODO: Connect delete functionality
+                openDeleteDialog(category);
               },
             );
           },
@@ -112,4 +108,43 @@ class _TransactionsState extends State<Transactions> {
       builder: (_) => CategorySheet(initialData: data),
     ).then((_) => loadCategories());
   }
+
+  openDeleteDialog(Category category) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Delete Category"),
+        content: Text("Delete '${category.c_name}'?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              await categoryHandler.deleteCategory(category.id!);
+
+              Navigator.pop(context); // close dialog
+              loadCategories(); // refresh UI
+
+              // snackbar
+              Get.snackbar(
+                "Category Deleted",
+                "'${category.c_name}' was removed.",
+                snackPosition: SnackPosition.top,
+                backgroundColor: Colors.red,
+                colorText: Colors.white,
+                duration: const Duration(seconds: 2),
+              );
+            },
+            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
 }// END
+

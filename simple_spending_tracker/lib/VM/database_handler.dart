@@ -36,9 +36,11 @@ class DatabaseHandler {
         // each record is linked to a category through c_id.
         // -------------------------------
         await db.execute("""
-          create table transactions (
+          create table spending_transactions (
             t_id integer primary key autoincrement,
+            t_name text not null,
             c_id integer not null,
+            time text not null,
             date text not null,
             type text not null,
             amount real not null,

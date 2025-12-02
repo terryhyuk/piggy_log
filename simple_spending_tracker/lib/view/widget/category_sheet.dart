@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_x/get.dart';
 import 'package:simple_spending_tracker/VM/category_handler.dart';
 import 'package:simple_spending_tracker/model/category.dart';
 import 'package:simple_spending_tracker/view/widget/color_picker_sheet.dart';
@@ -26,14 +27,17 @@ class _CategoryEditSheetState extends State<CategorySheet> {
   @override
   void initState() {
     super.initState();
+
+    // Always create initial hex color
+    selectedHexColor = selectedColor.value.toRadixString(16).padLeft(8, '0');
     // Load existing category data (edit mode)
     if (widget.initialData != null) {
       c_nameController.text = widget.initialData!['c_name'];
-      selectedColor = Color(int.parse(widget.initialData!['color']));
+      selectedColor = Color(int.parse(widget.initialData!['color'], radix: 16));
 
       selectedHexColor = selectedColor.value
           .toRadixString(16)
-          .padLeft(8, '0'); // ← 추가
+          .padLeft(8, '0'); // ← for saving to DB
 
       selectedIcon = IconData(
         widget.initialData!['icon_codepoint'],
@@ -64,8 +68,8 @@ class _CategoryEditSheetState extends State<CategorySheet> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // ---------- Header ----------
-                const Text(
-                  "Add Category",
+                Text(
+                  widget.initialData == null ? "Add Category" : "Edit Category",
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 22),
@@ -123,7 +127,6 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                       backgroundColor: Colors.transparent,
                       builder: (_) => const ColorPickerSheet(),
                     );
-
                     if (picked != null) {
                       selectedColor = picked;
                       selectedHexColor = picked.value
@@ -149,7 +152,6 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 38),
                 // ---------- Buttons ----------
                 Row(
@@ -169,8 +171,13 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                     // Save
                     ElevatedButton(
                       onPressed: () {
-                        addCategory();
-                        Navigator.pop(context);
+                        if (widget.initialData == null) {
+                          addCategory(); // add new category
+                          showSnackBar("Category Created", "New category added!", Colors.green);
+                        } else {
+                          editCategory(); // Update category
+                          showSnackBar("Category Updated", "Changes saved.", Colors.blue);
+                        } Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black87,
@@ -198,9 +205,35 @@ class _CategoryEditSheetState extends State<CategorySheet> {
       c_name: c_nameController.text,
     );
     await CategoryHandler().insertCategory(category);
+  }
 
+  editCategory() async {
+    // update category
+    Category category = Category(
+      id: widget.initialData!['id'],
+      iconCodePoint: selectedIcon.codePoint,
+      iconFontFamily: selectedIcon.fontFamily,
+      iconFontPackage: selectedIcon.fontPackage,
+      color: selectedHexColor,
+      c_name: c_nameController.text,
+    );
+    await CategoryHandler().updateCategory(category);
+  }
+
+  deleteCategory() async {
+    await CategoryHandler().deleteCategory(widget.initialData!['id']);
   }
 
 
+  showSnackBar(title, message, Color bgColor) {
+  Get.snackbar(
+    title,
+    message,
+    snackPosition: SnackPosition.top,
+    duration: const Duration(seconds: 2),
+    backgroundColor: bgColor,
+    colorText: Colors.white,   // text color
+  );
+}
 
 } // END

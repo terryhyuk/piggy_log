@@ -76,7 +76,11 @@ class CategoryCard extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.edit),
-                    onPressed: onEditPress,
+                    onPressed: (){
+                      if (onEditPress != null) {
+                        onEditPress!();
+                      }
+                    }
                   ),
                   IconButton(
                     icon: const Icon(Icons.close, size: 20),
@@ -89,4 +93,5 @@ class CategoryCard extends StatelessWidget {
       ),
     );
   }
+
 } // END

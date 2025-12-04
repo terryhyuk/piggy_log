@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:simple_spending_tracker/view/widget/add_transaction_dialog.dart';
 import 'package:simple_spending_tracker/view/widget/buildHeader.dart';
-import '../model/category.dart';
+import 'package:simple_spending_tracker/view/widget/transaction_list.dart';
+import '../../model/category.dart';
 
 class DetailCategory extends StatefulWidget {
   const DetailCategory({super.key});
@@ -48,6 +49,9 @@ class _DetailCategoryState extends State<DetailCategory> {
                 _openAddTransactionDialog();
               },
               ),
+              Expanded(
+                child: TransactionList(categoryId: category.id!),
+                ),
           ],
         ),
       ),
@@ -56,10 +60,12 @@ class _DetailCategoryState extends State<DetailCategory> {
 
   // Function
 
-  _openAddTransactionDialog() {
-    showDialog(
+  _openAddTransactionDialog() async{
+    await showDialog(
       context: context, 
       builder: (context) => AddTransactionDialog(c_id: category.id!),
       );
+      setState(() {});
   }
+
 }// END

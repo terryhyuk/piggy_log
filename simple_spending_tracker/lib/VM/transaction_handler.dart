@@ -5,22 +5,23 @@ class TransactionHandler {
   final DatabaseHandler databaseHandler = DatabaseHandler();
 
   // Insert Transaction
-  Future<int> insertTransaction(SpendingTransaction trx) async {
+  Future<int> insertTransaction(SpendingTransaction res) async {
     final db = await databaseHandler.initializeDB();
 
     return await db.rawInsert(
       """
       insert into spending_transactions 
-      (t_name, c_id, date, type, amount, memo, isRecurring)
+      (c_id, t_name, date, type, amount, memo, isRecurring)
       values (?, ?, ?, ?, ?, ?, ?)
       """,
       [
-        trx.c_id,
-        trx.date,
-        trx.type,
-        trx.amount,
-        trx.memo,
-        trx.isRecurring ? 1 : 0,
+        res.c_id,
+        res.t_name,
+        DateTime.now().toLocal().toString(), // Convert to local time toString(),
+        res.type,
+        res.amount,
+        res.memo,
+        res.isRecurring ? 1 : 0,
       ],
     );
   }

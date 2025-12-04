@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:simple_spending_tracker/VM/category_handler.dart';
-import 'package:simple_spending_tracker/view/detail_category.dart';
+import 'package:simple_spending_tracker/view/pages/detail_category.dart';
 import 'package:simple_spending_tracker/view/widget/button_widget.dart';
 import 'package:simple_spending_tracker/view/widget/category_sheet.dart';
 import 'package:simple_spending_tracker/view/widget/category_card.dart';
 
-import '../model/category.dart';
+import '../../model/category.dart';
 
 class Transactions extends StatefulWidget {
   const Transactions({super.key});
@@ -123,10 +123,8 @@ class _TransactionsState extends State<Transactions> {
           TextButton(
             onPressed: () async {
               await categoryHandler.deleteCategory(category.id!);
-
               Navigator.pop(context); // close dialog
               loadCategories(); // refresh UI
-
               // snackbar
               Get.snackbar(
                 "Category Deleted",

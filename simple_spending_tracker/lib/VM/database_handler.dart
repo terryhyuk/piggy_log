@@ -38,9 +38,8 @@ class DatabaseHandler {
         await db.execute("""
           create table spending_transactions (
             t_id integer primary key autoincrement,
-            t_name text not null,
             c_id integer not null,
-            time text not null,
+            t_name text not null,
             date text not null,
             type text not null,
             amount real not null,
@@ -61,6 +60,22 @@ class DatabaseHandler {
             yearMonth text not null,
             targetAmount real not null,
             foreign key(c_id) references categories(id)
+          )
+        """);
+
+        // -------------------------------
+        // settings table
+        // stores app settings.
+        // -------------------------------
+        await db.execute(
+          """
+          create table settings (
+          id integer primary key,
+          language text not null,
+          currency_code text not null,
+          currency_symbol text not null,
+          date_format text not null,
+          theme_mode text not null
           )
         """);
       },

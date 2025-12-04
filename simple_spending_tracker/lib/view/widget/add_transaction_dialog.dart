@@ -29,37 +29,26 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-
           // TiTLE
           TextField(
             controller: t_nameController,
-            decoration: const InputDecoration(
-              labelText: 'Title',
-              ),
+            decoration: const InputDecoration(labelText: 'Title'),
             keyboardType: TextInputType.text,
           ),
-
           // AMOUNT
           TextField(
             controller: amountController,
-            decoration: const InputDecoration(
-              labelText: 'Amount',
-              ),
+            decoration: const InputDecoration(labelText: 'Amount'),
             keyboardType: TextInputType.number,
           ),
-
           // MEMO
           TextField(
             controller: memoController,
-            decoration: const InputDecoration(
-              labelText: 'Memo',
-              ),
+            decoration: const InputDecoration(labelText: 'Memo'),
             keyboardType: TextInputType.text,
             maxLines: 2,
           ),
-
           const SizedBox(height: 16),
-
           // TYPE RADIO
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -88,9 +77,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               ),
             ],
           ),
-
           const SizedBox(height: 8),
-
           // DATE PICKER
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -105,9 +92,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               TextButton(onPressed: pickDate, child: const Text("Select Date")),
             ],
           ),
-
           const SizedBox(height: 8),
-
           // RECURRING SWITCH
           Row(
             children: [
@@ -120,7 +105,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
           ),
         ],
       ),
-
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
@@ -150,34 +134,35 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
     );
-
     if (picked != null) {
       setState(() => selectedDateTime = picked);
     }
   }
 
-  saveTransaction() async{
+  saveTransaction() async {
     if (t_nameController.text.trim().isEmpty) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Please enter a title')),
-  );
-  return;
-}else{
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please enter a title')));
+      return;
+    }
+    final amount = double.tryParse(amountController.text);
+    if (amount == null || amount <= 0) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Enter valid amount')));
+      return;
+    }
     SpendingTransaction transaction = SpendingTransaction(
-      c_id: widget.c_id, 
-      t_name: t_nameController.text, 
-      date: selectedDateTime.toString(), 
+      c_id: widget.c_id,
+      t_name: t_nameController.text,
+      date: selectedDateTime.toString(),
       type: selectedType,
-      amount: double.tryParse(amountController.text) ?? 0.0, 
-      memo: memoController.text, 
+      amount: amount,
+      memo: memoController.text,
       isRecurring: isRecurring,
     );
-
     await TransactionHandler().insertTransaction(transaction);
-}
     Navigator.pop(context, true);
   }
-
-
-  
-}// END
+} // END

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:simple_spending_tracker/VM/category_handler.dart';
+import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 import 'package:simple_spending_tracker/model/category.dart';
 import 'package:simple_spending_tracker/view/widget/color_picker_sheet.dart';
 import 'icon_picker_sheet.dart';
@@ -69,7 +70,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
               children: [
                 // ---------- Header ----------
                 Text(
-                  widget.initialData == null ? "Add Category" : "Edit Category",
+                  widget.initialData == null ? AppLocalizations.of(context)!.addCategory : AppLocalizations.of(context)!.editCategory,
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 22),
@@ -109,7 +110,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                       child: TextField(
                         controller: c_nameController,
                         decoration: InputDecoration(
-                          labelText: "Category Name",
+                          labelText: AppLocalizations.of(context)!.categoryName,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -138,7 +139,10 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("Color", style: TextStyle(fontSize: 16)),
+                        Text(
+                          AppLocalizations.of(context)!.color, 
+                          style: TextStyle(
+                            fontSize: 16)),
                       SizedBox(width: maxW * 0.07), // responsive spacing
                       // --- Color Preview Circle ---
                       Container(
@@ -163,8 +167,8 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey.shade300,
                       ),
-                      child: const Text(
-                        "Cancel",
+                      child: Text(
+                        AppLocalizations.of(context)!.cancel,
                         style: TextStyle(color: Colors.black),
                       ),
                     ),
@@ -173,16 +177,16 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                       onPressed: () {
                         if (widget.initialData == null) {
                           addCategory(); // add new category
-                          showSnackBar("Category Created", "New category added!", Colors.green);
+                          showSnackBar(AppLocalizations.of(context)!.categoryCreated, AppLocalizations.of(context)!.newCategoryAdded, Colors.green);
                         } else {
                           editCategory(); // Update category
-                          showSnackBar("Category Updated", "Changes saved.", Colors.blue);
+                          showSnackBar(AppLocalizations.of(context)!.categoryUpdated, AppLocalizations.of(context)!.changesSaved, Colors.blue);
                         } Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black87,
                       ),
-                      child: const Text("Save"),
+                      child: Text(AppLocalizations.of(context)!.save),
                     ),
                   ],
                 ),

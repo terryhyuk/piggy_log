@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:simple_spending_tracker/VM/category_handler.dart';
+import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 import 'package:simple_spending_tracker/view/pages/detail_category.dart';
 import 'package:simple_spending_tracker/view/widget/button_widget.dart';
 import 'package:simple_spending_tracker/view/widget/category_sheet.dart';
@@ -38,7 +39,11 @@ class _TransactionsState extends State<Transactions> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Transaction')),
+        appBar: AppBar(
+          title: Text(
+            AppLocalizations.of(context)!.transaction,
+            ),
+          ),
         body: GridView.builder(
           padding: const EdgeInsets.all(16),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -113,7 +118,7 @@ class _TransactionsState extends State<Transactions> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text("Delete Category"),
+        title: Text("Delete Category"),
         content: Text("Delete '${category.c_name}'?"),
         actions: [
           TextButton(

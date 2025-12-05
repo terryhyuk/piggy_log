@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 
 import '../../model/category_icons.dart';
 
@@ -52,8 +53,8 @@ class _IconPickerSheetState extends State<IconPickerSheet> {
           // ---------- Header ----------
           Row(
             children: [
-              const Text(
-                "Select Icon",
+                Text(
+                AppLocalizations.of(context)!.searchIcons,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
@@ -72,7 +73,7 @@ class _IconPickerSheetState extends State<IconPickerSheet> {
             onChanged: filterIcons, // Real-time filtering
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.search),
-              hintText: "Search icons",
+              hintText: AppLocalizations.of(context)!.searchIcons,
               filled: true,
               fillColor: Colors.grey.shade100,
               contentPadding: const EdgeInsets.symmetric(

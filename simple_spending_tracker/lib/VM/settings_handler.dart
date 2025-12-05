@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:simple_spending_tracker/VM/database_handler.dart';
 import 'package:simple_spending_tracker/model/settings.dart';
 import 'package:sqflite/sql.dart';
@@ -7,21 +9,43 @@ class SettingsHandler {
 
 /// Insert default settings on first app launch
   Future<int> insertDefaultSettings() async {
-    final db = await databaseHandler.initializeDB();
+  final db = await databaseHandler.initializeDB();
+  final systemLocale =
+      WidgetsBinding.instance.platformDispatcher.locale.toString();
 
-    return await db.insert(
+  return await db.insert(
+    'settings',
+    {
+      'id': 1,
+      'language': 'system',
+      'currency_code': 'system',
+      'currency_symbol':
+          NumberFormat.simpleCurrency(locale: systemLocale).currencySymbol,
+      'date_format': DateFormat.yMd(systemLocale).pattern,
+      'theme_mode': 'system',
+    },
+    conflictAlgorithm: ConflictAlgorithm.ignore,
+  );
+}
+
+
+  // Update settings
+  Future<int> updateSettings(Settings settings) async {
+    final db = await databaseHandler.initializeDB();
+    return await db.update(
       'settings',
       {
-        'id': 1,
-        'language': 'system',
-        'currency_code': 'system',  // default currency
-        'currency_symbol': '\$',
-        'date_format': 'yyyy-MM-dd',
-        'theme_mode': 'system',
+        'language': settings.language,
+        'currency_code': settings.currency_code,
+        'currency_symbol': settings.currency_symbol,
+        'date_format': settings.date_format,
+        'theme_mode': settings.theme_mode,
       },
-      conflictAlgorithm: ConflictAlgorithm.ignore,
+      where: 'id = ?',
+      whereArgs: [1],
     );
   }
+
 
   /// Fetch settings
   Future<Settings?> getSettings() async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:simple_spending_tracker/VM/transaction_handler.dart';
+import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 
 class TransactionList extends StatelessWidget {
 
@@ -19,7 +20,9 @@ class TransactionList extends StatelessWidget {
           return const CircularProgressIndicator();
         }
         if(!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Text('No transactions found');
+          return  Text(
+            AppLocalizations.of(context)!.noTransactionsFound,
+            );
         }
         return ListView.builder(
           itemCount: snapshot.data!.length,

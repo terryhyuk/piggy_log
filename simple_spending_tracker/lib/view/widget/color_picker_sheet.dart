@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 import '../../model/category_colors.dart';
 
 class ColorPickerSheet extends StatefulWidget {
@@ -37,8 +38,8 @@ class _ColorPickerSheetState extends State<ColorPickerSheet> {
           /// ----- Header -----
           Row(
             children: [
-              const Text(
-                "Select Color",
+            Text(
+                AppLocalizations.of(context)!.selectColor,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
               const Spacer(),

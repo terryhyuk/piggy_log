@@ -25,7 +25,7 @@ class _TransactionsState extends State<Transactions> {
   @override
   void initState() {
     super.initState();
-    loadCategories();
+    _loadCategories();
   }
 
   @override
@@ -55,7 +55,7 @@ class _TransactionsState extends State<Transactions> {
           itemBuilder: (context, index) {
             // Add Category button
             if (index == 0) {
-              return ButtonWidget(onTap: openCategorySheet);
+              return ButtonWidget(onTap: _openCategorySheet);
             }
 
             final category = categories[index - 1];
@@ -74,11 +74,11 @@ class _TransactionsState extends State<Transactions> {
               },
               // Edit button (currently placeholder)
               onEditPress: () {
-                openCategorySheet(category: category);
+                _openCategorySheet(category: category);
               },
               // Delete button (currently placeholder)
               onDeletePress: () {
-                openDeleteDialog(category);
+                _openDeleteDialog(category);
               },
             );
           },
@@ -88,14 +88,14 @@ class _TransactionsState extends State<Transactions> {
   }
 
   // Load categories from database
-  loadCategories() async {
+  _loadCategories() async {
     final list = await categoryHandler.queryCategory();
     categories = list;
     setState(() {});
   }
 
   // Open bottom sheet for creating or editing categories
-  openCategorySheet({Category? category}) {
+  _openCategorySheet({Category? category}) {
     final Map<String, dynamic>? data = category == null
         ? null
         : {
@@ -111,10 +111,10 @@ class _TransactionsState extends State<Transactions> {
       context: context,
       isScrollControlled: true,
       builder: (_) => CategorySheet(initialData: data),
-    ).then((_) => loadCategories());
+    ).then((_) => _loadCategories());
   }
 
-  openDeleteDialog(Category category) {
+  _openDeleteDialog(Category category) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -129,7 +129,7 @@ class _TransactionsState extends State<Transactions> {
             onPressed: () async {
               await categoryHandler.deleteCategory(category.id!);
               Navigator.pop(context); // close dialog
-              loadCategories(); // refresh UI
+              _loadCategories(); // refresh UI
               // snackbar
               Get.snackbar(
                 "Category Deleted",

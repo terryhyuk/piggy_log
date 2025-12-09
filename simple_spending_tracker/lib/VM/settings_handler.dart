@@ -29,7 +29,7 @@ class SettingsHandler {
 }
 
 
-  // Update settings
+  // Update DB with settings
   Future<int> updateSettings(Settings settings) async {
     final db = await databaseHandler.initializeDB();
     return await db.update(
@@ -46,7 +46,6 @@ class SettingsHandler {
     );
   }
 
-
   /// Fetch settings
   Future<Settings?> getSettings() async {
     final db = await databaseHandler.initializeDB();
@@ -58,4 +57,4 @@ class SettingsHandler {
     return null;
   }
 
-}
+} // END

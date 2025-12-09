@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
+import 'package:simple_spending_tracker/controller/setting_Controller.dart';
 import 'package:simple_spending_tracker/view/widget/add_transaction_dialog.dart';
 import 'package:simple_spending_tracker/view/widget/buildHeader.dart';
 import 'package:simple_spending_tracker/view/widget/transaction_list.dart';
@@ -16,7 +17,8 @@ class _DetailCategoryState extends State<DetailCategory> {
 
   // Property
   late final Category category;
-
+  final SettingsController settingsController = Get.find<SettingsController>();
+  
   @override
   void initState() {
     super.initState();
@@ -36,6 +38,8 @@ class _DetailCategoryState extends State<DetailCategory> {
     }
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +54,9 @@ class _DetailCategoryState extends State<DetailCategory> {
               },
               ),
               Expanded(
-                child: TransactionList(categoryId: category.id!),
+                child: TransactionList(
+                  categoryId: category.id!,
+                  ),
                 ),
           ],
         ),

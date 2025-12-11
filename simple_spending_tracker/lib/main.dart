@@ -4,7 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:simple_spending_tracker/controller/setting_Controller.dart';
 import 'package:simple_spending_tracker/controller/tabbar_controller.dart';
 import 'package:simple_spending_tracker/l10n/app_localizations.dart';
-import 'package:simple_spending_tracker/view/pages/dashboard.dart';
+import 'package:simple_spending_tracker/view/widget/mainTabBar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +15,9 @@ void main() async {
   // Controllerr for setting
   final settingsController = Get.put(SettingsController());
   await settingsController.loadSettings();
+
+  // Controllerr for Tabbar
+  Get.put(TabbarController());
 
   runApp(MyApp());
 }
@@ -43,7 +46,7 @@ class MyApp extends StatelessWidget {
           colorSchemeSeed: Colors.blue,
           brightness: Brightness.dark,
         ),
-        home: Dashboard(),
+        home: Maintabbar(),
       ),
     );
   }

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get_x/get.dart';
 import 'package:intl/intl.dart';
 import 'package:simple_spending_tracker/VM/transaction_handler.dart';
 import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 import 'package:simple_spending_tracker/model/spending_transaction.dart';
-import 'package:simple_spending_tracker/view/pages/settings_page.dart';
 
 class AddTransactionDialog extends StatefulWidget {
   final int c_id;
@@ -34,11 +32,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconButton(onPressed: () {
-            Get.to(
-              () => SettingsPage(),
-            );
-          }, icon: const Icon(Icons.settings)),
           // TiTLE
           TextField(
             controller: t_nameController,

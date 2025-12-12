@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:simple_spending_tracker/controller/dashboard_controller.dart';
-import 'package:simple_spending_tracker/VM/settings_handler.dart';
-import 'package:simple_spending_tracker/model/settings.dart';
+import 'package:get_x/get.dart';
+import 'package:simple_spending_tracker/VM/budget_handler.dart';
+import 'package:simple_spending_tracker/controller/dashboard_Controller.dart';
+import 'package:simple_spending_tracker/controller/setting_Controller.dart';
 import 'package:simple_spending_tracker/view/widget/chart_widget.dart';
 
 class Dashboard extends StatefulWidget {
@@ -12,464 +12,262 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  // ---------------- Properties ----------------
-  final DashboardController dashbordcontroller = DashboardController();
-  final SettingsHandler settingsHandler = SettingsHandler();
-
-  double monthlyExpense = 0.0;
+  final DashboardController dashbordcontroller =
+      Get.find<DashboardController>();
+  final SettingsController settingsController = Get.find<SettingsController>();
+  final TextEditingController budgetController = TextEditingController();
   double monthlyBudget = 0.0;
-  List<Map<String, dynamic>> categoryExpenses = [];
-  List<Map<String, dynamic>> top3Categories = [];
-  List recentTransactions = [];
-  Settings? settings;
-  bool isLoading = true;
-  
 
-  // ---------------- Init ----------------
+  final MonthlyBudgetHandler monthlyBudgetHandler = MonthlyBudgetHandler();
+
+  int? selectedPieIndex;
+
   @override
   void initState() {
     super.initState();
-    _loadData();
+    
+    dashbordcontroller.refreshDashboard();
+    _loadMonthlyBudget();
   }
 
-  // ---------------- Build ----------------
+  Future<void> _loadMonthlyBudget() async {
+    final now = DateTime.now();
+    final yearMonth = "${now.year}-${now.month.toString().padLeft(2, '0')}";
+
+    final value = await monthlyBudgetHandler.getMonthlyBudget(yearMonth);
+    monthlyBudget = value;
+    budgetController.text = value == 0 ? "" : value.toString();
+
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (isLoading) return const Center(child: CircularProgressIndicator());
-
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top summary: expense & budget
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Total Expense', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 4),
-                    Text(_formatCurrency(monthlyExpense),
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.redAccent)),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Monthly Budget', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 4),
-                    Text(_formatCurrency(monthlyBudget),
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green)),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-      
-            // Row: PieChart + Top3 + Radar
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: ChartsWidget(
-                    pieData: dashbordcontroller.makePieData(categoryExpenses),
-                    onTapCategory: _onSelectCategory,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  flex: 2,
-                  child: Column(
+        child: Obx(() {
+          // reactive trigger
+          settingsController.refreshTrigger.value;
+          dashbordcontroller.dataRefreshTrigger.value;
+
+          final monthlyExpense = dashbordcontroller.totalExpense.value;
+          final top3Categories = dashbordcontroller.top3Categories;
+          final recentTransactions = dashbordcontroller.recentTransactions;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top summary
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Top3 text
-                      ...top3Categories.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final item = entry.value;
-                        // final color = dashbordcontroller.categoryColors[index % dashbordcontroller.categoryColors.length];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Text(
-                            '${item['name']} - ${_formatCurrency(item['total'])}',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, ),
-                          ),
-                        );
-                      }).toList(),
-                      const SizedBox(height: 8),
-                      if (dashbordcontroller.selectedBreakdown.isNotEmpty)
-                        ChartsWidget(radarData: dashbordcontroller.selectedBreakdown),
+                      const Text(
+                        'Total Expense',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _formatCurrency(monthlyExpense),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.redAccent,
+                        ),
+                      ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-      
-            // Recent Transactions
-            const Text('Recent Transactions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Column(
-              children: recentTransactions.map((trx) {
-                return Card(
-                  child: ListTile(
-                    title: Text(trx.t_name),
-                    subtitle: Text(trx.date),
-                    trailing: Text(_formatCurrency(trx.amount)),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Monthly Budget",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      GestureDetector(
+                        onTap: () => _showBudgetDialog(),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 16,
+                          ),
+                          child: Text(
+                            monthlyBudget == 0
+                                ? "Set your monthly budget"
+                                : _formatCurrency(monthlyBudget),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Row: PieChart + Top3 + Radar
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: ChartsWidget(
+                      pieData: dashbordcontroller.makePieData(
+                        selectedIndex: selectedPieIndex,
+                      ),
+                      onTapCategory: _onSelectCategory,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ...top3Categories.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final item = entry.value;
+                          final color =
+                              dashbordcontroller.categoryColors[index %
+                                  dashbordcontroller.categoryColors.length];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Text(
+                              '${item['name']} - ${_formatCurrency(item['total'])}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: color,
+                              ),
+                            ),
+                          );
+                        }),
+                        const SizedBox(height: 8),
+                        Obx(() {
+                          final breakdown = Map<String, double>.from(
+                            dashbordcontroller.selectedBreakdown,
+                          );
+                          if (breakdown.isEmpty) return const SizedBox.shrink();
+                          return ChartsWidget(radarData: breakdown);
+                        }),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+
+              // Recent Transactions
+              const Text(
+                'Recent Transactions',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Column(
+                children: recentTransactions.map((trx) {
+                  return Card(
+                    child: ListTile(
+                      title: Text(trx['t_name']),
+                      subtitle: Text(trx['date']),
+                      trailing: Text(
+                        _formatCurrency(trx['amount']),
+                        style: TextStyle(
+                          color: trx['type'] == 'expense'
+                              ? Colors.red
+                              : Colors.green,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          );
+        }),
       ),
     );
   }
 
-  // ---------------- Functions ----------------
-  String _formatCurrency(double amount) {
-    final symbol = settings?.currency_symbol ?? '\$';
-    return '$symbol${amount.toStringAsFixed(2)}';
+  // --- Functions ---
+  String _formatCurrency(dynamic amount) {
+    final value = (amount as num?)?.toDouble() ?? 0.0;
+    return settingsController.formatCurrency(value) ?? value.toString();
   }
 
+  // String _formatCurrency(double amount) {
+  //   return settingsController.formatCurrency(amount) ?? amount.toString();
+  // }
+
   void _onSelectCategory(int index) async {
-    if (index < 0 || index >= categoryExpenses.length) {
-      dashbordcontroller.selectedBreakdown = {};
+    if (index < 0 || index >= dashbordcontroller.categoryList.length) {
+      dashbordcontroller.selectedBreakdown.clear();
+      selectedPieIndex = null;
       setState(() {});
       return;
     }
-    final selectedId = categoryExpenses[index]['id'] as int;
+
+    selectedPieIndex = index;
+    final selectedId = dashbordcontroller.categoryList[index]['id'] as int;
     await dashbordcontroller.loadBreakdown(selectedId);
     setState(() {});
   }
 
-  Future<void> _loadData() async {
-    setState(() => isLoading = true);
-    final now = DateTime.now();
-    final yearMonth = DateFormat('yyyy-MM').format(now);
+  // Monthly Budget Dialog
+  Future<void> _showBudgetDialog() async {
+    final TextEditingController dialogController = TextEditingController(
+      text: monthlyBudget == 0 ? "" : monthlyBudget.toString(),
+    );
 
-    settings = await settingsHandler.getSettings();
-    monthlyExpense = await dashbordcontroller.handler.getMonthlyTotalExpense(yearMonth);
-    monthlyBudget = await dashbordcontroller.handler.getMonthlyBudget(yearMonth);
-    categoryExpenses = await dashbordcontroller.handler.getCategoryExpense(yearMonth);
-    top3Categories = await dashbordcontroller.handler.getTop3Categories(yearMonth);
-    recentTransactions = await dashbordcontroller.handler.getRecentTransactions(limit: 4);
+    final result = await showDialog<double>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Set Monthly Budget"),
+        content: TextField(
+          controller: dialogController,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(hintText: "Enter your budget"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context), // 취소
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              final value = double.tryParse(dialogController.text.trim());
+              if (value != null) Navigator.pop(context, value);
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      ),
+    );
 
-    setState(() => isLoading = false);
+    if (result != null) {
+      // DB에 저장
+      final now = DateTime.now();
+      final yearMonth = "${now.year}-${now.month.toString().padLeft(2, '0')}";
+      await monthlyBudgetHandler.saveMonthlyBudget(yearMonth, result);
+
+      setState(() {
+        monthlyBudget = result;
+      });
+    }
   }
-}
-
-// class Dashboard extends StatefulWidget {
-//   const Dashboard({super.key});
-
-//   @override
-//   State<Dashboard> createState() => _DashboardState();
-// }
-
-// class _DashboardState extends State<Dashboard> {
-//   final DashboardController dashbordcontroller = DashboardController();
-//   final SettingsHandler settingsHandler = SettingsHandler();
-
-//   double monthlyExpense = 0.0;
-//   double monthlyBudget = 0.0;
-//   List<Map<String, dynamic>> categoryExpenses = [];
-//   List<Map<String, dynamic>> top3Categories = [];
-//   List recentTransactions = [];
-//   Settings? settings;
-
-//   bool isLoading = true;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _loadData();
-//   }
-
-//   Future<void> _loadData() async {
-//     setState(() => isLoading = true);
-
-//     final now = DateTime.now();
-//     final yearMonth = DateFormat('yyyy-MM').format(now);
-
-//     settings = await settingsHandler.getSettings();
-//     monthlyExpense = await dashbordcontroller.handler.getMonthlyTotalExpense(yearMonth);
-//     monthlyBudget = await dashbordcontroller.handler.getMonthlyBudget(yearMonth);
-//     categoryExpenses = await dashbordcontroller.handler.getCategoryExpense(yearMonth);
-//     top3Categories = await dashbordcontroller.handler.getTop3Categories(yearMonth);
-//     recentTransactions = await dashbordcontroller.handler.getRecentTransactions(limit: 4);
-
-//     isLoading = false;
-//     setState(() {});
-//   }
-
-//   String _formatCurrency(double amount) {
-//     final symbol = settings?.currency_symbol ?? '\$';
-//     return '$symbol${amount.toStringAsFixed(2)}';
-//   }
-
-//   void _onSelectCategory(int index) async {
-//     if (index < 0 || index >= categoryExpenses.length) return;
-
-//     final selected = categoryExpenses[index];
-//     final selectedId = selected['id'] as int;
-
-//     await dashbordcontroller.loadBreakdown(selectedId);
-//     setState(() {});
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     if (isLoading) return const Center(child: CircularProgressIndicator());
-
-//     return SingleChildScrollView(
-//       padding: const EdgeInsets.all(16),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           // -----------------------------
-//           // 상단: 총 지출 + 이번달 목표
-//           // -----------------------------
-//           Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//             children: [
-//               Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   const Text('Total Expense', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-//                   const SizedBox(height: 4),
-//                   Text(_formatCurrency(monthlyExpense), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-//                 ],
-//               ),
-//               Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   const Text('Monthly Budget', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-//                   const SizedBox(height: 4),
-//                   Text(_formatCurrency(monthlyBudget), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-//                 ],
-//               ),
-//             ],
-//           ),
-
-//           const SizedBox(height: 24),
-
-//           // -----------------------------
-//           // PieChart + Top3 텍스트
-//           // -----------------------------
-//          Row(
-//   crossAxisAlignment: CrossAxisAlignment.start,
-//   children: [
-//     // PieChart
-//     Expanded(
-//       flex: 3,
-//       child: ChartsWidget(
-//         pieData: dashbordcontroller.makePieData(categoryExpenses),
-//         onTapCategory: _onSelectCategory,
-//       ),
-//     ),
-//     const SizedBox(width: 12),
-//     // Top3 + RadarChart
-//     Expanded(
-//       flex: 2,
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           // Top3 텍스트
-//           ...top3Categories.map((item) => Padding(
-//                 padding: const EdgeInsets.symmetric(vertical: 4),
-//                 child: Text(
-//                   '${item['name']} - ${_formatCurrency(item['total'])}',
-//                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-//                 ),
-//               )),
-//           const SizedBox(height: 8),
-//           // RadarChart
-//           if (dashbordcontroller.selectedBreakdown.isNotEmpty)
-//             ChartsWidget(radarData: dashbordcontroller.selectedBreakdown),
-//         ],
-//       ),
-//     ),
-//   ],
-// ),
-
-
-//           const SizedBox(height: 24),
-
-//           // -----------------------------
-//           // Recent Transactions
-//           // -----------------------------
-//           const Text('Recent Transactions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-//           const SizedBox(height: 8),
-//           Column(
-//             children: recentTransactions.map((trx) {
-//               return Card(
-//                 child: ListTile(
-//                   title: Text(trx.t_name),
-//                   subtitle: Text(trx.date),
-//                   trailing: Text(_formatCurrency(trx.amount)),
-//                 ),
-//               );
-//             }).toList(),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// // class Dashboard extends StatefulWidget {
-// //   const Dashboard({super.key});
-
-// //   @override
-// //   State<Dashboard> createState() => _DashboardState();
-// // }
-
-// // class _DashboardState extends State<Dashboard> {
-
-// //   // --------------------------
-// //   // Properties
-// //   // --------------------------
-// //   final DashboardController dashbordcontroller = DashboardController();
-// //   final SettingsHandler settingsHandler = SettingsHandler();
-// //   final TabbarController tabController = Get.find();
-
-// //   double monthlyExpense = 0.0;
-// //   double monthlyBudget = 0.0;
-// //   List<Map<String, dynamic>> categoryExpenses = [];
-// //   List<Map<String, dynamic>> top3Categories = [];
-// //   List recentTransactions = [];
-// //   Settings? settings;
-
-// //   bool isLoading = true;
-
-// //   // --------------------------
-// //   // Init
-// //   // --------------------------
-// //   @override
-// //   void initState() {
-// //     super.initState();
-// //     _loadData();
-// //   }
-
-// //   // --------------------------
-// //   // Build
-// //   // --------------------------
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     if (isLoading) {
-// //       return const Center(child: CircularProgressIndicator());
-// //     }
-
-// //     return SingleChildScrollView(
-// //       padding: const EdgeInsets.all(16),
-// //       child: Column(
-// //         crossAxisAlignment: CrossAxisAlignment.start,
-// //         children: [
-          
-// //           // Row: PieChart + Top3
-// //           Row(
-// //             children: [
-// //               // PieChart
-// //               Expanded(
-// //   flex: 3,
-// //   child: ChartsWidget(
-// //     pieData: dashbordcontroller.makePieData(categoryExpenses),
-// //     onTapCategory: _onSelectCategory,
-// //   ),
-// // ),
-
-
-// //               const SizedBox(width: 12),
-
-// //               // Top 3 Categories
-// //               Expanded(
-// //                 flex: 2,
-// //                 child: Column(
-// //                   children: top3Categories.map((item) {
-// //                     return Card(
-// //                       child: ListTile(
-// //                         dense: true,
-// //                         title: Text(item['name']),
-// //                         trailing:
-// //                             Text(_formatCurrency(item['total'])),
-// //                       ),
-// //                     );
-// //                   }).toList(),
-// //                 ),
-// //               ),
-// //             ],
-// //           ),
-
-// //           const SizedBox(height: 16),
-
-// //           // RadarChart for selected category
-// //           if (dashbordcontroller.selectedBreakdown.isNotEmpty)
-// //             ChartsWidget(
-// //               pieData: const [],
-// //               radarData: dashbordcontroller.selectedBreakdown,
-// //             ),
-
-// //           const SizedBox(height: 24),
-
-// //           // Recent Transactions
-// //           const Text('Recent Transactions'),
-// //           const SizedBox(height: 8),
-// //           Column(
-// //             children: recentTransactions.map((trx) {
-// //               return Card(
-// //                 child: ListTile(
-// //                   title: Text(trx.t_name),
-// //                   subtitle: Text(trx.date),
-// //                   trailing: Text(_formatCurrency(trx.amount)),
-// //                 ),
-// //               );
-// //             }).toList(),
-// //           ),
-// //         ],
-// //       ),
-// //     );
-// //   }
-
-// //   // --------------------------
-// //   // Helpers
-// //   // --------------------------
-// //   String _formatCurrency(double amount) {
-// //     final symbol = settings?.currency_symbol ?? '\$';
-// //     return '$symbol${amount.toStringAsFixed(2)}';
-// //   }
-
-// //   // --------------------------
-// //   // Functions
-// //   // --------------------------
-// // void _onSelectCategory(int index) async {
-// //     if (index < 0 || index >= categoryExpenses.length) return;
-
-// //   final selected = categoryExpenses[index];
-// //   final selectedId = selected['id'] as int;
-
-// //   await dashbordcontroller.loadBreakdown(selectedId);
-// //   setState(() {});
-// // }
-
-
-// //   Future<void> _loadData() async {
-// //     setState(() => isLoading = true);
-
-// //     final now = DateTime.now();
-// //     final yearMonth = DateFormat('yyyy-MM').format(now);
-
-// //     settings = await settingsHandler.getSettings();
-// //     monthlyExpense = await dashbordcontroller.handler.getMonthlyTotalExpense(yearMonth);
-// //     monthlyBudget = await dashbordcontroller.handler.getMonthlyBudget(yearMonth);
-// //     categoryExpenses = await dashbordcontroller.handler.getCategoryExpense(yearMonth);
-// //     top3Categories = await dashbordcontroller.handler.getTop3Categories(yearMonth);
-// //     recentTransactions =
-// //         await dashbordcontroller.handler.getRecentTransactions(limit: 4);
-
-// //     isLoading = false;
-// //     setState(() {});
-// //   }
-// // }
+} // END

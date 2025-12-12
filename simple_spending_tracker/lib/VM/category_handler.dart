@@ -52,14 +52,23 @@ class CategoryHandler {
     return result;
   }
 
-  // Delete Category
-  Future<int> deleteCategory(int id) async {
-    int result = 0;
-    Database db = await databaseHandler.initializeDB();
-    result = await db.rawDelete(
-      """delete from categories where id = ?""",
-      [id],
-    );
-    return result;
-  }
+  // Delete Category + Its Transactions
+Future<int> deleteCategory(int id) async {
+  final db = await databaseHandler.initializeDB();
+
+  // 1) 해당 카테고리의 거래내역 삭제
+  await db.delete(
+    'spending_transactions',
+    where: 'c_id = ?',
+    whereArgs: [id],
+  );
+
+  // 2) 카테고리 삭제
+  return await db.delete(
+    'categories',
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+}
+
 }// END

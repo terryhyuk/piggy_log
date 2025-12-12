@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get_x/get.dart';
 import 'package:intl/intl.dart';
 import 'package:simple_spending_tracker/VM/transaction_handler.dart';
+import 'package:simple_spending_tracker/controller/dashboard_Controller.dart';
 import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 import 'package:simple_spending_tracker/model/spending_transaction.dart';
 
@@ -26,9 +28,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(
-        AppLocalizations.of(context)!.addTransaction,
-        ),
+      title: Text(AppLocalizations.of(context)!.addTransaction),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -36,7 +36,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
           TextField(
             controller: t_nameController,
             decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.title),
+              labelText: AppLocalizations.of(context)!.title,
+            ),
             keyboardType: TextInputType.text,
           ),
           // AMOUNT
@@ -44,7 +45,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             controller: amountController,
             decoration: InputDecoration(
               labelText: AppLocalizations.of(context)!.amount,
-              ),
+            ),
             keyboardType: TextInputType.number,
           ),
           // MEMO
@@ -52,7 +53,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             controller: memoController,
             decoration: InputDecoration(
               labelText: AppLocalizations.of(context)!.memo,
-              ),
+            ),
             keyboardType: TextInputType.text,
             maxLines: 2,
           ),
@@ -69,8 +70,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                     onChanged: (v) => updateType(v.toString()),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    AppLocalizations.of(context)!.expense),
+                  Text(AppLocalizations.of(context)!.expense),
                 ],
               ),
               Column(
@@ -81,8 +81,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                     onChanged: (v) => updateType(v.toString()),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    AppLocalizations.of(context)!.income),
+                  Text(AppLocalizations.of(context)!.income),
                 ],
               ),
             ],
@@ -100,11 +99,9 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 ),
               ),
               TextButton(
-                onPressed: pickDate, 
-                child: Text(
-                  AppLocalizations.of(context)!.selectDate
-                  ),
-                  ),
+                onPressed: pickDate,
+                child: Text(AppLocalizations.of(context)!.selectDate),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -115,9 +112,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 value: isRecurring,
                 onChanged: (v) => updateRecurring(v ?? false),
               ),
-              Text(
-                AppLocalizations.of(context)!.recurringTransaction
-              ),
+              Text(AppLocalizations.of(context)!.recurringTransaction),
             ],
           ),
         ],
@@ -125,16 +120,12 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(
-            AppLocalizations.of(context)!.cancel),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         ElevatedButton(
-          onPressed: saveTransaction, 
-          child:
-            Text(
-              AppLocalizations.of(context)!.save,
-              ),
-            ),
+          onPressed: saveTransaction,
+          child: Text(AppLocalizations.of(context)!.save),
+        ),
       ],
     );
   }
@@ -165,40 +156,33 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
   saveTransaction() async {
     if (t_nameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.pleaseEnterTitle,
-            ),
-            ),
-            );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseEnterTitle)),
+      );
       return;
     }
     final amount = double.tryParse(amountController.text);
     if (amount == null || amount <= 0) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.enterValidAmount,
-            ),
-            ),
-            );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.enterValidAmount)),
+      );
       return;
     }
     SpendingTransaction transaction = SpendingTransaction(
       c_id: widget.c_id,
       t_name: t_nameController.text,
-      date: selectedDateTime.toString(),
+      date: DateFormat('yyyy-MM-dd').format(selectedDateTime), // ISO 저장
       type: selectedType,
       amount: amount,
       memo: memoController.text,
       isRecurring: isRecurring,
     );
+
     await TransactionHandler().insertTransaction(transaction);
+    final controller = Get.find<DashboardController>();
+    await controller.refreshDashboard();
+    await Get.find<DashboardController>().refreshDashboard();
+
     Navigator.pop(context, true);
   }
 } // END

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:simple_spending_tracker/VM/category_handler.dart';
+import 'package:simple_spending_tracker/controller/category_Controller.dart';
+import 'package:simple_spending_tracker/controller/dashboard_Controller.dart';
 import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 import 'package:simple_spending_tracker/view/pages/detail_category.dart';
 import 'package:simple_spending_tracker/view/widget/button_widget.dart';
@@ -128,8 +130,11 @@ class _TransactionsState extends State<Transactions> {
           TextButton(
             onPressed: () async {
               await categoryHandler.deleteCategory(category.id!);
-              Navigator.pop(context); // close dialog
               _loadCategories(); // refresh UI
+              final dashboardController = Get.find<DashboardController>();
+    await dashboardController.refreshDashboard();
+              Get.find<CategoryController>().notifyChange();
+              Navigator.pop(context); // close dialog
               // snackbar
               Get.snackbar(
                 "Category Deleted",

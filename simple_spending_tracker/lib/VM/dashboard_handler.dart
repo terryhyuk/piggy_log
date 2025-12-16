@@ -88,6 +88,7 @@ Future<Map<String, double>> getCategoryBreakdown(int categoryId) async {
   }
   return map;
 }
+
 /// 최근 거래 가져오기
 Future<List<Map<String, dynamic>>> getRecentTransactions({int limit = 5}) async {
   final db = await dbHandler.initializeDB();

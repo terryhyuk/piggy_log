@@ -179,7 +179,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                           addCategory(); // add new category
                           showSnackBar(AppLocalizations.of(context)!.categoryCreated, AppLocalizations.of(context)!.newCategoryAdded, Colors.green);
                         } else {
-                          editCategory(); // Update category
+                          editCategory_history(); // Update category
                           showSnackBar(AppLocalizations.of(context)!.categoryUpdated, AppLocalizations.of(context)!.changesSaved, Colors.blue);
                         } Navigator.pop(context);
                       },
@@ -211,7 +211,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
     await CategoryHandler().insertCategory(category);
   }
 
-  editCategory() async {
+  editCategory_history() async {
     // update category
     Category category = Category(
       id: widget.initialData!['id'],
@@ -224,9 +224,12 @@ class _CategoryEditSheetState extends State<CategorySheet> {
     await CategoryHandler().updateCategory(category);
   }
 
-  deleteCategory() async {
-    await CategoryHandler().deleteCategory(widget.initialData!['id']);
-  }
+  // deleteCategory_history() async {
+  //   await CategoryHandler().deleteCategory(widget.initialData!['id']);
+  //   final settingsController = Get.find<SettingsController>();
+  //   settingsController.refreshTrigger.value++;
+
+  // }
 
 
   showSnackBar(title, message, Color bgColor) {

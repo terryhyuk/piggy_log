@@ -1,10 +1,10 @@
 
 import 'package:get_x/get.dart';
-import 'package:simple_spending_tracker/VM/dashboard_handler.dart';
+import 'package:simple_spending_tracker/VM/calender_handler.dart';
 import 'package:simple_spending_tracker/controller/setting_Controller.dart';
 
 class CalendarController extends GetxController {
-  final DashboardHandler handler = DashboardHandler();
+  final CalenderHandler calenderHandler = CalenderHandler();
   final SettingsController settingsController = Get.find<SettingsController>();
 
   RxMap<String, double> dailyTotals = <String, double>{}.obs;
@@ -23,25 +23,28 @@ class CalendarController extends GetxController {
 
   /// 하루별 총액 불러오기
   Future<void> loadDailyTotals() async {
-    // final totals = await handler.getDailyTotal();
-    // dailyTotals.value = totals;
+    final totals = await calenderHandler.getDailyTotals();
+    dailyTotals.value = totals;
   }
 
   /// 날짜 선택 시 해당 날짜 거래 불러오기
   Future<void> selectDate(DateTime date) async {
-    // selectedDay.value = date;
-    // focusedDay.value = date;
+    selectedDay.value = date;
+    focusedDay.value = date;
+    final key = dateKey(date);
+    print("선택 날짜 key: $key");
 
     // final key = dateKey(date);
-    // final transactions = await handler.getTransactionsByDate(key);
-    // selectedDateTransactions.value = transactions;
+    final transactions = await calenderHandler.getTransactionsByDate(key);
+  print("가져온 거래 수: ${transactions.length}");
+    selectedDateTransactions.value = transactions;
 
-    // double total = 0.0;
-    // for (var tx in transactions) {
-    //   final amount = (tx['amount'] as num?)?.toDouble() ?? 0.0;
-    //   total += (tx['type'] == 'expense') ? -amount : amount;
-    // }
-    // selectedDayTotal.value = total;
+    double total = 0.0;
+    for (var tx in transactions) {
+      final amount = (tx['amount'] as num?)?.toDouble() ?? 0.0;
+      total += (tx['type'] == 'expense') ? -amount : amount;
+    }
+    selectedDayTotal.value = total;
   }
 
   /// 화면용 포맷

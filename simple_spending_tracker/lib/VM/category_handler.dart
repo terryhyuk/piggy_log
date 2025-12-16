@@ -1,4 +1,7 @@
+import 'package:get_x/get.dart';
 import 'package:simple_spending_tracker/VM/database_handler.dart';
+import 'package:simple_spending_tracker/controller/calendar_Controller.dart';
+import 'package:simple_spending_tracker/controller/dashboard_Controller.dart';
 import 'package:simple_spending_tracker/model/category.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -64,11 +67,40 @@ Future<int> deleteCategory(int id) async {
   );
 
   // 2) 카테고리 삭제
-  return await db.delete(
+  final result = await db.delete(
     'categories',
     where: 'id = ?',
     whereArgs: [id],
   );
+
+  // 3) CalendarController 갱신
+  final calController = Get.find<CalendarController>();
+  await calController.loadDailyTotals();
+  await calController.selectDate(calController.selectedDay.value);
+
+  // 4) DashboardController 갱신
+  await Get.find<DashboardController>().refreshDashboard();
+
+  return result;
 }
+
+// Future<int> deleteCategory(int id) async {
+//   final db = await databaseHandler.initializeDB();
+
+//   // 1) 해당 카테고리의 거래내역 삭제
+//   await db.delete(
+//     'spending_transactions',
+//     where: 'c_id = ?',
+//     whereArgs: [id],
+//   );
+
+//   // 2) 카테고리 삭제
+//   return await db.delete(
+//     'categories',
+//     where: 'id = ?',
+//     whereArgs: [id],
+//   );
+  
+// }
 
 }// END

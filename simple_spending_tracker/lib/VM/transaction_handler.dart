@@ -4,27 +4,50 @@ import 'package:simple_spending_tracker/model/spending_transaction.dart';
 class TransactionHandler {
   final DatabaseHandler databaseHandler = DatabaseHandler();
 
-  // Insert Transaction
-  Future<int> insertTransaction(SpendingTransaction res) async {
-    final db = await databaseHandler.initializeDB();
+Future<int> insertTransaction(
+    SpendingTransaction res, {
+    DateTime? customDate, // 선택적 날짜
+  }) async {
+  final db = await databaseHandler.initializeDB();
 
-    return await db.rawInsert(
-      """
-      insert into spending_transactions 
-      (c_id, t_name, date, type, amount, memo, isRecurring)
-      values (?, ?, ?, ?, ?, ?, ?)
-      """,
-      [
-        res.c_id,
-        res.t_name,
-        DateTime.now().toLocal().toString(), // Convert to local time toString(),
-        res.type,
-        res.amount,
-        res.memo,
-        res.isRecurring ? 1 : 0,
-      ],
-    );
+  // 1️⃣ 지정 날짜가 있으면 사용, 없으면 오늘
+  DateTime date = customDate ?? DateTime.now();
+
+  // 2️⃣ 미래 날짜 막기 (오늘 이후면 오늘로 강제)
+  final today = DateTime.now();
+  final todayOnly = DateTime(today.year, today.month, today.day); // 오늘 00:00
+  final dateOnly = DateTime(date.year, date.month, date.day); // 날짜만 비교
+
+  if (dateOnly.isAfter(todayOnly)) {
+    date = todayOnly;
+  } else {
+    date = dateOnly;
   }
+
+  // 3️⃣ DB에 YYYY-MM-DD 형식으로 저장
+  final dateStr =
+      "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+
+  print("=== INSERT DATE === $dateStr"); // 확인용
+
+  // 4️⃣ DB insert
+  return await db.rawInsert(
+    """
+    INSERT INTO spending_transactions
+    (c_id, t_name, date, type, amount, memo, isRecurring)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    """,
+    [
+      res.c_id,
+      res.t_name,
+      dateStr,
+      res.type,
+      res.amount,
+      res.memo,
+      res.isRecurring ? 1 : 0,
+    ],
+  );
+}
 
   // Get Transactions By Category
   Future<List<SpendingTransaction>> getTransactionsByCategory(int categoryId) async {
@@ -80,4 +103,13 @@ Future<double> getCategoryTotal(int categoryId) async {
   return value == null ? 0.0 : (value as num).toDouble();
 }
 
+  // delete Transaction
+  Future<void> deleteTransaction(int transactionId) async {
+    final db = await databaseHandler.initializeDB();
+    await db.delete(
+      'spending_transactions',
+      where: 't_id = ?',
+      whereArgs: [transactionId],
+    );
+  }
 }

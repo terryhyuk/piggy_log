@@ -25,7 +25,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
-    
+
     dashbordcontroller.refreshDashboard();
     _loadMonthlyBudget();
   }
@@ -184,7 +184,12 @@ class _DashboardState extends State<Dashboard> {
                   return Card(
                     child: ListTile(
                       title: Text(trx['t_name']),
-                      subtitle: Text(trx['date']),
+                      subtitle: Text(
+                        settingsController.formatDate(
+                              DateTime.parse(trx['date']),
+                            ) ??
+                            trx['date'],
+                      ),
                       trailing: Text(
                         _formatCurrency(trx['amount']),
                         style: TextStyle(
@@ -209,10 +214,6 @@ class _DashboardState extends State<Dashboard> {
     final value = (amount as num?)?.toDouble() ?? 0.0;
     return settingsController.formatCurrency(value) ?? value.toString();
   }
-
-  // String _formatCurrency(double amount) {
-  //   return settingsController.formatCurrency(amount) ?? amount.toString();
-  // }
 
   void _onSelectCategory(int index) async {
     if (index < 0 || index >= dashbordcontroller.categoryList.length) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
+import 'package:simple_spending_tracker/model/spending_transaction.dart';
 import 'package:simple_spending_tracker/view/widget/calendar_build_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:simple_spending_tracker/controller/calendar_Controller.dart';
@@ -139,12 +140,41 @@ class _CalendarPageState extends State<CalendarPage> {
                           calController.formatCurrency(amount),
                           style: TextStyle(color: color, fontWeight: FontWeight.bold),
                         ),
-                        onTap: () {
-                          // Map 그대로 전달
-                          Get.to(() => const TransactionsDetail(), arguments: tx)?.then((result) {
-                            if (result == true) calController.loadDailyTotals();
-                          });
-                        },
+onTap: () {
+  try {
+    // 1. Map 데이터를 안전하게 SpendingTransaction 객체로 변환
+    final trxObject = SpendingTransaction(
+      t_id: tx['t_id'], 
+      c_id: tx['c_id'] ?? 0, // null일 경우 기본값 0
+      t_name: tx['t_name']?.toString() ?? '', // null일 경우 빈 문자열
+      amount: (tx['amount'] as num?)?.toDouble() ?? 0.0,
+      date: tx['date']?.toString() ?? DateTime.now().toIso8601String(), // 날짜 null 방지
+      type: tx['type']?.toString() ?? 'expense',
+      memo: tx['memo']?.toString() ?? '',
+      isRecurring: tx['isRecurring'] == 1 || tx['isRecurring'] == true,
+    );
+
+    // 2. 객체 전달
+    Get.to(
+      () => const TransactionsDetail(),
+      arguments: trxObject,
+    )?.then((result) {
+      if (result == true) {
+        calController.loadDailyTotals();
+        settingsController.refreshTrigger.value++;
+      }
+    });
+  } catch (e) {
+    print("Error creating Transaction object: $e");
+    // 어디서 null 에러가 났는지 콘솔에서 확인 가능합니다.
+  }
+},
+                        // onTap: () {
+                        //   // Map 그대로 전달
+                        //   Get.to(() => const TransactionsDetail(), arguments: tx)?.then((result) {
+                        //     if (result == true) calController.loadDailyTotals();
+                        //   });
+                        // },
                       );
                     },
                   );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:intl/intl.dart';
 import 'package:simple_spending_tracker/VM/transaction_handler.dart';
+import 'package:simple_spending_tracker/controller/setting_Controller.dart';
 import 'package:simple_spending_tracker/model/spending_transaction.dart';
 
 class TransactionsDetail extends StatefulWidget {
@@ -18,6 +19,8 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
   late TextEditingController amountController;
   late TextEditingController memoController;
 
+  final settingsController = Get.find<SettingsController>();
+
   late DateTime selectedDate;
   late String selectedType;
   late bool isRecurring;
@@ -31,7 +34,7 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
     titleController = TextEditingController(text: trx.t_name);
     amountController =
         TextEditingController(text: trx.amount.toString());
-    memoController = TextEditingController(text: trx.memo ?? '');
+    memoController = TextEditingController(text: trx.memo);
 
     selectedDate = DateTime.parse(trx.date);
     selectedType = trx.type;
@@ -192,16 +195,13 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
     }
   }
 
-  save() async {
+save() async {
     final amount = double.tryParse(amountController.text);
-    if (titleController.text.trim().isEmpty ||
-        amount == null ||
-        amount <= 0) {
+    if (titleController.text.trim().isEmpty || amount == null || amount <= 0) {
       return;
     }
 
-    final dateStr =
-        "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+    final dateStr = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
 
     final updated = SpendingTransaction(
       t_id: trx.t_id,
@@ -214,26 +214,78 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
       isRecurring: isRecurring,
     );
 
+    // 1. DB 업데이트
     await TransactionHandler().updateTransaction(updated);
 
+    // 2. ✅ 모든 페이지 갱신 (SettingsController에 만든 함수 호출)
+    await settingsController.refreshAllData();
+
+    // 3. 페이지 닫기
     Get.back(result: true);
   }
 
   deleteTransaction() {
-  Get.defaultDialog(
-    title: 'Delete transaction',
-    middleText: 'Are you sure you want to delete this transaction?',
-    textCancel: 'Cancel',
-    textConfirm: 'Delete',
-    confirmTextColor: Colors.white,
-    buttonColor: Colors.red,
-    cancelTextColor: Theme.of(context).colorScheme.onSurface,
-    onConfirm: () async {
-      await TransactionHandler().deleteTransaction(trx.t_id!);
-      Get.back(); // close dialog
-      Get.back(result: true); // close detail page
-    },
-  );
-}
+    Get.defaultDialog(
+      title: 'Delete transaction',
+      middleText: 'Are you sure you want to delete this transaction?',
+      textCancel: 'Cancel',
+      textConfirm: 'Delete',
+      confirmTextColor: Colors.white,
+      buttonColor: Colors.red,
+      onConfirm: () async {
+        // 1. DB 삭제
+        await TransactionHandler().deleteTransaction(trx.t_id!);
+        
+        // 2. ✅ 모든 페이지 갱신
+        await settingsController.refreshAllData();
+
+        Get.back(); // 다이얼로그 닫기
+        Get.back(result: true); // 상세 페이지 닫기
+      },
+    );
+  }
+//   save() async {
+//     final amount = double.tryParse(amountController.text);
+//     if (titleController.text.trim().isEmpty ||
+//         amount == null ||
+//         amount <= 0) {
+//       return;
+//     }
+
+//     final dateStr =
+//         "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+
+//     final updated = SpendingTransaction(
+//       t_id: trx.t_id,
+//       c_id: trx.c_id,
+//       t_name: titleController.text,
+//       date: dateStr,
+//       type: selectedType,
+//       amount: amount,
+//       memo: memoController.text,
+//       isRecurring: isRecurring,
+//     );
+
+//     await TransactionHandler().updateTransaction(updated);
+
+//     Get.back(result: true);
+//   }
+
+//   deleteTransaction() {
+//   Get.defaultDialog(
+//     title: 'Delete transaction',
+//     middleText: 'Are you sure you want to delete this transaction?',
+//     textCancel: 'Cancel',
+//     textConfirm: 'Delete',
+//     confirmTextColor: Colors.white,
+//     buttonColor: Colors.red,
+//     cancelTextColor: Theme.of(context).colorScheme.onSurface,
+//     onConfirm: () async {
+//       await TransactionHandler().deleteTransaction(trx.t_id!);
+//       Get.back(); // close dialog
+//       Get.back(result: true); // close detail page
+//     },
+//   );
+// }
 
 }

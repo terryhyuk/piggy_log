@@ -108,21 +108,52 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       isRecurring: isRecurring,
     );
 
+    // 1. DB 작업 (등록 또는 수정)
     if (widget.transactionToEdit == null) {
       await TransactionHandler().insertTransaction(trx, customDate: selectedDateTime);
     } else {
       await TransactionHandler().updateTransaction(trx);
     }
 
-    // Dashboard refresh
-    final controller = Get.find<DashboardController>();
-    await controller.refreshDashboard();
-
-    // calendar refresh
+    // 2. ✅ 모든 페이지 데이터 일괄 갱신
+    // SettingsController에 정의한 refreshAllData()를 호출합니다.
     final settingsController = Get.find<SettingsController>();
-    settingsController.refreshTrigger.value++;
+    await settingsController.refreshAllData();
 
+    // 3. 다이얼로그 닫기
     Navigator.pop(context, true);
   }
+  // saveTransaction() async {
+  //   final amount = double.tryParse(amountController.text);
+
+  //   if (t_nameController.text.trim().isEmpty || amount == null || amount <= 0) return;
+
+  //   SpendingTransaction trx = SpendingTransaction(
+  //     t_id: widget.transactionToEdit?.t_id,
+  //     c_id: widget.c_id,
+  //     t_name: t_nameController.text,
+  //     date: "${selectedDateTime.year}-${selectedDateTime.month.toString().padLeft(2,'0')}-${selectedDateTime.day.toString().padLeft(2,'0')}",
+  //     type: selectedType,
+  //     amount: amount,
+  //     memo: memoController.text,
+  //     isRecurring: isRecurring,
+  //   );
+
+  //   if (widget.transactionToEdit == null) {
+  //     await TransactionHandler().insertTransaction(trx, customDate: selectedDateTime);
+  //   } else {
+  //     await TransactionHandler().updateTransaction(trx);
+  //   }
+
+  //   // Dashboard refresh
+  //   final controller = Get.find<DashboardController>();
+  //   await controller.refreshDashboard();
+
+  //   // calendar refresh
+  //   final settingsController = Get.find<SettingsController>();
+  //   settingsController.refreshTrigger.value++;
+
+  //   Navigator.pop(context, true);
+  // }
 }
 

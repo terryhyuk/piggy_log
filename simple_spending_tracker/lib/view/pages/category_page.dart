@@ -143,203 +143,91 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   _openDeleteDialog(Category category) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text("Delete Category"),
-        content: Text("Delete '${category.c_name}'?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          TextButton(
-            onPressed: () async {
-              await categoryHandler.deleteCategory(category.id!);
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: Text("Delete Category"),
+      content: Text("Delete '${category.c_name}'?"),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () async {
+            // 1. DB에서 카테고리 삭제
+            await categoryHandler.deleteCategory(category.id!);
+            
+            // 2. 현재 페이지의 카테고리 목록(List) 업데이트
+            _loadCategories(); 
+
+            // 3. ✅ 핵심: 모든 컨트롤러 싹 다 새로고침 (SettingsController에 만든 함수)
+            await settingsController.refreshAllData();
+            // 4. (추가로 필요한 경우에만 유지) 
+            categoryController.notifyChange(); 
+
+            Navigator.pop(context); // 다이얼로그 닫기
+
+            // 스낵바 알림
+            Get.snackbar(
+              "Category Deleted",
+              "'${category.c_name}' was removed.",
+              snackPosition: SnackPosition.top,
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 2),
+            );
+          },
+          child: const Text("Delete", style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    ),
+  );
+}
+  // _openDeleteDialog(Category category) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (_) => AlertDialog(
+  //       title: Text("Delete Category"),
+  //       content: Text("Delete '${category.c_name}'?"),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text("Cancel"),
+  //         ),
+  //         TextButton(
+  //           onPressed: () async {
+  //             await categoryHandler.deleteCategory(category.id!);
               
-              _loadCategories(); // 카테고리 목록 (List) 업데이트 (setState 포함)
+  //             _loadCategories(); // 카테고리 목록 (List) 업데이트 (setState 포함)
 
-              // refresh dashboard
-              await dashboardController.refreshDashboard();
+  //             // refresh dashboard
+  //             await dashboardController.refreshDashboard();
               
-              // refresh calendar (거래 기록 표시 업데이트)
-              await calController.loadDailyTotals();
-              // 캘린더 날짜 재선택을 통해 UI를 명시적으로 업데이트 (필요 시 유지)
-              await calController.selectDate(calController.selectedDay.value);
+  //             // refresh calendar (거래 기록 표시 업데이트)
+  //             await calController.loadDailyTotals();
+  //             // 캘린더 날짜 재선택을 통해 UI를 명시적으로 업데이트 (필요 시 유지)
+  //             await calController.selectDate(calController.selectedDay.value);
 
-              // settings, category 컨트롤러에게 변경 사항 통보 (다른 탭 업데이트)
-              settingsController.refreshTrigger.value++;
-              categoryController.notifyChange(); 
+  //             // settings, category 컨트롤러에게 변경 사항 통보 (다른 탭 업데이트)
+  //             settingsController.refreshTrigger.value++;
+  //             categoryController.notifyChange(); 
 
-              Navigator.pop(context); // close dialog
-              // snackbar
-              Get.snackbar(
-                "Category Deleted",
-                "'${category.c_name}' was removed.",
-                snackPosition: SnackPosition.top,
-                backgroundColor: Colors.red,
-                colorText: Colors.white,
-                duration: const Duration(seconds: 2),
-              );
-            },
-            child: const Text("Delete", style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
+  //             Navigator.pop(context); // close dialog
+  //             // snackbar
+  //             Get.snackbar(
+  //               "Category Deleted",
+  //               "'${category.c_name}' was removed.",
+  //               snackPosition: SnackPosition.top,
+  //               backgroundColor: Colors.red,
+  //               colorText: Colors.white,
+  //               duration: const Duration(seconds: 2),
+  //             );
+  //           },
+  //           child: const Text("Delete", style: TextStyle(color: Colors.red)),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 } // END
-// class CategoryPage extends StatefulWidget {
-//   const CategoryPage({super.key});
-
-//   @override
-//   State<CategoryPage> createState() => _CategoryPageState();
-// }
-
-// class _CategoryPageState extends State<CategoryPage> {
-//   // Properties
-//   final CategoryHandler categoryHandler = CategoryHandler();
-//   final TabbarController tabController =
-//       Get.find<TabbarController>();
-//   List<Category> categories = [];
-//   bool isEditMode = false;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _loadCategories();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return GestureDetector(
-//       // Exit edit mode when tapping outside
-//       onTap: () {
-//         if (isEditMode) {
-//           isEditMode = false;
-//           setState(() {});
-//         }
-//       },
-//         child:  Scaffold(
-//           appBar: AppBar(
-//             title: Text(AppLocalizations.of(context)!.transaction),
-//           ),
-//           body: GridView.builder(
-//             padding: const EdgeInsets.all(16),
-//             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//               crossAxisCount: 2,
-//               crossAxisSpacing: 16,
-//               mainAxisSpacing: 16,
-//             ),
-//             itemCount: categories.length + 1, // +1 for Add button
-//             itemBuilder: (context, index) {
-//               // Add Category button
-//               if (index == 0) {
-//                 return ButtonWidget(onTap: _openCategorySheet);
-//               }
-
-//               final category = categories[index - 1];
-
-//               return CategoryCard(
-//                 category: category,
-//                 isEditMode:
-//                     Get.find<TabbarController>().isCategoryEditMode.value,
-//                 // Normal tap → open edit sheet
-//                 onTap: () {
-//                   Get.to(() => TransactionsHistory(), arguments: category);
-//                 },
-//                 // Long press → enter edit mode
-//                 onLongPress: () {
-//                   Get.find<TabbarController>().isCategoryEditMode.value = true;
-//                   setState(() {});
-//                 },
-//                 // Edit button (currently placeholder)
-//                 onEditPress: () {
-//                   _openCategorySheet(category: category);
-//                 },
-//                 // Delete button (currently placeholder)
-//                 onDeletePress: () {
-//                   _openDeleteDialog(category);
-//                 },
-//               );
-//             },
-//           ),
-//         ),
-//     );
-//   }
-
-//   // Load categories from database
-//   _loadCategories() async {
-//     final list = await categoryHandler.queryCategory();
-//     categories = list;
-//     setState(() {});
-//   }
-
-//   // Open bottom sheet for creating or editing categories
-//   _openCategorySheet({Category? category}) {
-//     final Map<String, dynamic>? data = category == null
-//         ? null
-//         : {
-//             'id': category.id,
-//             'c_name': category.c_name,
-//             'icon_codepoint': category.iconCodePoint,
-//             'icon_font_family': category.iconFontFamily,
-//             'icon_font_package': category.iconFontPackage,
-//             'color': category.color,
-//           };
-
-//     showModalBottomSheet(
-//       context: context,
-//       isScrollControlled: true,
-//       builder: (_) => CategorySheet(initialData: data),
-//     ).then((_) => _loadCategories());
-//   }
-
-//   _openDeleteDialog(Category category) {
-//     showDialog(
-//       context: context,
-//       builder: (_) => AlertDialog(
-//         title: Text("Delete Category"),
-//         content: Text("Delete '${category.c_name}'?"),
-//         actions: [
-//           TextButton(
-//             onPressed: () => Navigator.pop(context),
-//             child: const Text("Cancel"),
-//           ),
-//           TextButton(
-//             onPressed: () async {
-//               await categoryHandler.deleteCategory(category.id!);
-//               _loadCategories(); // refresh UI
-//               // refresh dashboard
-//               final dashboardController = Get.find<DashboardController>();
-//               await dashboardController.refreshDashboard();
-//               // refresh calendar
-//               final calController = Get.find<CalendarController>();
-//               await calController.loadDailyTotals();
-//               await calController.selectDate(calController.selectedDay.value);
-
-//               final settingsController = Get.find<SettingsController>();
-//               settingsController.refreshTrigger.value++;
-
-//               // refresh category
-//               Get.find<CategoryController>().notifyChange();
-
-//               Navigator.pop(context); // close dialog
-//               // snackbar
-//               Get.snackbar(
-//                 "Category Deleted",
-//                 "'${category.c_name}' was removed.",
-//                 snackPosition: SnackPosition.top,
-//                 backgroundColor: Colors.red,
-//                 colorText: Colors.white,
-//                 duration: const Duration(seconds: 2),
-//               );
-//             },
-//             child: const Text("Delete", style: TextStyle(color: Colors.red)),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }// END
-

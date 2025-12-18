@@ -79,6 +79,9 @@ class DashboardController extends GetxController {
   Future<void> refreshDashboard() async {
     final yearMonth = DateFormat('yyyy-MM').format(DateTime.now());
 
+    selectedBreakdown.clear();
+    categoryBreakdown.clear();
+
     // 카테고리
     final categoriesRaw = await handler.getCategoryExpense(yearMonth);
     categoryList.value = categoriesRaw.map((r) {

@@ -58,6 +58,9 @@ dependencies:
   # Slidable
   flutter_slidable: ^4.0.3
 
+  # animation
+  lottie: ^3.3.2
+
 
 dev_dependencies:
   flutter_test:

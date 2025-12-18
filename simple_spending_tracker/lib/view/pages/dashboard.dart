@@ -121,55 +121,71 @@ class _DashboardState extends State<Dashboard> {
               const SizedBox(height: 24),
 
               // Row: PieChart + Top3 + Radar
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: ChartsWidget(
-                      pieData: dashbordcontroller.makePieData(
-                        selectedIndex: selectedPieIndex,
+              Obx(() {
+                if (dashbordcontroller.categoryList.isEmpty) {
+                  return const Center(
+                    child: Text("NO data"),
+                  );
+                }
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: ChartsWidget(
+                        pieData: dashbordcontroller.makePieData(
+                          selectedIndex: selectedPieIndex,
+                        ),
+                        onTapCategory: _onSelectCategory,
                       ),
-                      onTapCategory: _onSelectCategory,
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ...top3Categories.asMap().entries.map((entry) {
-                          final index = entry.key;
-                          final item = entry.value;
-                          final color =
-                              dashbordcontroller.categoryColors[index %
-                                  dashbordcontroller.categoryColors.length];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Text(
-                              '${item['name']} - ${_formatCurrency(item['total'])}',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: color,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ...top3Categories.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final item = entry.value;
+                            final color =
+                                dashbordcontroller.categoryColors[index %
+                                    dashbordcontroller.categoryColors.length];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Text(
+                                '${item['name']} - ${_formatCurrency(item['total'])}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: color,
+                                ),
                               ),
-                            ),
-                          );
-                        }),
-                        const SizedBox(height: 8),
-                        Obx(() {
-                          final breakdown = Map<String, double>.from(
-                            dashbordcontroller.selectedBreakdown,
-                          );
-                          if (breakdown.isEmpty) return const SizedBox.shrink();
-                          return ChartsWidget(radarData: breakdown);
-                        }),
-                      ],
+                            );
+                          }),
+                          const SizedBox(height: 8),
+                          Obx(() {
+                            final breakdown = Map<String, double>.from(
+                              dashbordcontroller.selectedBreakdown,
+                            );
+                            if (breakdown.isEmpty || breakdown.isEmpty)
+                              return const SizedBox.shrink();
+                            return ChartsWidget(radarData: breakdown);
+                          }),
+                          // Obx(() {
+                          //   final breakdown = Map<String, double>.from(
+                          //     dashbordcontroller.selectedBreakdown,
+                          //   );
+                          //   if (breakdown.isEmpty) return const SizedBox.shrink();
+                          //   return ChartsWidget(radarData: breakdown);
+                          // }),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                );
+        }),
 
               const SizedBox(height: 24),
 

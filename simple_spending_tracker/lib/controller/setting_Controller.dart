@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:intl/intl.dart';
 import 'package:simple_spending_tracker/VM/settings_handler.dart';
+import 'package:simple_spending_tracker/controller/calendar_Controller.dart';
+import 'package:simple_spending_tracker/controller/dashboard_Controller.dart';
 import 'package:simple_spending_tracker/model/settings.dart';
 
 class SettingsController extends GetxController {
@@ -133,4 +135,22 @@ class SettingsController extends GetxController {
   formatCurrency(double amount) {
     return currencyFormat?.format(amount);
   }
+
+  Future<void> refreshAllData() async {
+    // 1. 설정/카테고리 리스트 트리거 갱신
+    Get.find<SettingsController>().refreshTrigger.value++;
+
+    // 2. 대시보드 데이터 갱신
+    if (Get.isRegistered<DashboardController>()) {
+      await Get.find<DashboardController>().refreshDashboard();
+    }
+
+    // 3. 달력 데이터 갱신 (현재 달력 페이지라면)
+    if (Get.isRegistered<CalendarController>()) {
+      final cal = Get.find<CalendarController>();
+      await cal.loadDailyTotals();
+      cal.selectDate(cal.selectedDay.value);
+    }
+  }
+  
 } // END

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:simple_spending_tracker/VM/category_handler.dart';
+import 'package:simple_spending_tracker/controller/setting_Controller.dart';
 import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 import 'package:simple_spending_tracker/model/category.dart';
 import 'package:simple_spending_tracker/view/widget/color_picker_sheet.dart';
@@ -200,29 +201,63 @@ class _CategoryEditSheetState extends State<CategorySheet> {
   }
 
   //--- Fuunctions---
-  addCategory() async {
-    Category category = Category(
-      iconCodePoint: selectedIcon.codePoint,
-      iconFontFamily: selectedIcon.fontFamily,
-      iconFontPackage: selectedIcon.fontPackage,
-      color: selectedHexColor,
-      c_name: c_nameController.text,
-    );
-    await CategoryHandler().insertCategory(category);
-  }
+  // 1. 추가(addCategory) 함수 수정
+addCategory() async {
+  Category category = Category(
+    iconCodePoint: selectedIcon.codePoint,
+    iconFontFamily: selectedIcon.fontFamily,
+    iconFontPackage: selectedIcon.fontPackage,
+    color: selectedHexColor,
+    c_name: c_nameController.text,
+  );
+  
+  // DB 저장
+  await CategoryHandler().insertCategory(category);
+  
+  // ✅ 모든 페이지 데이터 일괄 갱신
+  await Get.find<SettingsController>().refreshAllData();
+}
 
-  editCategory_history() async {
-    // update category
-    Category category = Category(
-      id: widget.initialData!['id'],
-      iconCodePoint: selectedIcon.codePoint,
-      iconFontFamily: selectedIcon.fontFamily,
-      iconFontPackage: selectedIcon.fontPackage,
-      color: selectedHexColor,
-      c_name: c_nameController.text,
-    );
-    await CategoryHandler().updateCategory(category);
-  }
+// 2. 수정(editCategory_history) 함수 수정
+editCategory_history() async {
+  Category category = Category(
+    id: widget.initialData!['id'],
+    iconCodePoint: selectedIcon.codePoint,
+    iconFontFamily: selectedIcon.fontFamily,
+    iconFontPackage: selectedIcon.fontPackage,
+    color: selectedHexColor,
+    c_name: c_nameController.text,
+  );
+  
+  // DB 업데이트
+  await CategoryHandler().updateCategory(category);
+  
+  // ✅ 모든 페이지 데이터 일괄 갱신
+  await Get.find<SettingsController>().refreshAllData();
+}
+  // addCategory() async {
+  //   Category category = Category(
+  //     iconCodePoint: selectedIcon.codePoint,
+  //     iconFontFamily: selectedIcon.fontFamily,
+  //     iconFontPackage: selectedIcon.fontPackage,
+  //     color: selectedHexColor,
+  //     c_name: c_nameController.text,
+  //   );
+  //   await CategoryHandler().insertCategory(category);
+  // }
+
+  // editCategory_history() async {
+  //   // update category
+  //   Category category = Category(
+  //     id: widget.initialData!['id'],
+  //     iconCodePoint: selectedIcon.codePoint,
+  //     iconFontFamily: selectedIcon.fontFamily,
+  //     iconFontPackage: selectedIcon.fontPackage,
+  //     color: selectedHexColor,
+  //     c_name: c_nameController.text,
+  //   );
+  //   await CategoryHandler().updateCategory(category);
+  // }
 
   // deleteCategory_history() async {
   //   await CategoryHandler().deleteCategory(widget.initialData!['id']);

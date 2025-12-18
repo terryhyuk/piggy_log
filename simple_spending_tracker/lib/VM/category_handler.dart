@@ -2,6 +2,7 @@ import 'package:get_x/get.dart';
 import 'package:simple_spending_tracker/VM/database_handler.dart';
 import 'package:simple_spending_tracker/controller/calendar_Controller.dart';
 import 'package:simple_spending_tracker/controller/dashboard_Controller.dart';
+import 'package:simple_spending_tracker/controller/setting_Controller.dart';
 import 'package:simple_spending_tracker/model/category.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -56,10 +57,11 @@ class CategoryHandler {
   }
 
   // Delete Category + Its Transactions
+// Delete Category + Its Transactions
 Future<int> deleteCategory(int id) async {
   final db = await databaseHandler.initializeDB();
 
-  // 1) 해당 카테고리의 거래내역 삭제
+  // 1) 해당 카테고리의 거래내역 삭제 (참조 무결성 유지)
   await db.delete(
     'spending_transactions',
     where: 'c_id = ?',
@@ -73,17 +75,46 @@ Future<int> deleteCategory(int id) async {
     whereArgs: [id],
   );
 
-  // 3) CalendarController 갱신
-  final calController = Get.find<CalendarController>();
-  await calController.loadDailyTotals();
-  await calController.selectDate(calController.selectedDay.value);
-
-  // 4) DashboardController 갱신
-  await Get.find<DashboardController>().refreshDashboard();
+  // 3) ✅ 일괄 갱신 호출
+  // 이제 개별 컨트롤러를 일일이 찾을 필요가 없습니다.
+  final settingsController = Get.find<SettingsController>();
+  await settingsController.refreshAllData();
 
   return result;
 }
 
+
+// Future<int> deleteCategory(int id) async {
+//   final db = await databaseHandler.initializeDB();
+
+//   // 1) 해당 카테고리의 거래내역 삭제
+//   await db.delete(
+//     'spending_transactions',
+//     where: 'c_id = ?',
+//     whereArgs: [id],
+//   );
+
+//   // 2) 카테고리 삭제
+//   final result = await db.delete(
+//     'categories',
+//     where: 'id = ?',
+//     whereArgs: [id],
+//   );
+
+//   // 3) CalendarController 갱신
+//   final calController = Get.find<CalendarController>();
+//   await calController.loadDailyTotals();
+//   await calController.selectDate(calController.selectedDay.value);
+
+//   // 4) DashboardController 갱신
+//   await Get.find<DashboardController>().refreshDashboard();
+
+//   return result;
+// }
+
+
+
+//-----------------
 // Future<int> deleteCategory(int id) async {
 //   final db = await databaseHandler.initializeDB();
 

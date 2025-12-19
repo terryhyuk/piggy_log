@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
           colorSchemeSeed: Colors.blue,
           brightness: Brightness.dark,
         ),
+        // home: Maintabbar(),
         home: SplashScreen(),
       ),
     );

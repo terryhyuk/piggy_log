@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_x/get.dart';
 import 'dart:async';
 import 'package:lottie/lottie.dart';
 import 'package:piggy_log/view/widget/mainTabBar.dart';
@@ -23,20 +24,25 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _navigateToHome() {
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            Maintabbar(),
-        transitionsBuilder:
-            (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(seconds: 1),
-      ),
-    );
+    Get.offAll(
+    () => Maintabbar(),
+    transition: Transition.fade,
+    duration: const Duration(seconds: 1),
+  );
+    // Navigator.of(context).pushReplacement(
+    //   PageRouteBuilder(
+    //     pageBuilder: (context, animation, secondaryAnimation) =>
+    //         Maintabbar(),
+    //     transitionsBuilder:
+    //         (context, animation, secondaryAnimation, child) {
+    //       return FadeTransition(
+    //         opacity: animation,
+    //         child: child,
+    //       );
+    //     },
+    //     transitionDuration: const Duration(seconds: 1),
+    //   ),
+    // );
   }
 
   @override

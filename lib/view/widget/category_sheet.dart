@@ -71,165 +71,168 @@ class _CategoryEditSheetState extends State<CategorySheet> {
     return SafeArea(
       /// iPhone 하단 영역과 겹침 방지
       top: false,
-      child: LayoutBuilder(
-        /// 반응형 크기 계산 (iOS/Android/태블릿 호환)
-        builder: (context, constraints) {
-          double maxW = constraints.maxWidth;
-          double iconBox = maxW * 0.26;  /// 반응형 아이콘 박스 크기
-          double iconSize = maxW * 0.13;
-
-          return Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(22),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: LayoutBuilder(
+          /// 반응형 크기 계산 (iOS/Android/태블릿 호환)
+          builder: (context, constraints) {
+            double maxW = constraints.maxWidth;
+            double iconBox = maxW * 0.26;  /// 반응형 아이콘 박스 크기
+            double iconSize = maxW * 0.13;
+        
+            return Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(22),
+                ),
               ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                /// ---------- 헤더 ----------
-                Text(
-                  widget.initialData == null
-                      ? local.addCategory      /// "카테고리 추가"
-                      : local.editCategory,    /// "카테고리 수정"
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ) ?? const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                      ),
-                ),
-                const SizedBox(height: 22),
-
-                /// ---------- 아이콘 + 이름 입력 ----------
-                Row(
-                  children: [
-                    /// 아이콘 선택 박스 (+ 모양 기본 표시)
-                    GestureDetector(
-                      onTap: () async {
-                        final result = await showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (_) => const IconPickerSheet(),
-                        );
-                        if (result != null) {
-                          setState(() {
-                            /// 선택된 아이콘 업데이트
-                            selectedIcon = result['icon'];
-                          });
-                        }
-                      },
-                      child: Container(
-                        width: iconBox,
-                        height: iconBox,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: theme.colorScheme.outline.withOpacity(0.4),
-                            width: 2,
-                          ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  /// ---------- 헤더 ----------
+                  Text(
+                    widget.initialData == null
+                        ? local.addCategory      /// "카테고리 추가"
+                        : local.editCategory,    /// "카테고리 수정"
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ) ?? const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
                         ),
-                        child: selectedIcon == Icons.category
-                            ? Icon(
-                                Icons.add, // 기본 상태: + 모양
-                                size: iconSize * 0.8,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              )
-                            : Icon(
-                                selectedIcon, // 선택된 사용자 아이콘
-                                size: iconSize,
-                                color: selectedColor,
-                              ),
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-
-                    /// 카테고리 이름 입력 필드
-                    Expanded(
-                      child: TextField(
-                        controller: c_nameController,
-                        decoration: InputDecoration(
-                          labelText: local.categoryName,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-
-                /// ---------- 색상 선택 영역 ----------
-                GestureDetector(
-                  onTap: () async {
-                    final Color? picked = await showModalBottomSheet<Color>(
-                      context: context,
-                      backgroundColor: Colors.transparent,
-                      builder: (_) => const ColorPickerSheet(),
-                    );
-                    if (picked != null) {
-                      setState(() {
-                        /// 색상 선택 업데이트
-                        selectedColor = picked;
-                        selectedHexColor = picked.value
-                            .toRadixString(16)
-                            .padLeft(8, '0');
-                      });
-                    }
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                  const SizedBox(height: 22),
+        
+                  /// ---------- 아이콘 + 이름 입력 ----------
+                  Row(
                     children: [
-                      Text(local.color, style: theme.textTheme.bodyMedium),
-                      SizedBox(width: maxW * 0.07),
-                      /// 색상 미리보기 원
-                      Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          color: selectedColor,
-                          shape: BoxShape.circle,
+                      /// 아이콘 선택 박스 (+ 모양 기본 표시)
+                      GestureDetector(
+                        onTap: () async {
+                          final result = await showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (_) => const IconPickerSheet(),
+                          );
+                          if (result != null) {
+                            setState(() {
+                              /// 선택된 아이콘 업데이트
+                              selectedIcon = result['icon'];
+                            });
+                          }
+                        },
+                        child: Container(
+                          width: iconBox,
+                          height: iconBox,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: theme.colorScheme.outline.withOpacity(0.4),
+                              width: 2,
+                            ),
+                          ),
+                          child: selectedIcon == Icons.category
+                              ? Icon(
+                                  Icons.add, // 기본 상태: + 모양
+                                  size: iconSize * 0.8,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                )
+                              : Icon(
+                                  selectedIcon, // 선택된 사용자 아이콘
+                                  size: iconSize,
+                                  color: selectedColor,
+                                ),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+        
+                      /// 카테고리 이름 입력 필드
+                      Expanded(
+                        child: TextField(
+                          controller: c_nameController,
+                          decoration: InputDecoration(
+                            labelText: local.categoryName,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 38),
-
-                /// ---------- 액션 버튼들 ----------
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    /// 취소 버튼
-                    ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                        foregroundColor: theme.colorScheme.onSurface,
-                      ),
-                      child: Text(local.cancel),
+                  const SizedBox(height: 32),
+        
+                  /// ---------- 색상 선택 영역 ----------
+                  GestureDetector(
+                    onTap: () async {
+                      final Color? picked = await showModalBottomSheet<Color>(
+                        context: context,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => const ColorPickerSheet(),
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          /// 색상 선택 업데이트
+                          selectedColor = picked;
+                          selectedHexColor = picked.value
+                              .toRadixString(16)
+                              .padLeft(8, '0');
+                        });
+                      }
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(local.color, style: theme.textTheme.bodyMedium),
+                        SizedBox(width: maxW * 0.07),
+                        /// 색상 미리보기 원
+                        Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: selectedColor,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ],
                     ),
-
-                    /// 저장 버튼
-                    ElevatedButton(
-                      onPressed: saveCategory,
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: theme.colorScheme.onPrimary,
-                        backgroundColor: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(height: 38),
+        
+                  /// ---------- 액션 버튼들 ----------
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      /// 취소 버튼
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                          foregroundColor: theme.colorScheme.onSurface,
+                        ),
+                        child: Text(local.cancel),
                       ),
-                      child: Text(local.save),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          );
-        },
+        
+                      /// 저장 버튼
+                      ElevatedButton(
+                        onPressed: saveCategory,
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          backgroundColor: theme.colorScheme.primary,
+                        ),
+                        child: Text(local.save),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

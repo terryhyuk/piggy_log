@@ -28,7 +28,7 @@ class CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    // final isDark = theme.brightness == Brightness.dark;
     final color = Color(int.parse(category.color, radix: 16));
 
     return GestureDetector(

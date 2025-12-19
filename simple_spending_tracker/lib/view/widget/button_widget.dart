@@ -7,25 +7,35 @@ class ButtonWidget extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white, // Match category card background
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 12,
-              offset: Offset(4, 4),
-            ),
-          ],
-        ),
-        child: const Center(
-          child: Icon(Icons.add, size: 32, color: Colors.black87),
+Widget build(BuildContext context) {
+  final theme = Theme.of(context);
+
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Color.lerp(
+              theme.colorScheme.surface,
+              theme.colorScheme.shadow,
+              0.12,
+            )!,
+            blurRadius: 12,
+            offset: Offset(4, 4),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Icon(
+          Icons.add,
+          size: 32,
+          color: theme.colorScheme.onSurfaceVariant,
         ),
       ),
-    );
-  }
-}// END
+    ),
+  );
+}
+}

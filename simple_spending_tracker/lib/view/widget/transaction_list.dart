@@ -9,16 +9,37 @@ import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 import 'package:simple_spending_tracker/view/pages/transactions_%20detail.dart';
 import 'package:simple_spending_tracker/view/widget/add_transaction_dialog.dart';
 
+/// TransactionList - Category Transaction List View
+///
+/// Displays all transactions for a specific category with swipe-to-edit/delete.
+/// Core list component for Simple Spending Tracker (Canada Edition).
+///
+/// Features:
+/// ✅ Swipe right → Edit transaction (AddTransactionDialog)
+/// ✅ Swipe right → Delete with confirmation dialog
+/// ✅ Real-time reactive updates via Obx() + refreshTrigger
+/// ✅ Currency formatting (CAD support via SettingsController)
+/// ✅ Material 3 colors (error/primary for expense/income)
+/// ✅ Slidable actions with smooth DrawerMotion animation
+///
+/// Data flow:
+/// CategoryId → TransactionHandler.getTransactionsByCategory() → ListView
+///
+/// Auto-refreshes: Dashboard + Category lists on delete/edit
+
 class TransactionList extends StatelessWidget {
   final int categoryId;
   final TransactionHandler transactionHandler = TransactionHandler();
   final SettingsController settingsController = Get.find<SettingsController>();
 
   TransactionList({super.key, required this.categoryId});
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Obx(() {
-      settingsController.refreshTrigger.value; // 👈 트리거
+      settingsController.refreshTrigger.value;
 
       return FutureBuilder(
         future: transactionHandler.getTransactionsByCategory(categoryId),
@@ -27,7 +48,13 @@ class TransactionList extends StatelessWidget {
             return const CircularProgressIndicator();
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Text(AppLocalizations.of(context)!.noTransactionsFound);
+            return Center(
+              child: Text(
+                AppLocalizations.of(context)!.noTransactionsFound,
+                style: TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            );
           }
 
           return ListView.builder(
@@ -54,8 +81,8 @@ class TransactionList extends StatelessWidget {
                           (_) => settingsController.refreshTrigger.value++,
                         );
                       },
-                      backgroundColor: Colors.transparent,
-                      foregroundColor: Theme.of(context).colorScheme.primary,
+                      backgroundColor: theme.colorScheme.surfaceContainer,
+                      foregroundColor: theme.colorScheme.primary,
                       icon: Icons.edit,
                       label: 'Edit',
                     ),
@@ -64,18 +91,26 @@ class TransactionList extends StatelessWidget {
                         bool? confirmed = await showDialog(
                           context: context,
                           builder: (_) => AlertDialog(
-                            title: const Text('Confirm Delete'),
-                            content: Text("Delete '${trx.t_name}'?"),
+                            title: Text(
+                              AppLocalizations.of(context)!.confirmDelete,
+                            ),
+                            content: Text(
+                              "'${trx.t_name}' ${AppLocalizations.of(context)!.deleteConfirm}",
+                            ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),
-                                child: const Text("Cancel"),
+                                child: Text(
+                                  AppLocalizations.of(context)!.cancel,
+                                ),
                               ),
                               TextButton(
                                 onPressed: () => Navigator.pop(context, true),
-                                child: const Text(
-                                  "Delete",
-                                  style: TextStyle(color: Colors.red),
+                                child: Text(
+                                  AppLocalizations.of(context)!.delete,
+                                  style: TextStyle(
+                                    color: theme.colorScheme.error,
+                                  ),
                                 ),
                               ),
                             ],
@@ -87,26 +122,23 @@ class TransactionList extends StatelessWidget {
                             trx.t_id!,
                           );
 
-                          // 1️⃣ 카테고리 리스트 갱신
                           settingsController.refreshTrigger.value++;
 
-                          // 2️⃣ 대시보드 갱신
                           final dashboardController =
                               Get.find<DashboardController>();
                           await dashboardController.refreshDashboard();
 
-                          // 3️⃣ 알림
                           Get.snackbar(
-                            'Deleted',
-                            "'${trx.t_name}' was removed.",
+                            AppLocalizations.of(context)!.deleted,
+                            "'${trx.t_name}' ${AppLocalizations.of(context)!.wasRemoved}",
                             snackPosition: SnackPosition.top,
-                            backgroundColor: Colors.red,
-                            colorText: Colors.white,
+                            backgroundColor: theme.colorScheme.errorContainer,
+                            colorText: theme.colorScheme.onErrorContainer,
                           );
                         }
                       },
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
+                      backgroundColor: theme.colorScheme.errorContainer,
+                      foregroundColor: theme.colorScheme.onErrorContainer,
                       icon: Icons.delete,
                       label: 'Delete',
                     ),
@@ -122,7 +154,9 @@ class TransactionList extends StatelessWidget {
                     settingsController.formatCurrency(trx.amount) ??
                         trx.amount.toString(),
                     style: TextStyle(
-                      color: trx.type == 'expense' ? Colors.red : Colors.green,
+                      color: trx.type == 'expense'
+                          ? theme.colorScheme.error
+                          : theme.colorScheme.primary,
                     ),
                   ),
                   onTap: () {

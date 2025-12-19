@@ -7,7 +7,7 @@ import 'package:simple_spending_tracker/controller/dashboard_Controller.dart';
 import 'package:simple_spending_tracker/controller/setting_Controller.dart';
 import 'package:simple_spending_tracker/controller/tabbar_controller.dart';
 import 'package:simple_spending_tracker/l10n/app_localizations.dart';
-import 'package:simple_spending_tracker/view/widget/mainTabBar.dart';
+import 'package:simple_spending_tracker/view/splashScrrenPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
 
     return Obx(
       () => GetMaterialApp(
-        title: 'Simple Spending Tracker',
+        title: 'Piggy Log',
         locale: controller.locale.value,
         themeMode: controller.themeMode.value ?? ThemeMode.system,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
           colorSchemeSeed: Colors.blue,
           brightness: Brightness.dark,
         ),
-        home: Maintabbar(),
+        home: SplashScreen(),
       ),
     );
   }

@@ -32,11 +32,9 @@ class CalendarController extends GetxController {
     selectedDay.value = date;
     focusedDay.value = date;
     final key = dateKey(date);
-    print("선택 날짜 key: $key");
 
     // final key = dateKey(date);
     final transactions = await calenderHandler.getTransactionsByDate(key);
-  print("가져온 거래 수: ${transactions.length}");
     selectedDateTransactions.value = transactions;
 
     double total = 0.0;
@@ -46,7 +44,7 @@ class CalendarController extends GetxController {
     }
     selectedDayTotal.value = total;
   }
-
+  
   /// 화면용 포맷
   String formatCurrency(double amount) {
     return settingsController.formatCurrency(amount) ?? amount.toString();

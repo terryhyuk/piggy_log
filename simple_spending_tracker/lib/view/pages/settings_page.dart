@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:simple_spending_tracker/VM/settings_handler.dart';
 import 'package:simple_spending_tracker/controller/setting_Controller.dart';
+import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 import 'package:simple_spending_tracker/model/settings.dart';
 import 'package:simple_spending_tracker/view/widget/language_sheet.dart';
 
@@ -51,17 +52,25 @@ class _SettingsPageState extends State<SettingsPage> {
     if (!isLoaded) return const Center(child: CircularProgressIndicator());
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(
+        title: Text(
+          AppLocalizations.of(context)!.settings,
+          ),
+        ),
       body: ListView(
         children: [
           ListTile(
-            title: Text('Language'),
+            title: Text(
+                AppLocalizations.of(context)!.language,
+                ),
             subtitle: Text(settings.language),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: _change_language,
           ),
           ListTile(
-            title: Text('Theme'),
+            title: Text(
+              AppLocalizations.of(context)!.theme,
+              ),
             subtitle: Text(settings.theme_mode),
             trailing: PopupMenuButton<String>(
               onSelected: _change_mode,
@@ -73,7 +82,9 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
-            title: Text('Currency'),
+            title: Text(
+              AppLocalizations.of(context)!.currency,
+              ),
             subtitle: Text(settings.currency_code),
             trailing: PopupMenuButton<String>(
               onSelected: _changeCurrency,
@@ -87,7 +98,9 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
-            title: Text('Date Format'),
+            title: Text(
+                AppLocalizations.of(context)!.dateformat,
+                ),
             subtitle: Text(settings.date_format),
             trailing: PopupMenuButton<String>(
               onSelected: _changeDateFormat,

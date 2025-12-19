@@ -7,9 +7,25 @@ import 'package:simple_spending_tracker/model/category.dart';
 import 'package:simple_spending_tracker/view/widget/color_picker_sheet.dart';
 import 'icon_picker_sheet.dart';
 
+/**
+ * CategorySheet - Category Add/Edit Bottom Sheet
+ * 
+ * Responsive bottom sheet for adding or editing categories in the allowance tracker app.
+ * - Icon selection (calls IconPickerSheet)
+ * - Color selection (calls ColorPickerSheet)
+ * - Category name input
+ * - iOS/Android responsive layout (uses LayoutBuilder)
+ * - Full dark/light mode support
+ * 
+ * Usage:
+ * Get.bottomSheet(CategorySheet());                    // Add new category
+ * Get.bottomSheet(CategorySheet(initialData: data));  // Edit existing category
+ */
+
+
 /// CategorySheet
-/// Responsive bottom sheet used for creating or editing a category.
-/// Uses LayoutBuilder for adaptive sizing on iOS/Android devices.
+/// Responsive bottom sheet for creating/editing categories.
+/// Icon picker maintained (search will be removed from IconPickerSheet).
 class CategorySheet extends StatefulWidget {
   final Map<String, dynamic>? initialData;
 
@@ -20,7 +36,7 @@ class CategorySheet extends StatefulWidget {
 }
 
 class _CategoryEditSheetState extends State<CategorySheet> {
-  // Property
+  /// 카테고리 편집 상태 변수들
   late IconData selectedIcon = Icons.category;
   late Color selectedColor = Colors.grey;
   late TextEditingController c_nameController = TextEditingController();
@@ -30,16 +46,14 @@ class _CategoryEditSheetState extends State<CategorySheet> {
   void initState() {
     super.initState();
 
-    // Always create initial hex color
+    /// 초기 hex 색상 생성 / 기존 카테고리 데이터 로드 (편집 모드)
     selectedHexColor = selectedColor.value.toRadixString(16).padLeft(8, '0');
-    // Load existing category data (edit mode)
+
     if (widget.initialData != null) {
+      /// 편집 모드: 기존 데이터 로드
       c_nameController.text = widget.initialData!['c_name'];
       selectedColor = Color(int.parse(widget.initialData!['color'], radix: 16));
-
-      selectedHexColor = selectedColor.value
-          .toRadixString(16)
-          .padLeft(8, '0'); // ← for saving to DB
+      selectedHexColor = selectedColor.value.toRadixString(16).padLeft(8, '0');
 
       selectedIcon = IconData(
         widget.initialData!['icon_codepoint'],
@@ -51,34 +65,48 @@ class _CategoryEditSheetState extends State<CategorySheet> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final local = AppLocalizations.of(context)!;
+
     return SafeArea(
-      // prevent overlap with iPhone bottom area
+      /// iPhone 하단 영역과 겹침 방지
       top: false,
       child: LayoutBuilder(
+        /// 반응형 크기 계산 (iOS/Android/태블릿 호환)
         builder: (context, constraints) {
           double maxW = constraints.maxWidth;
-          // Responsive icon box size
-          double iconBox = maxW * 0.26;
+          double iconBox = maxW * 0.26;  /// 반응형 아이콘 박스 크기
           double iconSize = maxW * 0.13;
+
           return Container(
             padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(22),
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // ---------- Header ----------
+                /// ---------- 헤더 ----------
                 Text(
-                  widget.initialData == null ? AppLocalizations.of(context)!.addCategory : AppLocalizations.of(context)!.editCategory,
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  widget.initialData == null
+                      ? local.addCategory      /// "카테고리 추가"
+                      : local.editCategory,    /// "카테고리 수정"
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ) ?? const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                      ),
                 ),
                 const SizedBox(height: 22),
-                // ---------- Icon + Name ----------
+
+                /// ---------- 아이콘 + 이름 입력 ----------
                 Row(
                   children: [
-                    // --- Icon Box (Square) ---
+                    /// 아이콘 선택 박스 (+ 모양 기본 표시)
                     GestureDetector(
                       onTap: () async {
                         final result = await showModalBottomSheet(
@@ -87,31 +115,44 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                           builder: (_) => const IconPickerSheet(),
                         );
                         if (result != null) {
-                          selectedIcon = result['icon'];
-                          setState(() {});
+                          setState(() {
+                            /// 선택된 아이콘 업데이트
+                            selectedIcon = result['icon'];
+                          });
                         }
                       },
                       child: Container(
                         width: iconBox,
                         height: iconBox,
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
+                          color: theme.colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: theme.colorScheme.outline.withOpacity(0.4),
+                            width: 2,
+                          ),
                         ),
-                        child: Icon(
-                          selectedIcon,
-                          size: iconSize,
-                          color: selectedColor,
-                        ),
+                        child: selectedIcon == Icons.category
+                            ? Icon(
+                                Icons.add, // 기본 상태: + 모양
+                                size: iconSize * 0.8,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              )
+                            : Icon(
+                                selectedIcon, // 선택된 사용자 아이콘
+                                size: iconSize,
+                                color: selectedColor,
+                              ),
                       ),
                     ),
                     const SizedBox(width: 20),
-                    // --- Category Name Input ---
+
+                    /// 카테고리 이름 입력 필드
                     Expanded(
                       child: TextField(
                         controller: c_nameController,
                         decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.categoryName,
+                          labelText: local.categoryName,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -121,7 +162,8 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                   ],
                 ),
                 const SizedBox(height: 32),
-                // ---------- Color Row ----------
+
+                /// ---------- 색상 선택 영역 ----------
                 GestureDetector(
                   onTap: () async {
                     final Color? picked = await showModalBottomSheet<Color>(
@@ -130,22 +172,21 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                       builder: (_) => const ColorPickerSheet(),
                     );
                     if (picked != null) {
-                      selectedColor = picked;
-                      selectedHexColor = picked.value
-                          .toRadixString(16)
-                          .padLeft(8, '0');
-                      setState(() {});
+                      setState(() {
+                        /// 색상 선택 업데이트
+                        selectedColor = picked;
+                        selectedHexColor = picked.value
+                            .toRadixString(16)
+                            .padLeft(8, '0');
+                      });
                     }
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                        Text(
-                          AppLocalizations.of(context)!.color, 
-                          style: TextStyle(
-                            fontSize: 16)),
-                      SizedBox(width: maxW * 0.07), // responsive spacing
-                      // --- Color Preview Circle ---
+                      Text(local.color, style: theme.textTheme.bodyMedium),
+                      SizedBox(width: maxW * 0.07),
+                      /// 색상 미리보기 원
                       Container(
                         width: 34,
                         height: 34,
@@ -158,36 +199,29 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                   ),
                 ),
                 const SizedBox(height: 38),
-                // ---------- Buttons ----------
+
+                /// ---------- 액션 버튼들 ----------
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Cancel
+                    /// 취소 버튼
                     ElevatedButton(
                       onPressed: () => Navigator.pop(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey.shade300,
+                        backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                        foregroundColor: theme.colorScheme.onSurface,
                       ),
-                      child: Text(
-                        AppLocalizations.of(context)!.cancel,
-                        style: TextStyle(color: Colors.black),
-                      ),
+                      child: Text(local.cancel),
                     ),
-                    // Save
+
+                    /// 저장 버튼
                     ElevatedButton(
-                      onPressed: () {
-                        if (widget.initialData == null) {
-                          addCategory(); // add new category
-                          showSnackBar(AppLocalizations.of(context)!.categoryCreated, AppLocalizations.of(context)!.newCategoryAdded, Colors.green);
-                        } else {
-                          editCategory_history(); // Update category
-                          showSnackBar(AppLocalizations.of(context)!.categoryUpdated, AppLocalizations.of(context)!.changesSaved, Colors.blue);
-                        } Navigator.pop(context);
-                      },
+                      onPressed: saveCategory,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black87,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        backgroundColor: theme.colorScheme.primary,
                       ),
-                      child: Text(AppLocalizations.of(context)!.save),
+                      child: Text(local.save),
                     ),
                   ],
                 ),
@@ -200,82 +234,70 @@ class _CategoryEditSheetState extends State<CategorySheet> {
     );
   }
 
-  //--- Fuunctions---
-  // 1. 추가(addCategory) 함수 수정
-addCategory() async {
-  Category category = Category(
-    iconCodePoint: selectedIcon.codePoint,
-    iconFontFamily: selectedIcon.fontFamily,
-    iconFontPackage: selectedIcon.fontPackage,
-    color: selectedHexColor,
-    c_name: c_nameController.text,
-  );
-  
-  // DB 저장
-  await CategoryHandler().insertCategory(category);
-  
-  // ✅ 모든 페이지 데이터 일괄 갱신
-  await Get.find<SettingsController>().refreshAllData();
+  /// 카테고리 저장 (추가/수정) 및 성공 피드백 표시
+  Future<void> saveCategory() async {
+    if (c_nameController.text.trim().isEmpty) return;
+
+    final local = AppLocalizations.of(context)!;
+
+    if (widget.initialData == null) {
+      /// 새 카테고리 추가
+      await addCategory();
+      showSnackBar(local.categoryCreated, local.newCategoryAdded, Colors.green);
+    } else {
+      /// 기존 카테고리 수정
+      await editCategory_history();
+      showSnackBar(local.categoryUpdated, local.changesSaved, Colors.blue);
+    }
+
+    Navigator.pop(context);
+  }
+
+  /// 새 카테고리를 DB에 추가하고 모든 데이터 새로고침
+  Future<void> addCategory() async {
+    final category = Category(
+      iconCodePoint: selectedIcon.codePoint,
+      iconFontFamily: selectedIcon.fontFamily,
+      iconFontPackage: selectedIcon.fontPackage,
+      color: selectedHexColor,
+      c_name: c_nameController.text.trim(),
+    );
+
+    await CategoryHandler().insertCategory(category);
+    await Get.find<SettingsController>().refreshAllData();
+  }
+
+  /// 기존 카테고리를 DB에서 업데이트
+  Future<void> editCategory_history() async {
+    final category = Category(
+      id: widget.initialData!['id'],
+      iconCodePoint: selectedIcon.codePoint,
+      iconFontFamily: selectedIcon.fontFamily,
+      iconFontPackage: selectedIcon.fontPackage,
+      color: selectedHexColor,
+      c_name: c_nameController.text.trim(),
+    );
+
+    await CategoryHandler().updateCategory(category);
+    await Get.find<SettingsController>().refreshAllData();
+  }
+
+  /// 사용자 피드백을 위한 스낵바 표시
+  void showSnackBar(String title, String message, Color bgColor) {
+    Get.snackbar(
+      title,
+      message,
+      snackPosition: SnackPosition.top,
+      duration: const Duration(seconds: 2),
+      backgroundColor: bgColor,
+      colorText: Colors.white,
+    );
+  }
+
+  @override
+  void dispose() {
+    /// 컨트롤러 메모리 해제
+    c_nameController.dispose();
+    super.dispose();
+  }
 }
-
-// 2. 수정(editCategory_history) 함수 수정
-editCategory_history() async {
-  Category category = Category(
-    id: widget.initialData!['id'],
-    iconCodePoint: selectedIcon.codePoint,
-    iconFontFamily: selectedIcon.fontFamily,
-    iconFontPackage: selectedIcon.fontPackage,
-    color: selectedHexColor,
-    c_name: c_nameController.text,
-  );
-  
-  // DB 업데이트
-  await CategoryHandler().updateCategory(category);
-  
-  // ✅ 모든 페이지 데이터 일괄 갱신
-  await Get.find<SettingsController>().refreshAllData();
-}
-  // addCategory() async {
-  //   Category category = Category(
-  //     iconCodePoint: selectedIcon.codePoint,
-  //     iconFontFamily: selectedIcon.fontFamily,
-  //     iconFontPackage: selectedIcon.fontPackage,
-  //     color: selectedHexColor,
-  //     c_name: c_nameController.text,
-  //   );
-  //   await CategoryHandler().insertCategory(category);
-  // }
-
-  // editCategory_history() async {
-  //   // update category
-  //   Category category = Category(
-  //     id: widget.initialData!['id'],
-  //     iconCodePoint: selectedIcon.codePoint,
-  //     iconFontFamily: selectedIcon.fontFamily,
-  //     iconFontPackage: selectedIcon.fontPackage,
-  //     color: selectedHexColor,
-  //     c_name: c_nameController.text,
-  //   );
-  //   await CategoryHandler().updateCategory(category);
-  // }
-
-  // deleteCategory_history() async {
-  //   await CategoryHandler().deleteCategory(widget.initialData!['id']);
-  //   final settingsController = Get.find<SettingsController>();
-  //   settingsController.refreshTrigger.value++;
-
-  // }
-
-
-  showSnackBar(title, message, Color bgColor) {
-  Get.snackbar(
-    title,
-    message,
-    snackPosition: SnackPosition.top,
-    duration: const Duration(seconds: 2),
-    backgroundColor: bgColor,
-    colorText: Colors.white,   // text color
-  );
-}
-
-} // END

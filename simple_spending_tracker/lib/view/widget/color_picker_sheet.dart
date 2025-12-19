@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 import '../../model/category_colors.dart';
-
 class ColorPickerSheet extends StatefulWidget {
   const ColorPickerSheet({super.key});
 
@@ -10,7 +9,6 @@ class ColorPickerSheet extends StatefulWidget {
 }
 
 class _ColorPickerSheetState extends State<ColorPickerSheet> {
-  // Property
   late List<Color> palette;
   Color? selectedColor;
 
@@ -22,29 +20,31 @@ class _ColorPickerSheetState extends State<ColorPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final double sheetHeight = MediaQuery.of(context).size.height * 0.45;
 
     return Container(
       height: sheetHeight,
       padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// ----- Header -----
           Row(
             children: [
-            Text(
+              Text(
                 AppLocalizations.of(context)!.selectColor,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ) ?? const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
               const Spacer(),
               IconButton(
-                icon: const Icon(Icons.close),
+                icon: Icon(Icons.close, color: theme.colorScheme.onSurface),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -72,7 +72,9 @@ class _ColorPickerSheetState extends State<ColorPickerSheet> {
                       color: color,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: isSelected ? Colors.black : Colors.transparent,
+                        color: isSelected 
+                            ? theme.colorScheme.onSurface
+                            : Colors.transparent,
                         width: 2.4,
                       ),
                     ),
@@ -86,14 +88,9 @@ class _ColorPickerSheetState extends State<ColorPickerSheet> {
     );
   }
 
-  // --- Functions ---
-  /// Handle color tap
-    _onSelectColor(Color color) {
+  _onSelectColor(Color color) {
     selectedColor = color;
     setState(() {});
-    /// Return selected color and close sheet
     Navigator.pop(context, color);
   }
-
-  
-}// END
+}

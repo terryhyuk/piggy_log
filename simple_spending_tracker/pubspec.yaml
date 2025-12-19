@@ -61,6 +61,10 @@ dependencies:
   # animation
   lottie: ^3.3.2
 
+  # images
+  fluttericon: ^2.0.0
+  font_awesome_flutter: ^10.12.0
+
 
 dev_dependencies:
   flutter_test:

@@ -6,10 +6,8 @@ import '../../model/category.dart';
 /// - Supports shaking animation in edit mode
 /// - Shows Edit/Delete buttons in edit mode
 /// - Provides tap & long press callbacks
+
 class CategoryCard extends StatelessWidget {
-
-  // property
-
   final Category category;
   final bool isEditMode;
   final VoidCallback onTap;
@@ -29,7 +27,8 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final color = Color(int.parse(category.color, radix: 16));
 
     return GestureDetector(
@@ -37,21 +36,37 @@ class CategoryCard extends StatelessWidget {
       onLongPress: onLongPress,
       child: Stack(
         children: [
-          // Card body with shake animation
+          // --- Card with optional shadow (light only) ---
           Positioned.fill(
             child: AnimatedShake(
               isActive: isEditMode,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: theme.colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
-                    BoxShadow(
-                      offset: Offset(4, 4),
-                      blurRadius: 8,
-                      color: Colors.black12,
-                    ),
-                  ],
+                  boxShadow: theme.brightness == Brightness.dark
+                      ? [
+                          // Dark mode → 살짝 떠 있는 느낌
+                          BoxShadow(
+                            color: Colors.black.withAlpha((0.1 * 255).round()),
+                            offset: const Offset(0, 2),
+                            blurRadius: 4,
+                          ),
+                        ]
+                      : [
+                          // Light mode → 기존 floating card 느낌
+                          BoxShadow(
+                            color: Colors.black.withAlpha((0.15 * 255).round()),
+                            offset: const Offset(0, 5),
+                            blurRadius: 12,
+                            spreadRadius: 1,
+                          ),
+                          BoxShadow(
+                            color: Colors.white.withAlpha((0.6 * 255).round()),
+                            offset: const Offset(0, -2),
+                            blurRadius: 4,
+                          ),
+                        ],
                 ),
                 child: Center(
                   child: Icon(
@@ -67,7 +82,8 @@ class CategoryCard extends StatelessWidget {
               ),
             ),
           ),
-          // Edit & delete buttons (visible only in edit mode)
+
+          // --- Edit & Delete buttons (visible only in edit mode) ---
           if (isEditMode)
             Positioned(
               right: 4,
@@ -76,11 +92,7 @@ class CategoryCard extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.edit),
-                    onPressed: (){
-                      if (onEditPress != null) {
-                        onEditPress!();
-                      }
-                    }
+                    onPressed: onEditPress,
                   ),
                   IconButton(
                     icon: const Icon(Icons.close, size: 20),
@@ -93,5 +105,4 @@ class CategoryCard extends StatelessWidget {
       ),
     );
   }
-
-} // END
+}

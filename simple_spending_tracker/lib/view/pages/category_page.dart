@@ -24,10 +24,10 @@ class _CategoryPageState extends State<CategoryPage> {
   // Properties
   final CategoryHandler categoryHandler = CategoryHandler();
   final TabbarController tabController = Get.find<TabbarController>();
-  
+
   // 1. categories 리스트는 StatefulWidget 로컬 상태(List<Category>)로 복원합니다.
-  List<Category> categories = []; 
-  
+  List<Category> categories = [];
+
   // 로컬 isEditMode 변수는 제거하고, TabbarController의 상태를 사용합니다.
 
   // 다른 컨트롤러들을 미리 찾아서 로직에 사용합니다.
@@ -35,7 +35,6 @@ class _CategoryPageState extends State<CategoryPage> {
   final calController = Get.find<CalendarController>();
   final settingsController = Get.find<SettingsController>();
   final categoryController = Get.find<CategoryController>();
-
 
   @override
   void initState() {
@@ -56,9 +55,7 @@ class _CategoryPageState extends State<CategoryPage> {
       },
       // 2. Scaffold 전체를 감싸던 Obx를 제거합니다.
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(AppLocalizations.of(context)!.transaction),
-        ),
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.categories)),
         body: GridView.builder(
           padding: const EdgeInsets.all(16),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -78,13 +75,14 @@ class _CategoryPageState extends State<CategoryPage> {
             // 3. Obx를 CategoryCard만 감싸도록 최소화하여 GetX 오류를 피합니다.
             // -> isCategoryEditMode.value의 변화에만 반응합니다.
             return Obx(() {
-              final bool currentIsEditMode = tabController.isCategoryEditMode.value;
+              final bool currentIsEditMode =
+                  tabController.isCategoryEditMode.value;
 
               return CategoryCard(
                 category: category,
                 // Obx 내부에서 구독하는 상태를 전달합니다.
                 isEditMode: currentIsEditMode,
-                
+
                 // Normal tap → open edit sheet
                 onTap: () {
                   // 편집 모드가 아닐 때만 이동
@@ -139,95 +137,56 @@ class _CategoryPageState extends State<CategoryPage> {
       context: context,
       isScrollControlled: true,
       builder: (_) => CategorySheet(initialData: data),
-    ).then((_) => _loadCategories()); // 카테고리 추가/수정 후 setState()를 포함한 _loadCategories 호출
+    ).then(
+      (_) => _loadCategories(),
+    ); // 카테고리 추가/수정 후 setState()를 포함한 _loadCategories 호출
   }
 
   _openDeleteDialog(Category category) {
-  showDialog(
-    context: context,
-    builder: (_) => AlertDialog(
-      title: Text("Delete Category"),
-      content: Text("Delete '${category.c_name}'?"),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Cancel"),
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.deleteCategory),
+        content: Text(
+          "${AppLocalizations.of(context)!.delete} '${category.c_name}'?",
         ),
-        TextButton(
-          onPressed: () async {
-            // 1. DB에서 카테고리 삭제
-            await categoryHandler.deleteCategory(category.id!);
-            
-            // 2. 현재 페이지의 카테고리 목록(List) 업데이트
-            _loadCategories(); 
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          TextButton(
+            onPressed: () async {
+              // 1. DB에서 카테고리 삭제
+              await categoryHandler.deleteCategory(category.id!);
 
-            // 3. ✅ 핵심: 모든 컨트롤러 싹 다 새로고침 (SettingsController에 만든 함수)
-            await settingsController.refreshAllData();
-            // 4. (추가로 필요한 경우에만 유지) 
-            categoryController.notifyChange(); 
+              // 2. 현재 페이지의 카테고리 목록(List) 업데이트
+              _loadCategories();
 
-            Navigator.pop(context); // 다이얼로그 닫기
+              // 3. ✅ 핵심: 모든 컨트롤러 싹 다 새로고침 (SettingsController에 만든 함수)
+              await settingsController.refreshAllData();
+              // 4. (추가로 필요한 경우에만 유지)
+              categoryController.notifyChange();
 
-            // 스낵바 알림
-            Get.snackbar(
-              "Category Deleted",
-              "'${category.c_name}' was removed.",
-              snackPosition: SnackPosition.top,
-              backgroundColor: Colors.red,
-              colorText: Colors.white,
-              duration: const Duration(seconds: 2),
-            );
-          },
-          child: const Text("Delete", style: TextStyle(color: Colors.red)),
-        ),
-      ],
-    ),
-  );
-}
-  // _openDeleteDialog(Category category) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (_) => AlertDialog(
-  //       title: Text("Delete Category"),
-  //       content: Text("Delete '${category.c_name}'?"),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.pop(context),
-  //           child: const Text("Cancel"),
-  //         ),
-  //         TextButton(
-  //           onPressed: () async {
-  //             await categoryHandler.deleteCategory(category.id!);
-              
-  //             _loadCategories(); // 카테고리 목록 (List) 업데이트 (setState 포함)
+              Navigator.pop(context); // 다이얼로그 닫기
 
-  //             // refresh dashboard
-  //             await dashboardController.refreshDashboard();
-              
-  //             // refresh calendar (거래 기록 표시 업데이트)
-  //             await calController.loadDailyTotals();
-  //             // 캘린더 날짜 재선택을 통해 UI를 명시적으로 업데이트 (필요 시 유지)
-  //             await calController.selectDate(calController.selectedDay.value);
-
-  //             // settings, category 컨트롤러에게 변경 사항 통보 (다른 탭 업데이트)
-  //             settingsController.refreshTrigger.value++;
-  //             categoryController.notifyChange(); 
-
-  //             Navigator.pop(context); // close dialog
-  //             // snackbar
-  //             Get.snackbar(
-  //               "Category Deleted",
-  //               "'${category.c_name}' was removed.",
-  //               snackPosition: SnackPosition.top,
-  //               backgroundColor: Colors.red,
-  //               colorText: Colors.white,
-  //               duration: const Duration(seconds: 2),
-  //             );
-  //           },
-  //           child: const Text("Delete", style: TextStyle(color: Colors.red)),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+              // 스낵바 알림
+              Get.snackbar(
+                AppLocalizations.of(context)!.deleteCategory,
+                "${AppLocalizations.of(context)!.delete} '${category.c_name}'",
+                snackPosition: SnackPosition.top,
+                backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                colorText: Theme.of(context).colorScheme.onErrorContainer,
+                duration: const Duration(seconds: 1),
+              );
+            },
+            child: Text(
+              AppLocalizations.of(context)!.delete,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 } // END

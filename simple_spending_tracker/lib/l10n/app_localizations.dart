@@ -100,59 +100,59 @@ abstract class AppLocalizations {
     Locale('ko'),
   ];
 
-  /// No description provided for @expense.
+  /// No description provided for @cancel.
   ///
   /// In en, this message translates to:
-  /// **'Expense'**
-  String get expense;
+  /// **'Cancel'**
+  String get cancel;
 
-  /// No description provided for @income.
+  /// No description provided for @save.
   ///
   /// In en, this message translates to:
-  /// **'Income'**
-  String get income;
+  /// **'Save'**
+  String get save;
 
-  /// No description provided for @noTransactionsFound.
+  /// No description provided for @edit.
   ///
   /// In en, this message translates to:
-  /// **'No transactions found'**
-  String get noTransactionsFound;
+  /// **'Edit'**
+  String get edit;
 
-  /// No description provided for @language.
+  /// No description provided for @delete.
   ///
   /// In en, this message translates to:
-  /// **'Language'**
-  String get language;
+  /// **'Delete'**
+  String get delete;
 
-  /// No description provided for @selectIcon.
+  /// No description provided for @update.
   ///
   /// In en, this message translates to:
-  /// **'Select Icon'**
-  String get selectIcon;
+  /// **'Update'**
+  String get update;
 
-  /// No description provided for @searchIcons.
+  /// No description provided for @wasRemoved.
   ///
   /// In en, this message translates to:
-  /// **'Search icons'**
-  String get searchIcons;
+  /// **'was removed'**
+  String get wasRemoved;
 
-  /// No description provided for @selectColor.
+  /// No description provided for @confirmDelete.
   ///
   /// In en, this message translates to:
-  /// **'Select Color'**
-  String get selectColor;
+  /// **'Confirm Delete'**
+  String get confirmDelete;
 
-  /// No description provided for @addCategory.
+  /// No description provided for @deleted.
   ///
   /// In en, this message translates to:
-  /// **'Add Category'**
-  String get addCategory;
+  /// **'Deleted'**
+  String get deleted;
 
-  /// No description provided for @editCategory.
+  /// No description provided for @deleteConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Edit Category'**
-  String get editCategory;
+  /// **'delete?'**
+  String get deleteConfirm;
 
   /// No description provided for @categoryName.
   ///
@@ -165,12 +165,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Color'**
   String get color;
-
-  /// No description provided for @cancel.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get cancel;
 
   /// No description provided for @categoryCreated.
   ///
@@ -196,11 +190,71 @@ abstract class AppLocalizations {
   /// **'Changes saved'**
   String get changesSaved;
 
-  /// No description provided for @save.
+  /// No description provided for @noTransactionsFound.
   ///
   /// In en, this message translates to:
-  /// **'Save'**
-  String get save;
+  /// **'No transactions found'**
+  String get noTransactionsFound;
+
+  /// No description provided for @toTalExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Expense'**
+  String get toTalExpense;
+
+  /// No description provided for @monthlyBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Budget'**
+  String get monthlyBudget;
+
+  /// No description provided for @setYourBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Your Budget'**
+  String get setYourBudget;
+
+  /// No description provided for @noTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'No Transactions'**
+  String get noTransactions;
+
+  /// No description provided for @recentTranscations.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Transactions'**
+  String get recentTranscations;
+
+  /// No description provided for @setMonthlyBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Monthly Budget'**
+  String get setMonthlyBudget;
+
+  /// No description provided for @enterYourBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Your Budget'**
+  String get enterYourBudget;
+
+  /// No description provided for @categories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categories;
+
+  /// No description provided for @addCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Category'**
+  String get addCategory;
+
+  /// No description provided for @editCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Category'**
+  String get editCategory;
 
   /// No description provided for @add.
   ///
@@ -208,11 +262,11 @@ abstract class AppLocalizations {
   /// **'Add'**
   String get add;
 
-  /// No description provided for @addTransaction.
+  /// No description provided for @deleteCategory.
   ///
   /// In en, this message translates to:
-  /// **'Add Transaction'**
-  String get addTransaction;
+  /// **'Delete Category'**
+  String get deleteCategory;
 
   /// No description provided for @title.
   ///
@@ -232,11 +286,23 @@ abstract class AppLocalizations {
   /// **'Memo'**
   String get memo;
 
-  /// No description provided for @recurringTransaction.
+  /// No description provided for @recurring.
   ///
   /// In en, this message translates to:
-  /// **'Recurring Transaction'**
-  String get recurringTransaction;
+  /// **'Recurring'**
+  String get recurring;
+
+  /// No description provided for @expense.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get expense;
+
+  /// No description provided for @income.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get income;
 
   /// No description provided for @selectDate.
   ///
@@ -244,11 +310,59 @@ abstract class AppLocalizations {
   /// **'Select Date'**
   String get selectDate;
 
-  /// No description provided for @pleaseEnterTitle.
+  /// No description provided for @deleteTransaction.
   ///
   /// In en, this message translates to:
-  /// **'Please enter a title'**
-  String get pleaseEnterTitle;
+  /// **'Delete Transaction'**
+  String get deleteTransaction;
+
+  /// No description provided for @deleteTransactionConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this transaction?'**
+  String get deleteTransactionConfirm;
+
+  /// No description provided for @addTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Transaction'**
+  String get addTransaction;
+
+  /// No description provided for @editTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Transaction'**
+  String get editTransaction;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// No description provided for @currency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get currency;
+
+  /// No description provided for @dateFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Format'**
+  String get dateFormat;
 
   /// No description provided for @enterValidAmount.
   ///
@@ -256,17 +370,95 @@ abstract class AppLocalizations {
   /// **'Enter valid amount'**
   String get enterValidAmount;
 
+  /// No description provided for @pleaseEnterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter title'**
+  String get pleaseEnterTitle;
+
+  /// No description provided for @recurringTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring Transaction'**
+  String get recurringTransaction;
+
+  /// No description provided for @searchIcons.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Icons'**
+  String get searchIcons;
+
+  /// No description provided for @confirmDeleteTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Delete Transaction'**
+  String get confirmDeleteTransaction;
+
+  /// No description provided for @transactionUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction Updated'**
+  String get transactionUpdated;
+
+  /// No description provided for @transactionCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction Created'**
+  String get transactionCreated;
+
+  /// No description provided for @selectCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Category'**
+  String get selectCategory;
+
+  /// No description provided for @selectIcon.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Icon'**
+  String get selectIcon;
+
+  /// No description provided for @selectColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Color'**
+  String get selectColor;
+
   /// No description provided for @transaction.
   ///
   /// In en, this message translates to:
   /// **'Transaction'**
   String get transaction;
 
-  /// No description provided for @settings.
+  /// No description provided for @totalExpense.
   ///
   /// In en, this message translates to:
-  /// **'Settings'**
-  String get settings;
+  /// **'Total Expense'**
+  String get totalExpense;
+
+  /// No description provided for @recentTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Transactions'**
+  String get recentTransactions;
+
+  /// No description provided for @enterMonthlyBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Monthly Budget'**
+  String get enterMonthlyBudget;
+
+  /// No description provided for @dateformat.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Format'**
+  String get dateformat;
+
+  /// No description provided for @errorTransactionDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to open transaction detail.'**
+  String get errorTransactionDetail;
 }
 
 class _AppLocalizationsDelegate

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:get_x/get.dart';
 import 'package:simple_spending_tracker/view/pages/calendar_page.dart';
 import 'package:simple_spending_tracker/view/pages/category_page.dart';
@@ -19,37 +21,55 @@ class Maintabbar extends StatelessWidget {
   ];
 
   @override
-
   Widget build(BuildContext context) {
     return Obx(
       () => Scaffold(
-        body: IndexedStack(
-          index: controller.index.value,
-          children: pages,
-        ),
+        body: IndexedStack(index: controller.index.value, children: pages),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: controller.index.value,
-          onTap: controller.changeTabIndex,
+          onTap: (i) {
+            HapticFeedback.lightImpact();
+            controller.changeTabIndex(i);
+          },
           type: BottomNavigationBarType.fixed,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard),
-              label: 'Dashboard',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.list),
-              label: 'Transactions',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month),
-              label: 'Calendar',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Settings',
-            ),
+
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+
+          selectedItemColor: Theme.of(context).colorScheme.primary,
+          unselectedItemColor: Colors.grey,
+
+          items: [
+            _navItem(context, FontAwesome.chart_pie, 0),
+            _navItem(context, FontAwesome.tags, 1),
+            _navItem(context, FontAwesome.calendar_empty, 2),
+            _navItem(context, FontAwesome.cog, 3),
           ],
         ),
+      ),
+    );
+  }
+
+  BottomNavigationBarItem _navItem(
+    BuildContext context,
+    IconData icon,
+    int index,
+  ) {
+    final isSelected = controller.index.value == index;
+
+    return BottomNavigationBarItem(
+      label: '',
+      icon: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.12)
+              : Colors.transparent,
+
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, size: 32),
       ),
     );
   }

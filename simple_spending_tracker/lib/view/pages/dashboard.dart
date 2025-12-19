@@ -3,6 +3,7 @@ import 'package:get_x/get.dart';
 import 'package:simple_spending_tracker/VM/budget_handler.dart';
 import 'package:simple_spending_tracker/controller/dashboard_Controller.dart';
 import 'package:simple_spending_tracker/controller/setting_Controller.dart';
+import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 import 'package:simple_spending_tracker/view/widget/chart_widget.dart';
 
 class Dashboard extends StatefulWidget {
@@ -65,8 +66,8 @@ class _DashboardState extends State<Dashboard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Total Expense',
+                      Text(
+                        AppLocalizations.of(context)!.totalExpense,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -86,8 +87,8 @@ class _DashboardState extends State<Dashboard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Monthly Budget",
+                      Text(
+                        AppLocalizations.of(context)!.monthlyBudget,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -105,7 +106,7 @@ class _DashboardState extends State<Dashboard> {
                           ),
                           child: Text(
                             monthlyBudget == 0
-                                ? "Set your monthly budget"
+                                ? AppLocalizations.of(context)!.setYourBudget
                                 : _formatCurrency(monthlyBudget),
                             style: const TextStyle(
                               fontSize: 16,
@@ -123,8 +124,10 @@ class _DashboardState extends State<Dashboard> {
               // Row: PieChart + Top3 + Radar
               Obx(() {
                 if (dashbordcontroller.categoryList.isEmpty) {
-                  return const Center(
-                    child: Text("NO data"),
+                  return Center(
+                    child: Text(
+                      AppLocalizations.of(context)!.noTransactions,
+                    ),
                   );
                 }
 
@@ -190,8 +193,8 @@ class _DashboardState extends State<Dashboard> {
               const SizedBox(height: 24),
 
               // Recent Transactions
-              const Text(
-                'Recent Transactions',
+              Text(
+                AppLocalizations.of(context)!.recentTransactions,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
@@ -254,23 +257,31 @@ class _DashboardState extends State<Dashboard> {
     final result = await showDialog<double>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Set Monthly Budget"),
+        title: Text(
+          AppLocalizations.of(context)!.setMonthlyBudget,
+        ),
         content: TextField(
           controller: dialogController,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(hintText: "Enter your budget"),
+          decoration: InputDecoration(
+            hintText: AppLocalizations.of(context)!.enterMonthlyBudget,
+            ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context), // 취소
-            child: const Text("Cancel"),
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              AppLocalizations.of(context)!.cancel,
+              ),
           ),
           TextButton(
             onPressed: () {
               final value = double.tryParse(dialogController.text.trim());
               if (value != null) Navigator.pop(context, value);
             },
-            child: const Text("Save"),
+            child: Text(
+              AppLocalizations.of(context)!.save,
+              ),
           ),
         ],
       ),
@@ -282,9 +293,8 @@ class _DashboardState extends State<Dashboard> {
       final yearMonth = "${now.year}-${now.month.toString().padLeft(2, '0')}";
       await monthlyBudgetHandler.saveMonthlyBudget(yearMonth, result);
 
-      setState(() {
-        monthlyBudget = result;
-      });
+      monthlyBudget = result;
+      setState(() {});
     }
   }
 } // END

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 
@@ -35,16 +34,17 @@ class _IconPickerSheetState extends State<IconPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     // Bottom sheet takes up 75% of the screen height
     final double sheetHeight = MediaQuery.of(context).size.height * 0.75;
 
     return Container(
       height: sheetHeight,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,  // 👈 변경1
         // Rounded top corners for the bottom sheet look
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
 
       child: Column(
@@ -53,40 +53,42 @@ class _IconPickerSheetState extends State<IconPickerSheet> {
           // ---------- Header ----------
           Row(
             children: [
-                Text(
+              Text(
                 AppLocalizations.of(context)!.searchIcons,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: theme.textTheme.headlineSmall?.copyWith(  // 👈 변경2
+                  fontWeight: FontWeight.w700,
+                ) ?? const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
               const Spacer(),
               // Close button (X)
               IconButton(
-                icon: const Icon(Icons.close),
+                icon: Icon(Icons.close, color: theme.colorScheme.onSurface),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
           ),
           const SizedBox(height: 10),
 
-          // ---------- Search Bar ----------
-          TextField(
-            controller: searchController,
-            onChanged: filterIcons, // Real-time filtering
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.search),
-              hintText: AppLocalizations.of(context)!.searchIcons,
-              filled: true,
-              fillColor: Colors.grey.shade100,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
+          // // ---------- Search Bar ----------
+          // TextField(
+          //   controller: searchController,
+          //   onChanged: filterIcons, // Real-time filtering
+          //   decoration: InputDecoration(
+          //     prefixIcon: Icon(Icons.search, color: theme.colorScheme.onSurfaceVariant),
+          //     hintText: AppLocalizations.of(context)!.searchIcons,
+          //     filled: true,
+          //     fillColor: theme.colorScheme.surfaceContainerHighest,
+          //     contentPadding: const EdgeInsets.symmetric(
+          //       horizontal: 12,
+          //       vertical: 10,
+          //     ),
+          //     border: OutlineInputBorder(
+          //       borderRadius: BorderRadius.circular(14),
+          //       borderSide: BorderSide.none,
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(height: 16),
 
           // ---------- Icon Grid ----------
           Expanded(
@@ -114,13 +116,13 @@ class _IconPickerSheetState extends State<IconPickerSheet> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
+                          color: theme.colorScheme.surfaceContainerHighest,  // 👈 변경4
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           iconData['icon'],
                           size: 26,
-                          color: Colors.black87,
+                          color: theme.colorScheme.onSurface,  // 👈 변경5
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -146,4 +148,4 @@ class _IconPickerSheetState extends State<IconPickerSheet> {
         .toList();
     setState(() {});
   }
-} // END
+}

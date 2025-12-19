@@ -11,10 +11,3 @@ class TabbarController extends GetxController{
     index.value = newIndex;
   }
 }
-
-// class TabbarController extends GetxController{
-//   var index = 0.obs;
-//   void changeTabIndex(int newIndex) {
-//     index.value = newIndex;
-//   }
-// }

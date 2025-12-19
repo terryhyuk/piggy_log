@@ -9,6 +9,7 @@ class LanguageSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final languages = [
       {'label': 'English', 'code': 'en'},
       {'label': '한국어', 'code': 'ko'},
@@ -17,24 +18,29 @@ class LanguageSheet extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             AppLocalizations.of(context)!.language,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ) ?? const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 20),
 
           ...languages.map((lang) {
             return ListTile(
-              title: Text(lang['label']!),
+              title: Text(
+                lang['label']!,
+                style: theme.textTheme.bodyLarge,
+              ),
               trailing: currentLanguage == lang['code']
-                  ? const Icon(Icons.check, color: Colors.black)
+                  ? Icon(Icons.check, color: theme.colorScheme.primary)
                   : null,
               onTap: () => Navigator.pop(context, lang),
             );

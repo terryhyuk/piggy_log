@@ -15,6 +15,8 @@ class ChartsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     if (pieData != null) {
       return AspectRatio(
         aspectRatio: 1,
@@ -48,19 +50,15 @@ class ChartsWidget extends StatelessWidget {
         height: 180,
         child: RadarChart(
           RadarChartData(
-            ticksTextStyle: const TextStyle(color: Colors.transparent),
+            ticksTextStyle: TextStyle(color: theme.colorScheme.surface),
             gridBorderData: BorderSide(
-              color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.white24
-            : Colors.black26,
+              color: Color.lerp(theme.colorScheme.surface, theme.colorScheme.shadow, 0.24)!,
               width: 1.2,
-              ),
+            ),
             radarBorderData: BorderSide(
-              color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.white70
-            : Colors.black87, 
+              color: Color.lerp(theme.colorScheme.surface, theme.colorScheme.primary, 0.7)!,
               width: 1.2,
-              ),
+            ),
             borderData: FlBorderData(show: false),
             radarBackgroundColor: Colors.transparent,
             getTitle: (index, angle) => RadarChartTitle(
@@ -69,15 +67,10 @@ class ChartsWidget extends StatelessWidget {
             dataSets: [
               RadarDataSet(
                 dataEntries: values.map((v) => RadarEntry(value: v)).toList(),
-                borderColor: Theme.of(context).brightness == Brightness.dark
-              ? Colors.lightBlueAccent
-              : Colors.blueAccent,
+                borderColor: theme.colorScheme.primary,
                 borderWidth: 2,
                 entryRadius: 0,
-                fillColor: (Theme.of(context).brightness == Brightness.dark
-                  ? Colors.lightBlueAccent
-                  : Colors.blueAccent)
-              .withAlpha(40),
+                fillColor: Color.lerp(theme.colorScheme.surface, theme.colorScheme.primary, 0.1)!,
               ),
             ],
             radarShape: RadarShape.polygon,

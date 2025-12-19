@@ -23,7 +23,6 @@ class CalendarBuildWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
 
-    // 🔥 핵심: 화면 비율 기반 셀 사이즈
     final screenWidth = MediaQuery.of(context).size.width;
     final cellSize = (screenWidth / 7).clamp(40.0, 56.0);
     final innerSize = cellSize * 0.85;
@@ -40,7 +39,7 @@ class CalendarBuildWidget extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isSelected
-                  ? primary.withOpacity(0.15)
+                  ? Color.lerp(Colors.transparent, primary, 0.15)!
                   : Colors.transparent,
               border: isToday
                   ? Border.all(color: primary, width: 2)
@@ -50,7 +49,7 @@ class CalendarBuildWidget extends StatelessWidget {
             child: Text(
               '${day.day}',
               style: TextStyle(
-                fontSize: innerSize * 0.4, // 비율 고정
+                fontSize: innerSize * 0.4,
                 fontWeight: FontWeight.w500,
                 color: textColor,
               ),

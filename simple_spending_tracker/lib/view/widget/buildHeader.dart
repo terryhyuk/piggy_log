@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
+import 'package:simple_spending_tracker/l10n/app_localizations.dart';
 import 'package:simple_spending_tracker/model/category.dart';
 
 class BuildHeader extends StatelessWidget {
@@ -14,54 +15,47 @@ class BuildHeader extends StatelessWidget {
   });
 
   @override
+  @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Back button
-        IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-          onPressed: () => Get.back(),
-        ),
-
-        const SizedBox(width: 20),
-
-        // Category Icon
-        Icon(
-          IconData(
-            category.iconCodePoint,
-            fontFamily: category.iconFontFamily,
-            fontPackage: category.iconFontPackage,
-          ),
-          size: 40,
-          color: Color(int.parse(category.color, radix: 16)),
-        ),
-
-        const SizedBox(width: 20),
-
-        // Category Name
-        Text(
-          category.c_name,
-          style: const TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-
-        const SizedBox(width: 20),
-
-        // + Add button
-        GestureDetector(
-          onTap: onAddTap,
-          child: const Text(
-            " + Add",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+              onPressed: () => Get.back(),
             ),
-          ),
+
+            const Spacer(),
+
+            Expanded(
+              child: Text(
+                category.c_name,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            const Spacer(),
+
+            GestureDetector(
+              onTap: onAddTap,
+              child: Text(
+                '+ ${AppLocalizations.of(context)!.add}',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

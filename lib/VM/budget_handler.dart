@@ -1,5 +1,5 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:simple_spending_tracker/VM/database_handler.dart';
+import 'package:piggy_log/VM/database_handler.dart';
 
 class MonthlyBudgetHandler {
   final DatabaseHandler databaseHandler = DatabaseHandler();

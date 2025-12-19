@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:get_x/get.dart';
-import 'package:simple_spending_tracker/view/pages/calendar_page.dart';
-import 'package:simple_spending_tracker/view/pages/category_page.dart';
-import 'package:simple_spending_tracker/view/pages/dashboard.dart';
-import 'package:simple_spending_tracker/view/pages/settings_page.dart';
+import 'package:piggy_log/view/pages/calendar_page.dart';
+import 'package:piggy_log/view/pages/category_page.dart';
+import 'package:piggy_log/view/pages/dashboard.dart';
+import 'package:piggy_log/view/pages/settings_page.dart';
 import '../../controller/tabbar_controller.dart';
 
 class Maintabbar extends StatelessWidget {

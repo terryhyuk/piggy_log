@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:simple_spending_tracker/VM/database_handler.dart';
-import 'package:simple_spending_tracker/model/settings.dart';
+import 'package:piggy_log/VM/database_handler.dart';
+import 'package:piggy_log/model/settings.dart';
 import 'package:sqflite/sql.dart';
 
 class SettingsHandler {

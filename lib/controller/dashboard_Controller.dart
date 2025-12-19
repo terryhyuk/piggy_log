@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
-import 'package:simple_spending_tracker/VM/dashboard_handler.dart';
+import 'package:piggy_log/VM/dashboard_handler.dart';
 import 'package:intl/intl.dart';
 
 class DashboardController extends GetxController {

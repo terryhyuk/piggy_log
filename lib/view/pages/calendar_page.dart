@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
-import 'package:simple_spending_tracker/l10n/app_localizations.dart';
-import 'package:simple_spending_tracker/model/spending_transaction.dart';
-import 'package:simple_spending_tracker/view/widget/calendar_build_widget.dart';
+import 'package:piggy_log/l10n/app_localizations.dart';
+import 'package:piggy_log/model/spending_transaction.dart';
+import 'package:piggy_log/view/widget/calendar_build_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:simple_spending_tracker/controller/calendar_Controller.dart';
-import 'package:simple_spending_tracker/controller/setting_Controller.dart';
-import 'package:simple_spending_tracker/view/pages/transactions_%20detail.dart';
+import 'package:piggy_log/controller/calendar_Controller.dart';
+import 'package:piggy_log/controller/setting_Controller.dart';
+import 'package:piggy_log/view/pages/transactions_%20detail.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});

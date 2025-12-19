@@ -1,4 +1,4 @@
-# simple_spending_tracker
+# piggy_log
 
 A new Flutter project.
 

@@ -1,6 +1,6 @@
 {
-    "name": "simple_spending_tracker",
-    "short_name": "simple_spending_tracker",
+    "name": "piggy_log",
+    "short_name": "piggy_log",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

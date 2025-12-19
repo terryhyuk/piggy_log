@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:simple_spending_tracker/view/widget/animatedShake.dart';
+import 'package:piggy_log/view/widget/animatedShake.dart';
 import '../../model/category.dart';
 
 /// Single Category Card widget

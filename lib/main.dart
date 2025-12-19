@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:simple_spending_tracker/controller/calendar_Controller.dart';
-import 'package:simple_spending_tracker/controller/category_Controller.dart';
-import 'package:simple_spending_tracker/controller/dashboard_Controller.dart';
-import 'package:simple_spending_tracker/controller/setting_Controller.dart';
-import 'package:simple_spending_tracker/controller/tabbar_controller.dart';
-import 'package:simple_spending_tracker/l10n/app_localizations.dart';
-import 'package:simple_spending_tracker/view/splashScrrenPage.dart';
+import 'package:piggy_log/controller/calendar_Controller.dart';
+import 'package:piggy_log/controller/category_Controller.dart';
+import 'package:piggy_log/controller/dashboard_Controller.dart';
+import 'package:piggy_log/controller/setting_Controller.dart';
+import 'package:piggy_log/controller/tabbar_controller.dart';
+import 'package:piggy_log/l10n/app_localizations.dart';
+import 'package:piggy_log/view/splashScrrenPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

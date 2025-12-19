@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:lottie/lottie.dart';
-import 'package:simple_spending_tracker/view/widget/mainTabBar.dart';
+import 'package:piggy_log/view/widget/mainTabBar.dart';
 
 class SplashScreen extends StatefulWidget {
 

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
-import 'package:simple_spending_tracker/controller/setting_Controller.dart';
-import 'package:simple_spending_tracker/model/category.dart';
-import 'package:simple_spending_tracker/view/widget/add_transaction_dialog.dart';
-import 'package:simple_spending_tracker/view/widget/buildHeader.dart';
-import 'package:simple_spending_tracker/view/widget/transaction_list.dart';
+import 'package:piggy_log/controller/setting_Controller.dart';
+import 'package:piggy_log/model/category.dart';
+import 'package:piggy_log/view/widget/add_transaction_dialog.dart';
+import 'package:piggy_log/view/widget/buildHeader.dart';
+import 'package:piggy_log/view/widget/transaction_list.dart';
 
 class TransactionsHistory extends StatefulWidget {
   const TransactionsHistory({super.key});

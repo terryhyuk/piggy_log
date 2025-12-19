@@ -1,7 +1,7 @@
 import 'package:get_x/get.dart';
-import 'package:simple_spending_tracker/VM/database_handler.dart';
-import 'package:simple_spending_tracker/controller/setting_Controller.dart';
-import 'package:simple_spending_tracker/model/category.dart';
+import 'package:piggy_log/VM/database_handler.dart';
+import 'package:piggy_log/controller/setting_Controller.dart';
+import 'package:piggy_log/model/category.dart';
 import 'package:sqflite/sqflite.dart';
 
 class CategoryHandler {

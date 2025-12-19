@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:simple_spending_tracker/l10n/app_localizations.dart';
+import 'package:piggy_log/l10n/app_localizations.dart';
 
 import '../../model/category_icons.dart';
 

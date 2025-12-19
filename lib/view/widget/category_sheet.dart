@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
-import 'package:simple_spending_tracker/VM/category_handler.dart';
-import 'package:simple_spending_tracker/controller/setting_Controller.dart';
-import 'package:simple_spending_tracker/l10n/app_localizations.dart';
-import 'package:simple_spending_tracker/model/category.dart';
-import 'package:simple_spending_tracker/view/widget/color_picker_sheet.dart';
+import 'package:piggy_log/VM/category_handler.dart';
+import 'package:piggy_log/controller/setting_Controller.dart';
+import 'package:piggy_log/l10n/app_localizations.dart';
+import 'package:piggy_log/model/category.dart';
+import 'package:piggy_log/view/widget/color_picker_sheet.dart';
 import 'icon_picker_sheet.dart';
 
 /**

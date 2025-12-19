@@ -1,5 +1,5 @@
-import 'package:simple_spending_tracker/VM/database_handler.dart';
-import 'package:simple_spending_tracker/model/spending_transaction.dart';
+import 'package:piggy_log/VM/database_handler.dart';
+import 'package:piggy_log/model/spending_transaction.dart';
 
 class TransactionHandler {
   final DatabaseHandler databaseHandler = DatabaseHandler();

@@ -1,7 +1,7 @@
 
 import 'package:get_x/get.dart';
-import 'package:simple_spending_tracker/VM/calender_handler.dart';
-import 'package:simple_spending_tracker/controller/setting_Controller.dart';
+import 'package:piggy_log/VM/calender_handler.dart';
+import 'package:piggy_log/controller/setting_Controller.dart';
 
 class CalendarController extends GetxController {
   final CalenderHandler calenderHandler = CalenderHandler();

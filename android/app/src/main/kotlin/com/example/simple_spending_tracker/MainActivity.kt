@@ -1,4 +1,4 @@
-package com.example.simple_spending_tracker
+package com.example.piggy_log
 
 import io.flutter.embedding.android.FlutterActivity
 

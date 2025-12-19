@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
-import 'package:simple_spending_tracker/l10n/app_localizations.dart';
-import 'package:simple_spending_tracker/model/category.dart';
+import 'package:piggy_log/l10n/app_localizations.dart';
+import 'package:piggy_log/model/category.dart';
 
 class BuildHeader extends StatelessWidget {
   // Property

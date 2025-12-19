@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:intl/intl.dart';
-import 'package:simple_spending_tracker/VM/settings_handler.dart';
-import 'package:simple_spending_tracker/controller/calendar_Controller.dart';
-import 'package:simple_spending_tracker/controller/dashboard_Controller.dart';
-import 'package:simple_spending_tracker/model/settings.dart';
+import 'package:piggy_log/VM/settings_handler.dart';
+import 'package:piggy_log/controller/calendar_Controller.dart';
+import 'package:piggy_log/controller/dashboard_Controller.dart';
+import 'package:piggy_log/model/settings.dart';
 
 class SettingsController extends GetxController {
   final SettingsHandler _handler = SettingsHandler();

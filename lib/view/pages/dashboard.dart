@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
-import 'package:simple_spending_tracker/VM/budget_handler.dart';
-import 'package:simple_spending_tracker/controller/dashboard_Controller.dart';
-import 'package:simple_spending_tracker/controller/setting_Controller.dart';
-import 'package:simple_spending_tracker/l10n/app_localizations.dart';
-import 'package:simple_spending_tracker/view/widget/chart_widget.dart';
+import 'package:piggy_log/VM/budget_handler.dart';
+import 'package:piggy_log/controller/dashboard_Controller.dart';
+import 'package:piggy_log/controller/setting_Controller.dart';
+import 'package:piggy_log/l10n/app_localizations.dart';
+import 'package:piggy_log/view/widget/chart_widget.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});

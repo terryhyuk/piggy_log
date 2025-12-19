@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
-import 'package:simple_spending_tracker/VM/settings_handler.dart';
-import 'package:simple_spending_tracker/controller/setting_Controller.dart';
-import 'package:simple_spending_tracker/l10n/app_localizations.dart';
-import 'package:simple_spending_tracker/model/settings.dart';
-import 'package:simple_spending_tracker/view/widget/language_sheet.dart';
+import 'package:piggy_log/VM/settings_handler.dart';
+import 'package:piggy_log/controller/setting_Controller.dart';
+import 'package:piggy_log/l10n/app_localizations.dart';
+import 'package:piggy_log/model/settings.dart';
+import 'package:piggy_log/view/widget/language_sheet.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

@@ -96,25 +96,34 @@ class SettingsController extends GetxController {
       'CAD' => '\$',
       'KRW' => '₩',
       'JPY' => '¥',
+      'THB' => '฿',
       _ => '\$',
     };
   }
 
-  _initCurrencyFormat() {
+_initCurrencyFormat() {
     final lang = settings.value?.language ?? 'en';
-    final localeStr = lang == 'ko'
-        ? 'ko_KR'
-        : lang == 'ja'
-        ? 'ja_JP'
-        : 'en_US';
+    
+    final String localeStr = switch (lang) {
+      'ko' => 'ko_KR',
+      'ja' => 'ja_JP',
+      'th' => 'th_TH',
+      _ => 'en_US',
+    };
 
     final symbol = settings.value?.currency_symbol ?? '\$';
+    final code = settings.value?.currency_code ?? 'system'; // 변수 하나 선언
 
-    int decimalDigits =
-        (settings.value?.currency_code == 'KRW' ||
-            settings.value?.currency_code == 'JPY')
-        ? 0
-        : 2;
+    // 핵심: 'system'일 때랑 'KRW/JPY'일 때 둘 다 체크해야 함!
+    int decimalDigits;
+    if (code == 'system') {
+      // 시스템 설정일 때는 현재 폰 언어가 한국어/일본어인지 확인
+      final systemLocale = WidgetsBinding.instance.platformDispatcher.locale.toString();
+      decimalDigits = (systemLocale.contains('ko') || systemLocale.contains('ja')) ? 0 : 2;
+    } else {
+      // 사용자가 직접 통화를 골랐을 때
+      decimalDigits = (code == 'KRW' || code == 'JPY') ? 0 : 2;
+    }
 
     currencyFormat = NumberFormat.currency(
       locale: localeStr,
@@ -122,6 +131,36 @@ class SettingsController extends GetxController {
       decimalDigits: decimalDigits,
     );
   }
+  // _initCurrencyFormat() {
+  //   final lang = settings.value?.language ?? 'en';
+    
+  //   final String localeStr = switch (lang) {
+  //     'ko' => 'ko_KR',
+  //     'ja' => 'ja_JP',
+  //     'th' => 'th_TH',
+  //     _ => 'en_US',
+  //   };
+
+  //   // final localeStr = lang == 'ko'
+  //   //     ? 'ko_KR'
+  //   //     : lang == 'ja'
+  //   //     ? 'ja_JP'
+  //   //     : 'en_US';
+
+  //   final symbol = settings.value?.currency_symbol ?? '\$';
+
+  //   int decimalDigits =
+  //       (settings.value?.currency_code == 'KRW' ||
+  //           settings.value?.currency_code == 'JPY')
+  //       ? 0
+  //       : 2;
+
+  //   currencyFormat = NumberFormat.currency(
+  //     locale: localeStr,
+  //     symbol: symbol,
+  //     decimalDigits: decimalDigits,
+  //   );
+  // }
 
   _initDateFormat() {
     final formatStr = settings.value?.date_format ?? 'yyyy-MM-dd';

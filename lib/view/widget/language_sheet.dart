@@ -11,9 +11,11 @@ class LanguageSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final languages = [
+      {'label': 'System Default', 'code': 'system'},
       {'label': 'English', 'code': 'en'},
       {'label': '한국어', 'code': 'ko'},
       {'label': '日本語', 'code': 'ja'},
+      {'label': 'ไทย (Thai)', 'code': 'th'}
     ];
 
     return Container(
@@ -37,7 +39,9 @@ class LanguageSheet extends StatelessWidget {
             return ListTile(
               title: Text(
                 lang['label']!,
-                style: theme.textTheme.bodyLarge,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: currentLanguage == lang['code'] ? FontWeight.bold : null,
+                ),
               ),
               trailing: currentLanguage == lang['code']
                   ? Icon(Icons.check, color: theme.colorScheme.primary)

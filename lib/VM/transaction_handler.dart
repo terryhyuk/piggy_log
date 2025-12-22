@@ -28,8 +28,6 @@ Future<int> insertTransaction(
   final dateStr =
       "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 
-  print("=== INSERT DATE === $dateStr"); // 확인용
-
   // 4️⃣ DB insert
   return await db.rawInsert(
     """

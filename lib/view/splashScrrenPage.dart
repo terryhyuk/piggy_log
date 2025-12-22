@@ -23,26 +23,12 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 
-  _navigateToHome() {
+  void _navigateToHome() {
     Get.offAll(
-    () => Maintabbar(),
-    transition: Transition.fade,
-    duration: const Duration(seconds: 1),
-  );
-    // Navigator.of(context).pushReplacement(
-    //   PageRouteBuilder(
-    //     pageBuilder: (context, animation, secondaryAnimation) =>
-    //         Maintabbar(),
-    //     transitionsBuilder:
-    //         (context, animation, secondaryAnimation, child) {
-    //       return FadeTransition(
-    //         opacity: animation,
-    //         child: child,
-    //       );
-    //     },
-    //     transitionDuration: const Duration(seconds: 1),
-    //   ),
-    // );
+      () => Maintabbar(),
+      transition: Transition.fade,
+      duration: const Duration(seconds: 1),
+    );
   }
 
   @override

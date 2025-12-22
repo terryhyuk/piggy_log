@@ -61,9 +61,23 @@ class ChartsWidget extends StatelessWidget {
             ),
             borderData: FlBorderData(show: false),
             radarBackgroundColor: Colors.transparent,
-            getTitle: (index, angle) => RadarChartTitle(
-              text: labels[index], 
-              angle: 0),
+            getTitle: (index, angle) {
+              // 라벨 텍스트 가져오기
+              String label = labels[index];
+              
+              // 6자가 넘어가면 잘라내고 '...' 추가 (숫자는 앱 디자인에 맞춰 조절하세요)
+              if (label.length > 6) {
+                label = '${label.substring(0, 5)}..';
+              }
+
+              return RadarChartTitle(
+                text: label, 
+                angle: 0,
+              );
+            },
+            // getTitle: (index, angle) => RadarChartTitle(
+            //   text: labels[index],
+            //   angle: 0),
             dataSets: [
               RadarDataSet(
                 dataEntries: values.map((v) => RadarEntry(value: v)).toList(),

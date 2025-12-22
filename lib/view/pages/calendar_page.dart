@@ -169,22 +169,32 @@ class _CalendarPageState extends State<CalendarPage> {
                           try {
                             // 1. Map 데이터를 안전하게 SpendingTransaction 객체로 변환
                             final trxObject = SpendingTransaction(
-                              t_id: tx['t_id'],
-                              c_id: tx['c_id'] ?? 0, // null일 경우 기본값 0
-                              t_name:
-                                  tx['t_name']?.toString() ??
-                                  '', // null일 경우 빈 문자열
-                              amount: (tx['amount'] as num?)?.toDouble() ?? 0.0,
-                              date:
-                                  tx['date']?.toString() ??
-                                  DateTime.now()
-                                      .toIso8601String(), // 날짜 null 방지
-                              type: tx['type']?.toString() ?? 'expense',
-                              memo: tx['memo']?.toString() ?? '',
-                              isRecurring:
-                                  tx['isRecurring'] == 1 ||
-                                  tx['isRecurring'] == true,
-                            );
+  t_id: tx['t_id'],
+  c_id: tx['c_id'], // 👈 이제 핸들러에서 가져온 진짜 c_id가 들어갑니다!
+  t_name: tx['t_name']?.toString() ?? '',
+  amount: (tx['amount'] as num?)?.toDouble() ?? 0.0,
+  date: tx['date']?.toString() ?? DateTime.now().toIso8601String(),
+  type: tx['type']?.toString() ?? 'expense',
+  memo: tx['memo']?.toString() ?? '',
+  isRecurring: tx['isRecurring'] == 1,
+);
+                            // final trxObject = SpendingTransaction(
+                            //   t_id: tx['t_id'],
+                            //   c_id: tx['c_id'] ?? 0, // null일 경우 기본값 0
+                            //   t_name:
+                            //       tx['t_name']?.toString() ??
+                            //       '', // null일 경우 빈 문자열
+                            //   amount: (tx['amount'] as num?)?.toDouble() ?? 0.0,
+                            //   date:
+                            //       tx['date']?.toString() ??
+                            //       DateTime.now()
+                            //           .toIso8601String(), // 날짜 null 방지
+                            //   type: tx['type']?.toString() ?? 'expense',
+                            //   memo: tx['memo']?.toString() ?? '',
+                            //   isRecurring:
+                            //       tx['isRecurring'] == 1 ||
+                            //       tx['isRecurring'] == true,
+                            // );
 
                             // 2. 객체 전달
                             Get.to(

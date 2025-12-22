@@ -21,12 +21,11 @@ class CalenderHandler {
   return map;
   }
 
-  // 
 Future<List<Map<String, dynamic>>> getTransactionsByDate(String date) async {
   final db = await handler.initializeDB();
   final result = await db.rawQuery(
     """
-    SELECT t_id, t_name, amount, type, memo
+    SELECT t_id, t_name, amount, type, memo, c_id, isRecurring -- ⭐ c_id를 꼭 추가해야 함!
     FROM spending_transactions
     WHERE date = ?
     ORDER BY t_id DESC
@@ -40,7 +39,29 @@ Future<List<Map<String, dynamic>>> getTransactionsByDate(String date) async {
     'amount': (r['amount'] as num?)?.toDouble() ?? 0.0,
     'type': r['type'],
     'memo': r['memo'],
+    'c_id': r['c_id'], // ⭐ 여기도 추가!
+    'isRecurring': r['isRecurring'], // ⭐ 여기도 추가!
   }).toList();
 }
+// Future<List<Map<String, dynamic>>> getTransactionsByDate(String date) async {
+//   final db = await handler.initializeDB();
+//   final result = await db.rawQuery(
+//     """
+//     SELECT t_id, t_name, amount, type, memo
+//     FROM spending_transactions
+//     WHERE date = ?
+//     ORDER BY t_id DESC
+//     """,
+//     [date],
+//   );
+
+//   return result.map((r) => {
+//     't_id': r['t_id'],
+//     't_name': r['t_name'],
+//     'amount': (r['amount'] as num?)?.toDouble() ?? 0.0,
+//     'type': r['type'],
+//     'memo': r['memo'],
+//   }).toList();
+// }
 
 }

@@ -29,7 +29,7 @@ class CategoryHandler {
   Future<List<Category>> queryCategory() async {
     final db = await databaseHandler.initializeDB();
     final List<Map<String, Object?>> queryCategory = await db.rawQuery("""
-      select * from categories
+      select * from categories order by id desc
       """);
     return queryCategory.map((e) => Category.fromMap(e)).toList();
   }

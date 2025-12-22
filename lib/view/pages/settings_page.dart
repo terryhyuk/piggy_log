@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
+import 'package:intl/intl.dart';
 import 'package:piggy_log/VM/settings_handler.dart';
 import 'package:piggy_log/controller/setting_Controller.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
@@ -24,28 +25,58 @@ class _SettingsPageState extends State<SettingsPage> {
     loadSettings();
   }
 
-  Future<void> loadSettings() async {
-    final handler = SettingsHandler();
-    final result = await handler.getSettings();
+Future<void> loadSettings() async {
+  final handler = SettingsHandler();
+  final result = await handler.getSettings();
 
-    // if null, create default and insert to DB
-    if (result == null) {
-      settings = Settings(
-        id: 1,
-        language: 'system',
-        currency_code: 'system',
-        currency_symbol: '\$',
-        date_format: 'yyyy-MM-dd',
-        theme_mode: 'system',
-      );
-      await handler.insertDefaultSettings();
-    } else {
-      settings = result;
-    }
+  if (result == null) {
+    final locale = WidgetsBinding.instance.platformDispatcher.locale;
+    final String localeString = locale.toString();
 
-    isLoaded = true;
-    setState(() {});
+    int? digits = (localeString.contains('ko') || localeString.contains('ja')) ? 0 : null;
+
+    final format = NumberFormat.simpleCurrency(
+      locale: localeString, 
+      decimalDigits: digits
+    );
+
+    settings = Settings(
+      id: 1,
+      language: 'system',
+      currency_code: 'system',
+      currency_symbol: format.currencySymbol, 
+      date_format: 'yyyy-MM-dd',
+      theme_mode: 'system',
+    );
+    await handler.insertDefaultSettings();
+  } else {
+    settings = result;
   }
+  isLoaded = true;
+  setState(() {});
+}
+  // Future<void> loadSettings() async {
+  //   final handler = SettingsHandler();
+  //   final result = await handler.getSettings();
+
+  //   // if null, create default and insert to DB
+  //   if (result == null) {
+  //     settings = Settings(
+  //       id: 1,
+  //       language: 'system',
+  //       currency_code: 'system',
+  //       currency_symbol: '\$',
+  //       date_format: 'yyyy-MM-dd',
+  //       theme_mode: 'system',
+  //     );
+  //     await handler.insertDefaultSettings();
+  //   } else {
+  //     settings = result;
+  //   }
+
+  //   isLoaded = true;
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +125,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   const PopupMenuItem(value: 'KRW', child: Text('KRW - ₩')),
                   const PopupMenuItem(value: 'CAD', child: Text('CAD - \$')),
                   const PopupMenuItem(value: 'JPY', child: Text('JPY - ¥')),
+                  const PopupMenuItem(value: 'THB', child: Text('THB - ฿'))
               ],
             ),
           ),
@@ -155,22 +187,49 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   _changeCurrency(String currencyCode) async {
-    final currencies = {
-      'USD': {'symbol': '\$', 'code': 'USD'},
-      'CAD': {'symbol': '\$', 'code': 'CAD'},
-      'KRW': {'symbol': '₩', 'code': 'KRW'},
-      'JPY': {'symbol': '¥', 'code': 'JPY'},
-    };
+  final currencies = {
+    'USD': {'symbol': '\$', 'code': 'USD'},
+    'CAD': {'symbol': '\$', 'code': 'CAD'},
+    'KRW': {'symbol': '₩', 'code': 'KRW'},
+    'JPY': {'symbol': '¥', 'code': 'JPY'},
+    'THB': {'symbol': '฿', 'code': 'THB'},
+  };
 
+  if (currencyCode == 'system') {
+    // get system locale
+    final locale = WidgetsBinding.instance.platformDispatcher.locale;
+    final format = NumberFormat.simpleCurrency(locale: locale.toString());
+    
+    settings.currency_code = 'system'; 
+    settings.currency_symbol = format.currencySymbol; // system local symbol 
+  } else {
     final data = currencies[currencyCode]!;
     settings.currency_symbol = data['symbol']!;
     settings.currency_code = data['code']!;
-
-    await SettingsHandler().updateSettings(settings);
-      Get.find<SettingsController>().setCurrency(currencyCode);
-
-    setState(() {});
   }
+
+  await SettingsHandler().updateSettings(settings);
+  Get.find<SettingsController>().setCurrency(currencyCode);
+  setState(() {});
+}
+
+  // _changeCurrency(String currencyCode) async {
+  //   final currencies = {
+  //     'USD': {'symbol': '\$', 'code': 'USD'},
+  //     'CAD': {'symbol': '\$', 'code': 'CAD'},
+  //     'KRW': {'symbol': '₩', 'code': 'KRW'},
+  //     'JPY': {'symbol': '¥', 'code': 'JPY'},
+  //   };
+
+  //   final data = currencies[currencyCode]!;
+  //   settings.currency_symbol = data['symbol']!;
+  //   settings.currency_code = data['code']!;
+
+  //   await SettingsHandler().updateSettings(settings);
+  //     Get.find<SettingsController>().setCurrency(currencyCode);
+
+  //   setState(() {});
+  // }
 
   _changeDateFormat(String format) async {
     settings.date_format = format;

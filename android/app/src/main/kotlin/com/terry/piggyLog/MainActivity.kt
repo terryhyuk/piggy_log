@@ -1,4 +1,4 @@
-package com.example.piggy_log
+package com.terry.piggyLog
 
 import io.flutter.embedding.android.FlutterActivity
 

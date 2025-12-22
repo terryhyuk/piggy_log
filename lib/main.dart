@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
 
     return Obx(
       () => GetMaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Piggy Log',
         locale: controller.locale.value,
         themeMode: controller.themeMode.value ?? ThemeMode.system,

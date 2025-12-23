@@ -21,8 +21,20 @@
 
 * **Multi-Language Support**: Full localization for **English, Korean, Japanese, and Thai**.
 * **Budget Management**: Set and track monthly goals by category.
-* **Data Visualization**: Insightful charts for spending patterns using `Syncfusion`.
+* **Data Visualization**: Interactive charts for spending insights
 * **Personalization**: Customizable categories with diverse icons and color palettes.
+
+---
+
+
+## 🛠 Key Libraries
+
+* **GetX** – MVVM-based state management and reactive UI updates
+* **sqflite** – Offline-first local database using SQLite
+* **fl_chart** – Interactive data visualization with animations and touch handling
+* **table_calendar** – Calendar-driven transaction browsing
+* **intl** – Localization and date/number formatting
+
 
 ---
 
@@ -83,12 +95,16 @@ lib/
 ```
 
 
-💡 Technical Challenges & Solutions
-Challenge: Managing consistent data types between SQLite and Dart.
+---
 
-Solution: Refactored the DatabaseHandler to strictly align with the physical schema, ensuring REAL types for currency to prevent rounding errors during calculations.
+## 💡 Technical Challenges & Solutions
 
-📬 Contact
-Terry Yoon 📧 yonghyuk.terry.yoon@gmail.com
+* **Challenge**: Managing consistent data types between SQLite and Dart.
+* **Solution**: Refactored the `DatabaseHandler` to strictly align with the physical schema, ensuring `REAL` types for currency to prevent rounding errors during calculations.
 
+---
+
+## 📬 Contact
+
+**Terry Yoon** 📧 [yonghyuk.terry.yoon@gmail.com](mailto:yonghyuk.terry.yoon@gmail.com)  
 📍 Vancouver, BC, Canada

@@ -188,4 +188,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get errorTransactionDetail => 'ไม่สามารถเปิดรายละเอียดธุรกรรมได้';
+
+  @override
+  String get pleaseEnterCategoryName => 'กรุณากรอกชื่อหมวดหมู่';
 }

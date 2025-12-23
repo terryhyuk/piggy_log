@@ -188,4 +188,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorTransactionDetail => 'Failed to open transaction detail.';
+
+  @override
+  String get pleaseEnterCategoryName => 'Please enter a category name';
 }

@@ -58,5 +58,6 @@
   "recentTransactions": "최근 거래",
   "enterMonthlyBudget": "월 예산 입력",
   "dateformat": "날짜 형식",
-  "errorTransactionDetail": "거래 상세 정보를 열지 못했습니다."
+  "errorTransactionDetail": "거래 상세 정보를 열지 못했습니다.",
+  "pleaseEnterCategoryName": "카테고리 이름을 입력해주세요"
 }

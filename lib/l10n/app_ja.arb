@@ -58,5 +58,6 @@
   "recentTransactions": "最近の取引",
   "enterMonthlyBudget": "月間予算入力",
   "dateformat": "日付形式",
-  "errorTransactionDetail": "取引の詳細を開けませんでした。"
+  "errorTransactionDetail": "取引の詳細を開けませんでした。",
+  "pleaseEnterCategoryName": "カテゴリー名を入力してください"
 }

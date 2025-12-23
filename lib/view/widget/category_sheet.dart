@@ -7,25 +7,16 @@ import 'package:piggy_log/model/category.dart';
 import 'package:piggy_log/view/widget/color_picker_sheet.dart';
 import 'icon_picker_sheet.dart';
 
-/**
- * CategorySheet - Category Add/Edit Bottom Sheet
- * 
- * Responsive bottom sheet for adding or editing categories in the allowance tracker app.
- * - Icon selection (calls IconPickerSheet)
- * - Color selection (calls ColorPickerSheet)
- * - Category name input
- * - iOS/Android responsive layout (uses LayoutBuilder)
- * - Full dark/light mode support
- * 
- * Usage:
- * Get.bottomSheet(CategorySheet());                    // Add new category
- * Get.bottomSheet(CategorySheet(initialData: data));  // Edit existing category
- */
+// --------------------------------------------------------------
+//  * CategorySheet - Category Creation & Edition Bottom Sheet
+//  * * A responsive UI component for managing expense categories.
+//  * - Icon selection via IconPickerSheet
+//  * - Color selection via ColorPickerSheet
+//  * - Category name input with validation
+//  * - Cross-platform responsive layout (iOS/Android/Tablet)
+//  * - Dynamic theme support (Light/Dark mode)
+//  --------------------------------------------------------------
 
-
-/// CategorySheet
-/// Responsive bottom sheet for creating/editing categories.
-/// Icon picker maintained (search will be removed from IconPickerSheet).
 class CategorySheet extends StatefulWidget {
   final Map<String, dynamic>? initialData;
 
@@ -36,21 +27,21 @@ class CategorySheet extends StatefulWidget {
 }
 
 class _CategoryEditSheetState extends State<CategorySheet> {
-  /// 카테고리 편집 상태 변수들
+  /// Properties for managing category state
   late IconData selectedIcon = Icons.category;
   late Color selectedColor = Colors.grey;
   late TextEditingController c_nameController = TextEditingController();
-  late String selectedHexColor; // For saving to DB
+  late String selectedHexColor; // For DB storage in Hex format
 
   @override
   void initState() {
     super.initState();
 
-    /// 초기 hex 색상 생성 / 기존 카테고리 데이터 로드 (편집 모드)
+    /// Initialize default hex color and load existing data if in Edit Mode
     selectedHexColor = selectedColor.value.toRadixString(16).padLeft(8, '0');
 
     if (widget.initialData != null) {
-      /// 편집 모드: 기존 데이터 로드
+      /// Edit Mode: Populating existing data into fields
       c_nameController.text = widget.initialData!['c_name'];
       selectedColor = Color(int.parse(widget.initialData!['color'], radix: 16));
       selectedHexColor = selectedColor.value.toRadixString(16).padLeft(8, '0');
@@ -64,20 +55,27 @@ class _CategoryEditSheetState extends State<CategorySheet> {
   }
 
   @override
+  void dispose() {
+    /// Clean up controller to prevent memory leaks
+    c_nameController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final local = AppLocalizations.of(context)!;
 
     return SafeArea(
-      /// iPhone 하단 영역과 겹침 방지
+      /// Prevents UI overlap with iOS bottom home indicator
       top: false,
       child: SingleChildScrollView(
         padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         child: LayoutBuilder(
-          /// 반응형 크기 계산 (iOS/Android/태블릿 호환)
+          /// Calculating responsive sizes for cross-device compatibility
           builder: (context, constraints) {
             double maxW = constraints.maxWidth;
-            double iconBox = maxW * 0.26;  /// 반응형 아이콘 박스 크기
+            double iconBox = maxW * 0.26;  /// Responsive container size
             double iconSize = maxW * 0.13;
         
             return Container(
@@ -91,11 +89,11 @@ class _CategoryEditSheetState extends State<CategorySheet> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  /// ---------- 헤더 ----------
+                  /// ---------- Header ----------
                   Text(
                     widget.initialData == null
-                        ? local.addCategory      /// "카테고리 추가"
-                        : local.editCategory,    /// "카테고리 수정"
+                        ? local.addCategory      /// "Add Category"
+                        : local.editCategory,    /// "Edit Category"
                     style: theme.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                         ) ?? const TextStyle(
@@ -105,10 +103,10 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                   ),
                   const SizedBox(height: 22),
         
-                  /// ---------- 아이콘 + 이름 입력 ----------
+                  /// ---------- Icon & Name Input Section ----------
                   Row(
                     children: [
-                      /// 아이콘 선택 박스 (+ 모양 기본 표시)
+                      /// Icon Selection Trigger (Displays '+' by default)
                       GestureDetector(
                         onTap: () async {
                           final result = await showModalBottomSheet(
@@ -118,7 +116,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                           );
                           if (result != null) {
                             setState(() {
-                              /// 선택된 아이콘 업데이트
+                              /// Update UI with the selected icon
                               selectedIcon = result['icon'];
                             });
                           }
@@ -136,12 +134,12 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                           ),
                           child: selectedIcon == Icons.category
                               ? Icon(
-                                  Icons.add, // 기본 상태: + 모양
+                                  Icons.add, // Placeholder '+' icon
                                   size: iconSize * 0.8,
                                   color: theme.colorScheme.onSurfaceVariant,
                                 )
                               : Icon(
-                                  selectedIcon, // 선택된 사용자 아이콘
+                                  selectedIcon, // Selected category icon
                                   size: iconSize,
                                   color: selectedColor,
                                 ),
@@ -149,7 +147,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                       ),
                       const SizedBox(width: 20),
         
-                      /// 카테고리 이름 입력 필드
+                      /// Category Name TextField
                       Expanded(
                         child: TextField(
                           controller: c_nameController,
@@ -165,7 +163,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                   ),
                   const SizedBox(height: 32),
         
-                  /// ---------- 색상 선택 영역 ----------
+                  /// ---------- Color Picker Section ----------
                   GestureDetector(
                     onTap: () async {
                       final Color? picked = await showModalBottomSheet<Color>(
@@ -175,7 +173,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                       );
                       if (picked != null) {
                         setState(() {
-                          /// 색상 선택 업데이트
+                          /// Sync selected color and generate Hex string
                           selectedColor = picked;
                           selectedHexColor = picked.value
                               .toRadixString(16)
@@ -188,7 +186,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                       children: [
                         Text(local.color, style: theme.textTheme.bodyMedium),
                         SizedBox(width: maxW * 0.07),
-                        /// 색상 미리보기 원
+                        /// Color Preview Circle
                         Container(
                           width: 34,
                           height: 34,
@@ -202,11 +200,11 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                   ),
                   const SizedBox(height: 38),
         
-                  /// ---------- 액션 버튼들 ----------
+                  /// ---------- Action Buttons ----------
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      /// 취소 버튼
+                      /// Cancel Action
                       ElevatedButton(
                         onPressed: () => Navigator.pop(context),
                         style: ElevatedButton.styleFrom(
@@ -216,7 +214,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                         child: Text(local.cancel),
                       ),
         
-                      /// 저장 버튼
+                      /// Save Action (Create or Update)
                       ElevatedButton(
                         onPressed: saveCategory,
                         style: ElevatedButton.styleFrom(
@@ -237,18 +235,28 @@ class _CategoryEditSheetState extends State<CategorySheet> {
     );
   }
 
-  /// 카테고리 저장 (추가/수정) 및 성공 피드백 표시
+  /// Handles category persistence and provides UI feedback
   Future<void> saveCategory() async {
-    if (c_nameController.text.trim().isEmpty) return;
-
+    /// Basic validation for category name
     final local = AppLocalizations.of(context)!;
+    final name = c_nameController.text.trim();
+
+    if(name.isEmpty){
+      showSnackBar(
+        "",
+        local.pleaseEnterCategoryName, 
+        Colors.orange,
+        );
+        return;
+    }
+
 
     if (widget.initialData == null) {
-      /// 새 카테고리 추가
+      /// Logic for creating a new category
       await addCategory();
       showSnackBar(local.categoryCreated, local.newCategoryAdded, Colors.green);
     } else {
-      /// 기존 카테고리 수정
+      /// Logic for updating existing category history
       await editCategory_history();
       showSnackBar(local.categoryUpdated, local.changesSaved, Colors.blue);
     }
@@ -256,7 +264,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
     Navigator.pop(context);
   }
 
-  /// 새 카테고리를 DB에 추가하고 모든 데이터 새로고침
+  /// Persists a new category record to the database
   Future<void> addCategory() async {
     final category = Category(
       iconCodePoint: selectedIcon.codePoint,
@@ -270,7 +278,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
     await Get.find<SettingsController>().refreshAllData();
   }
 
-  /// 기존 카테고리를 DB에서 업데이트
+  /// Updates an existing category record in the database
   Future<void> editCategory_history() async {
     final category = Category(
       id: widget.initialData!['id'],
@@ -285,7 +293,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
     await Get.find<SettingsController>().refreshAllData();
   }
 
-  /// 사용자 피드백을 위한 스낵바 표시
+  /// Global Snackbar for user action feedback
   void showSnackBar(String title, String message, Color bgColor) {
     Get.snackbar(
       title,
@@ -295,12 +303,5 @@ class _CategoryEditSheetState extends State<CategorySheet> {
       backgroundColor: bgColor,
       colorText: Colors.white,
     );
-  }
-
-  @override
-  void dispose() {
-    /// 컨트롤러 메모리 해제
-    c_nameController.dispose();
-    super.dispose();
   }
 }

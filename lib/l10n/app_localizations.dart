@@ -461,6 +461,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to open transaction detail.'**
   String get errorTransactionDetail;
+
+  /// No description provided for @pleaseEnterCategoryName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a category name'**
+  String get pleaseEnterCategoryName;
 }
 
 class _AppLocalizationsDelegate

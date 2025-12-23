@@ -80,7 +80,7 @@ lib/
 ├── model/       # Data entities synchronized with DB schema
 ├── view/        # UI pages and reusable widgets
 └── VM/          # ViewModels & Database Handlers
-'''
+```
 
 
 💡 Technical Challenges & Solutions

@@ -58,5 +58,6 @@
   "recentTransactions": "Recent Transactions", 
   "enterMonthlyBudget": "Enter Monthly Budget",
   "dateformat": "Date Format",
-  "errorTransactionDetail": "Failed to open transaction detail."
+  "errorTransactionDetail": "Failed to open transaction detail.",
+  "pleaseEnterCategoryName": "Please enter a category name"
 }

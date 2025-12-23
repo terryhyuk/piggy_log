@@ -37,8 +37,7 @@ dependencies:
 
   # get
   get_x: ^5.0.0
-  # charts
-  syncfusion_flutter_charts: ^31.2.12
+  
   # DB(SQflite)
   sqflite: ^2.4.2
   path: ^1.9.1

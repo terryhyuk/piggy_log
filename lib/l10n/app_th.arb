@@ -58,5 +58,6 @@
   "recentTransactions": "ธุรกรรมล่าสุด",
   "enterMonthlyBudget": "กรอกงบประมาณรายเดือน",
   "dateformat": "รูปแบบวันที่",
-  "errorTransactionDetail": "ไม่สามารถเปิดรายละเอียดธุรกรรมได้"
+  "errorTransactionDetail": "ไม่สามารถเปิดรายละเอียดธุรกรรมได้",
+  "pleaseEnterCategoryName": "กรุณากรอกชื่อหมวดหมู่"
 }

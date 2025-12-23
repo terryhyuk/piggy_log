@@ -187,4 +187,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get errorTransactionDetail => '取引の詳細を開けませんでした。';
+
+  @override
+  String get pleaseEnterCategoryName => 'カテゴリー名を入力してください';
 }

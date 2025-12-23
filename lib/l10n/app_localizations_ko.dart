@@ -187,4 +187,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get errorTransactionDetail => '거래 상세 정보를 열지 못했습니다.';
+
+  @override
+  String get pleaseEnterCategoryName => '카테고리 이름을 입력해주세요';
 }

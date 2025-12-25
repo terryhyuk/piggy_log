@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:intl/intl.dart';
 import 'package:piggy_log/VM/settings_handler.dart';
-import 'package:piggy_log/controller/calendar_Controller.dart';
-import 'package:piggy_log/controller/dashboard_Controller.dart';
+import 'package:piggy_log/controller/calendar_controller.dart';
+import 'package:piggy_log/controller/dashboard_controller.dart';
 import 'package:piggy_log/model/settings.dart';
 
 class SettingsController extends GetxController {
@@ -131,36 +131,6 @@ _initCurrencyFormat() {
       decimalDigits: decimalDigits,
     );
   }
-  // _initCurrencyFormat() {
-  //   final lang = settings.value?.language ?? 'en';
-    
-  //   final String localeStr = switch (lang) {
-  //     'ko' => 'ko_KR',
-  //     'ja' => 'ja_JP',
-  //     'th' => 'th_TH',
-  //     _ => 'en_US',
-  //   };
-
-  //   // final localeStr = lang == 'ko'
-  //   //     ? 'ko_KR'
-  //   //     : lang == 'ja'
-  //   //     ? 'ja_JP'
-  //   //     : 'en_US';
-
-  //   final symbol = settings.value?.currency_symbol ?? '\$';
-
-  //   int decimalDigits =
-  //       (settings.value?.currency_code == 'KRW' ||
-  //           settings.value?.currency_code == 'JPY')
-  //       ? 0
-  //       : 2;
-
-  //   currencyFormat = NumberFormat.currency(
-  //     locale: localeStr,
-  //     symbol: symbol,
-  //     decimalDigits: decimalDigits,
-  //   );
-  // }
 
   _initDateFormat() {
     final formatStr = settings.value?.date_format ?? 'yyyy-MM-dd';

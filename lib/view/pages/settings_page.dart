@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:intl/intl.dart';
 import 'package:piggy_log/VM/settings_handler.dart';
-import 'package:piggy_log/controller/setting_Controller.dart';
+import 'package:piggy_log/controller/setting_controller.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 import 'package:piggy_log/model/settings.dart';
 import 'package:piggy_log/view/widget/language_sheet.dart';
@@ -55,28 +55,6 @@ Future<void> loadSettings() async {
   isLoaded = true;
   setState(() {});
 }
-  // Future<void> loadSettings() async {
-  //   final handler = SettingsHandler();
-  //   final result = await handler.getSettings();
-
-  //   // if null, create default and insert to DB
-  //   if (result == null) {
-  //     settings = Settings(
-  //       id: 1,
-  //       language: 'system',
-  //       currency_code: 'system',
-  //       currency_symbol: '\$',
-  //       date_format: 'yyyy-MM-dd',
-  //       theme_mode: 'system',
-  //     );
-  //     await handler.insertDefaultSettings();
-  //   } else {
-  //     settings = result;
-  //   }
-
-  //   isLoaded = true;
-  //   setState(() {});
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -212,24 +190,6 @@ Future<void> loadSettings() async {
   Get.find<SettingsController>().setCurrency(currencyCode);
   setState(() {});
 }
-
-  // _changeCurrency(String currencyCode) async {
-  //   final currencies = {
-  //     'USD': {'symbol': '\$', 'code': 'USD'},
-  //     'CAD': {'symbol': '\$', 'code': 'CAD'},
-  //     'KRW': {'symbol': '₩', 'code': 'KRW'},
-  //     'JPY': {'symbol': '¥', 'code': 'JPY'},
-  //   };
-
-  //   final data = currencies[currencyCode]!;
-  //   settings.currency_symbol = data['symbol']!;
-  //   settings.currency_code = data['code']!;
-
-  //   await SettingsHandler().updateSettings(settings);
-  //     Get.find<SettingsController>().setCurrency(currencyCode);
-
-  //   setState(() {});
-  // }
 
   _changeDateFormat(String format) async {
     settings.date_format = format;

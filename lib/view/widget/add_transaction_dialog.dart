@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:piggy_log/VM/transaction_handler.dart';
-import 'package:piggy_log/controller/setting_Controller.dart';
+import 'package:piggy_log/controller/setting_controller.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 import 'package:piggy_log/model/spending_transaction.dart';
 

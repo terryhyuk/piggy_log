@@ -66,6 +66,17 @@ After finalizing the logic, I designed the **Physical Schema** using **ERDCloud*
 
 ---
 
+* ### 3. System Architecture (SFD)
+To ensure clear business logic and efficient state management, I designed a **System Flow Diagram (SFD)**. This maps the reactive interactions between the UI, GetX Controllers, and SQLite Handlers.
+
+![System Flow Diagram](./docs/design/sfd_architecture.png)
+
+* **Consolidated Management**: Integrated Locale and Settings management into a single controller to improve code cohesion.
+* **Reactive Data Flow**: Implemented a global refresh trigger system to ensure data synchronization across Dashboard, Calendar, and History views.
+* **Decoupled Architecture**: Separated business logic (Controllers) from data persistence (Handlers) to maintain a clean MVVM structure.
+
+---
+
 ## 🎨 UI/UX & Marketing Assets
 
 * **Prototyping**: Designed high-fidelity wireframes and UI components using **Figma** to ensure a user-centric interface.

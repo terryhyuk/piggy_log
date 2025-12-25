@@ -1,6 +1,6 @@
 import 'package:get_x/get.dart';
 import 'package:piggy_log/VM/database_handler.dart';
-import 'package:piggy_log/controller/setting_Controller.dart';
+import 'package:piggy_log/controller/setting_controller.dart';
 import 'package:piggy_log/model/category.dart';
 import 'package:sqflite/sqflite.dart';
 

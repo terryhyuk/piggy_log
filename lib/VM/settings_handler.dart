@@ -57,4 +57,42 @@ class SettingsHandler {
     return null;
   }
 
+
+  // --- Backup All Tables ---
+
+  /// Get all data from all tables for a full backup
+  Future<Map<String, List<Map<String, dynamic>>>> getAllAppData() async {
+    final db = await databaseHandler.initializeDB();
+    return {
+      'categories': await db.query('categories'),
+      'spending_transactions': await db.query('spending_transactions'),
+      'monthly_budget': await db.query('monthly_budget'),
+      'settings': await db.query('settings'),
+    };
+  }
+
+  /// Wipe everything before restore (except settings if you want to keep current)
+  Future<void> clearAllAppData() async {
+    final db = await databaseHandler.initializeDB();
+    await db.transaction((txn) async {
+      await txn.delete('spending_transactions');
+      await txn.delete('monthly_budget');
+      await txn.delete('categories');
+      // Reset auto-increment sequences
+      await txn.delete('sqlite_sequence');
+    });
+  }
+  
+  /// Bulk insert for any table
+  Future<void> insertTableData(String tableName, List<Map<String, dynamic>> dataList) async {
+    final db = await databaseHandler.initializeDB();
+    await db.transaction((txn) async {
+      await txn.execute('PRAGMA foreign_keys = OFF');
+      for (var data in dataList) {
+        await txn.insert(tableName, data, conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+      await txn.execute('PRAGMA foreign_keys = ON');
+    });
+  }
+
 } // END

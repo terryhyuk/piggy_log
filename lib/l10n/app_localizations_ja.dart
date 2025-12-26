@@ -190,4 +190,47 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get pleaseEnterCategoryName => 'カテゴリー名を入力してください';
+
+  @override
+  String get monthlyBudgetHistory => '月間予算履歴';
+
+  @override
+  String get remaining => '残り';
+
+  @override
+  String get overBudget => '予算超過';
+
+  @override
+  String get budget => '予算';
+
+  @override
+  String get dataManagement => 'データ管理';
+
+  @override
+  String get exportBackup => 'バックアップの書き出し';
+
+  @override
+  String get importBackup => 'バックアップの読み込み';
+
+  @override
+  String get exportDesc => 'データをファイルに書き出して安全に保管します。';
+
+  @override
+  String get importDesc => 'バックアップファイルからデータを復元します。';
+
+  @override
+  String get warning => 'ご注意';
+
+  @override
+  String get restoreWarning =>
+      '読み込みを実行すると、現在のすべてのデータが削除され、ファイルの内容に置き換わります。よろしいですか？';
+
+  @override
+  String get confirm => '確認';
+
+  @override
+  String get exportSuccess => 'バックアップファイルが正常に保存されました。';
+
+  @override
+  String get restoreSuccess => 'データが正常に復元されました。';
 }

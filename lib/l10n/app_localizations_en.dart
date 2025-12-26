@@ -191,4 +191,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pleaseEnterCategoryName => 'Please enter a category name';
+
+  @override
+  String get monthlyBudgetHistory => 'Monthly Budget History';
+
+  @override
+  String get remaining => 'Remaining';
+
+  @override
+  String get overBudget => 'Over Budget';
+
+  @override
+  String get budget => 'Budget';
+
+  @override
+  String get dataManagement => 'Data Management';
+
+  @override
+  String get exportBackup => 'Export Backup';
+
+  @override
+  String get importBackup => 'Import Backup';
+
+  @override
+  String get exportDesc => 'Save your data to your device or cloud.';
+
+  @override
+  String get importDesc => 'Restore data from a backup file.';
+
+  @override
+  String get warning => 'Warning';
+
+  @override
+  String get restoreWarning =>
+      'Importing will delete all current data and replace it with the file\'s data. Do you want to proceed?';
+
+  @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get exportSuccess => 'exportSuccess';
+
+  @override
+  String get restoreSuccess => 'restoreSuccess';
 }

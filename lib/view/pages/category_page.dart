@@ -33,7 +33,7 @@ class _CategoryPageState extends State<CategoryPage> {
   // 다른 컨트롤러들을 미리 찾아서 로직에 사용합니다.
   final dashboardController = Get.find<DashboardController>();
   final calController = Get.find<CalendarController>();
-  final settingsController = Get.find<SettingsController>();
+  final settingsController = Get.find<SettingController>();
   final categoryController = Get.find<CategoryController>();
 
   @override

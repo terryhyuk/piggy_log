@@ -35,35 +35,41 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
-  # get
+  # High-performance state management, dependency injection, and route management
   get_x: ^5.0.0
   
-  # DB(SQflite)
+  # Local database (SQLite) for storing transaction and category data
   sqflite: ^2.4.2
+  # Utilities for manipulating file and directory paths
   path: ^1.9.1
 
+  # Internationalization and date formatting (e.g., currency, date strings)
   intl: ^0.20.2
 
-  # Localization
+  # Official Flutter localization support
   flutter_localizations:
     sdk: flutter
 
-  # Chart
+  # Data visualization and charts (e.g., spending breakdown graphs)
   fl_chart: ^1.1.1
 
-  # Calendar
+  # Interactive calendar view for tracking daily transactions
   table_calendar: ^3.2.0
 
-  # Slidable
+  # Slide-to-action UI (e.g., swipe to delete or edit transactions)
   flutter_slidable: ^4.0.3
 
-  # animation
+  # High-quality Lottie animations for splash or empty states
   lottie: ^3.3.2
 
-  # images
+  # Custom and FontAwesome icon sets for categories
   fluttericon: ^2.0.0
   font_awesome_flutter: ^10.12.0
 
+  # To find the database file path on the device (e.g., getDatabasesPath)
+  path_provider: ^2.1.5
+  # To pick a backup file from the device storage for data restoration
+  file_picker: ^10.3.8
 
 dev_dependencies:
   flutter_test:

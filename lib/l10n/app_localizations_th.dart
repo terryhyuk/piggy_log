@@ -191,4 +191,47 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get pleaseEnterCategoryName => 'กรุณากรอกชื่อหมวดหมู่';
+
+  @override
+  String get monthlyBudgetHistory => 'ประวัติงบประมาณรายเดือน';
+
+  @override
+  String get remaining => 'คงเหลือ';
+
+  @override
+  String get overBudget => 'เกินงบประมาณ';
+
+  @override
+  String get budget => 'งบประมาณ';
+
+  @override
+  String get dataManagement => 'การจัดการข้อมูล';
+
+  @override
+  String get exportBackup => 'ส่งออกข้อมูลสำรอง';
+
+  @override
+  String get importBackup => 'นำเข้าข้อมูลสำรอง';
+
+  @override
+  String get exportDesc => 'บันทึกข้อมูลของคุณไปยังอุปกรณ์หรือคลาวด์';
+
+  @override
+  String get importDesc => 'กู้คืนข้อมูลจากไฟล์สำรอง';
+
+  @override
+  String get warning => 'คำเตือน';
+
+  @override
+  String get restoreWarning =>
+      'การนำเข้าข้อมูลจะลบข้อมูลปัจจุบันทั้งหมดและแทนที่ด้วยข้อมูลจากไฟล์ คุณต้องการดำเนินการต่อหรือไม่?';
+
+  @override
+  String get confirm => 'ยืนยัน';
+
+  @override
+  String get exportSuccess => 'บันทึกไฟล์สำรองข้อมูลสำเร็จแล้ว';
+
+  @override
+  String get restoreSuccess => 'กู้คืนข้อมูลสำเร็จแล้ว';
 }

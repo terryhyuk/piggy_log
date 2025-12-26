@@ -3,24 +3,24 @@ import 'database_handler.dart';
 class DashboardHandler {
   final DatabaseHandler dbHandler = DatabaseHandler();
 
-/// 이번 달 총 지출
-Future<double> getMonthlyTotalExpense(String yearMonth) async {
+/// 기간별 또는 월별 총 지출액 (통합 버전)
+Future<double> getMonthlyTotalExpense({String? yearMonth, String? startDate, String? endDate}) async {
   final db = await dbHandler.initializeDB();
-  final result = await db.rawQuery(
-    "SELECT SUM(amount) as total FROM spending_transactions "
-    "WHERE type='expense' AND date LIKE '$yearMonth%'"
-  );
-  final value = result.first['total'];
-  return (value != null ? (value as num).toDouble() : 0.0);
-}
+  
+  String query;
+  List<dynamic> args;
 
-/// 이번 달 예산 합계
-Future<double> getMonthlyBudget(String yearMonth) async {
-  final db = await dbHandler.initializeDB();
-  final result = await db.rawQuery(
-    "SELECT SUM(targetAmount) as total FROM monthly_budget WHERE yearMonth=?",
-    [yearMonth],
-  );
+  if (startDate != null && endDate != null) {
+    // 1. 달력 범위 선택 시 (BETWEEN 사용)
+    query = "SELECT SUM(amount) as total FROM spending_transactions WHERE type='expense' AND date BETWEEN ? AND ?";
+    args = [startDate, endDate];
+  } else {
+    // 2. 기본 월별 조회 시 (LIKE 사용)
+    query = "SELECT SUM(amount) as total FROM spending_transactions WHERE type='expense' AND date LIKE ?";
+    args = ['$yearMonth%'];
+  }
+
+  final result = await db.rawQuery(query, args);
   final value = result.first['total'];
   return (value != null ? (value as num).toDouble() : 0.0);
 }
@@ -113,4 +113,35 @@ Future<List<Map<String, dynamic>>> getRecentTransactions({int limit = 5}) async 
     };
   }).toList();
 }
+
+// 1. Get unique templates marked as Recurring
+Future<List<Map<String, dynamic>>> getRecurringTemplates() async {
+  final db = await dbHandler.initializeDB();
+  // Grouping by name and amount to get templates for each recurring item
+  // Table name updated to 'spending_transactions'
+  return await db.rawQuery('''
+    SELECT * FROM spending_transactions 
+    WHERE isRecurring = 1 
+    GROUP BY t_name, amount 
+  ''');
+}
+
+// 2. Check if the same item already exists in the given month
+Future<bool> checkIfAlreadyAdded(String title, double amount, String yearMonth) async {
+  final db = await dbHandler.initializeDB();
+  // Table name updated to 'spending_transactions'
+  final result = await db.query(
+    'spending_transactions',
+    where: 't_name = ? AND amount = ? AND date LIKE ?',
+    whereArgs: [title, amount, '$yearMonth%'],
+  );
+  return result.isNotEmpty;
+}
+
+// 3. New transaction insertion (Helper for auto-recurring)
+Future<void> insertTransaction(Map<String, dynamic> data) async {
+  final db = await dbHandler.initializeDB();
+  await db.insert('spending_transactions', data);
+}
+
 }

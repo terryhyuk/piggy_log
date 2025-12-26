@@ -5,7 +5,7 @@ import 'package:piggy_log/controller/setting_controller.dart';
 
 class CalendarController extends GetxController {
   final CalenderHandler calenderHandler = CalenderHandler();
-  final SettingsController settingsController = Get.find<SettingsController>();
+  final SettingController settingsController = Get.find<SettingController>();
 
   RxMap<String, double> dailyTotals = <String, double>{}.obs;
   RxList<Map<String, dynamic>> selectedDateTransactions = <Map<String, dynamic>>[].obs;

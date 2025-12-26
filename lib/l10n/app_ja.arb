@@ -59,5 +59,20 @@
   "enterMonthlyBudget": "月間予算入力",
   "dateformat": "日付形式",
   "errorTransactionDetail": "取引の詳細を開けませんでした。",
-  "pleaseEnterCategoryName": "カテゴリー名を入力してください"
+  "pleaseEnterCategoryName": "カテゴリー名を入力してください",
+  "monthlyBudgetHistory": "月間予算履歴",
+  "remaining": "残り",
+  "overBudget": "予算超過",
+  "budget": "予算",
+  "dataManagement": "データ管理",
+  "exportBackup": "バックアップの書き出し",
+  "importBackup": "バックアップの読み込み",
+  "exportDesc": "データをファイルに書き出して安全に保管します。",
+  "importDesc": "バックアップファイルからデータを復元します。",
+  "warning": "ご注意",
+  "restoreWarning": "読み込みを実行すると、現在のすべてのデータが削除され、ファイルの内容に置き換わります。よろしいですか？",
+  "cancel": "キャンセル",
+  "confirm": "確認",
+  "exportSuccess": "バックアップファイルが正常に保存されました。",
+  "restoreSuccess": "データが正常に復元されました。"
 }

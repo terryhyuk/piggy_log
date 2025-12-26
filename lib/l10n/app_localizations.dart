@@ -467,6 +467,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter a category name'**
   String get pleaseEnterCategoryName;
+
+  /// No description provided for @monthlyBudgetHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Budget History'**
+  String get monthlyBudgetHistory;
+
+  /// No description provided for @remaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get remaining;
+
+  /// No description provided for @overBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Over Budget'**
+  String get overBudget;
+
+  /// No description provided for @budget.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget'**
+  String get budget;
+
+  /// No description provided for @dataManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Management'**
+  String get dataManagement;
+
+  /// No description provided for @exportBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Backup'**
+  String get exportBackup;
+
+  /// No description provided for @importBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Backup'**
+  String get importBackup;
+
+  /// No description provided for @exportDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Save your data to your device or cloud.'**
+  String get exportDesc;
+
+  /// No description provided for @importDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore data from a backup file.'**
+  String get importDesc;
+
+  /// No description provided for @warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get warning;
+
+  /// No description provided for @restoreWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing will delete all current data and replace it with the file\'s data. Do you want to proceed?'**
+  String get restoreWarning;
+
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
+  /// No description provided for @exportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'exportSuccess'**
+  String get exportSuccess;
+
+  /// No description provided for @restoreSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'restoreSuccess'**
+  String get restoreSuccess;
 }
 
 class _AppLocalizationsDelegate

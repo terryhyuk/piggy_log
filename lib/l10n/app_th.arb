@@ -59,5 +59,20 @@
   "enterMonthlyBudget": "กรอกงบประมาณรายเดือน",
   "dateformat": "รูปแบบวันที่",
   "errorTransactionDetail": "ไม่สามารถเปิดรายละเอียดธุรกรรมได้",
-  "pleaseEnterCategoryName": "กรุณากรอกชื่อหมวดหมู่"
+  "pleaseEnterCategoryName": "กรุณากรอกชื่อหมวดหมู่",
+  "monthlyBudgetHistory": "ประวัติงบประมาณรายเดือน",
+  "remaining": "คงเหลือ",
+  "overBudget": "เกินงบประมาณ",
+  "budget": "งบประมาณ",
+  "dataManagement": "การจัดการข้อมูล",
+  "exportBackup": "ส่งออกข้อมูลสำรอง",
+  "importBackup": "นำเข้าข้อมูลสำรอง",
+  "exportDesc": "บันทึกข้อมูลของคุณไปยังอุปกรณ์หรือคลาวด์",
+  "importDesc": "กู้คืนข้อมูลจากไฟล์สำรอง",
+  "warning": "คำเตือน",
+  "restoreWarning": "การนำเข้าข้อมูลจะลบข้อมูลปัจจุบันทั้งหมดและแทนที่ด้วยข้อมูลจากไฟล์ คุณต้องการดำเนินการต่อหรือไม่?",
+  "cancel": "ยกเลิก",
+  "confirm": "ยืนยัน",
+  "exportSuccess": "บันทึกไฟล์สำรองข้อมูลสำเร็จแล้ว",
+  "restoreSuccess": "กู้คืนข้อมูลสำเร็จแล้ว"
 }

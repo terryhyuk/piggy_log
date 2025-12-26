@@ -4,13 +4,12 @@ import 'package:sqflite/sqflite.dart';
 /// Handles the initialization and creation of the local SQLite database.
 /// This class creates all tables required by the app (categories, transactions, monthly budgets).
 class DatabaseHandler {
-
   /// Opens the SQLite database. If it does not exist, it will be created.
   Future<Database> initializeDB() async {
     String path = await getDatabasesPath();
 
     return openDatabase(
-      join(path, 'myFlowLogix.db'),
+      join(path, 'piggy_log.db'),
 
       /// Runs only when the database is created for the first time.
       onCreate: (db, version) async {
@@ -83,4 +82,13 @@ class DatabaseHandler {
       version: 1, // database version
     );
   }
+
+  // DatabaseHandler 클래스 맨 밑에 추가
+Future<void> closeDB() async {
+  String path = await getDatabasesPath();
+  // 열려있는 경로의 DB를 강제로 찾아서 닫아버리는 기능입니다.
+  final db = await openDatabase(join(path, 'piggy_log.db'));
+  await db.close();
+}
+  
 } // END

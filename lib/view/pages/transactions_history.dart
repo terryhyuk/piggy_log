@@ -15,7 +15,7 @@ class TransactionsHistory extends StatefulWidget {
 
 class _TransactionsHistoryState extends State<TransactionsHistory> {
   late final Category category;
-  final SettingsController settingsController = Get.find<SettingsController>();
+  final SettingController settingsController = Get.find<SettingController>();
 
   @override
   void initState() {

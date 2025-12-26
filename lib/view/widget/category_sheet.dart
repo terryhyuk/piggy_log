@@ -274,7 +274,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
     );
 
     await CategoryHandler().insertCategory(category);
-    await Get.find<SettingsController>().refreshAllData();
+    await Get.find<SettingController>().refreshAllData();
   }
 
   /// Updates an existing category record in the database
@@ -289,7 +289,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
     );
 
     await CategoryHandler().updateCategory(category);
-    await Get.find<SettingsController>().refreshAllData();
+    await Get.find<SettingController>().refreshAllData();
   }
 
   /// Global Snackbar for user action feedback

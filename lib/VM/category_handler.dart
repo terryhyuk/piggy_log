@@ -74,7 +74,7 @@ Future<int> deleteCategory(int id) async {
 
   // 3) ✅ 일괄 갱신 호출
   // 이제 개별 컨트롤러를 일일이 찾을 필요가 없습니다.
-  final settingsController = Get.find<SettingsController>();
+  final settingsController = Get.find<SettingController>();
   await settingsController.refreshAllData();
 
   return result;

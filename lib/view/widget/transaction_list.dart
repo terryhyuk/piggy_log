@@ -30,7 +30,7 @@ import 'package:piggy_log/view/widget/add_transaction_dialog.dart';
 class TransactionList extends StatelessWidget {
   final int categoryId;
   final TransactionHandler transactionHandler = TransactionHandler();
-  final SettingsController settingsController = Get.find<SettingsController>();
+  final SettingController settingsController = Get.find<SettingController>();
 
   TransactionList({super.key, required this.categoryId});
 

@@ -190,4 +190,47 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get pleaseEnterCategoryName => '카테고리 이름을 입력해주세요';
+
+  @override
+  String get monthlyBudgetHistory => '월간 예산 히스토리';
+
+  @override
+  String get remaining => '남은 금액';
+
+  @override
+  String get overBudget => '예산 초과';
+
+  @override
+  String get budget => '예산';
+
+  @override
+  String get dataManagement => '데이터 관리';
+
+  @override
+  String get exportBackup => '데이터 내보내기';
+
+  @override
+  String get importBackup => '데이터 불러오기';
+
+  @override
+  String get exportDesc => '데이터를 파일로 내보내 안전하게 보관하세요.';
+
+  @override
+  String get importDesc => '백업된 파일에서 데이터를 복구합니다.';
+
+  @override
+  String get warning => '주의';
+
+  @override
+  String get restoreWarning =>
+      '불러오기를 하면 현재 앱의 모든 데이터가 삭제되고 파일 내용으로 대체됩니다. 진행하시겠습니까?';
+
+  @override
+  String get confirm => '확인';
+
+  @override
+  String get exportSuccess => '백업 파일이 성공적으로 저장되었습니다.';
+
+  @override
+  String get restoreSuccess => '데이터가 성공적으로 복구되었습니다.';
 }

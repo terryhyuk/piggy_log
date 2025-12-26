@@ -17,7 +17,7 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   final CalendarController calController = Get.find<CalendarController>();
-  final SettingsController settingsController = Get.find<SettingsController>();
+  final SettingController settingsController = Get.find<SettingController>();
 
   @override
   void initState() {
@@ -27,6 +27,8 @@ class _CalendarPageState extends State<CalendarPage> {
 
     // Settings changes will trigger refresh
     settingsController.refreshTrigger.listen((_) {
+      if (!mounted) return;
+      
       calController.loadDailyTotals();
       calController.selectDate(calController.selectedDay.value);
       setState(() {});

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:piggy_log/VM/dashboard_handler.dart';
 import 'package:piggy_log/controller/calendar_controller.dart';
 import 'package:piggy_log/controller/category_controller.dart';
 import 'package:piggy_log/controller/dashboard_controller.dart';
@@ -16,9 +17,10 @@ void main() async {
     Get.put(TabbarController());
 
   // Controllerr for setting
-  final settingsController = Get.put(SettingsController());
+  final settingsController = Get.put(SettingController());
   await settingsController.loadSettings();
     Get.put(DashboardController());
+    Get.put(DashboardHandler());
     Get.put(CategoryController());
     Get.put(CalendarController());
 
@@ -31,7 +33,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SettingsController controller = Get.find<SettingsController>();
+    final SettingController controller = Get.find<SettingController>();
 
     return Obx(
       () => GetMaterialApp(

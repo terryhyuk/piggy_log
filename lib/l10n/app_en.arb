@@ -59,5 +59,20 @@
   "enterMonthlyBudget": "Enter Monthly Budget",
   "dateformat": "Date Format",
   "errorTransactionDetail": "Failed to open transaction detail.",
-  "pleaseEnterCategoryName": "Please enter a category name"
+  "pleaseEnterCategoryName": "Please enter a category name",
+  "monthlyBudgetHistory": "Monthly Budget History",
+  "remaining": "Remaining",
+  "overBudget": "Over Budget",
+  "budget": "Budget",
+  "dataManagement": "Data Management",
+  "exportBackup": "Export Backup",
+  "importBackup": "Import Backup",
+  "exportDesc": "Save your data to your device or cloud.",
+  "importDesc": "Restore data from a backup file.",
+  "warning": "Warning",
+  "restoreWarning": "Importing will delete all current data and replace it with the file's data. Do you want to proceed?",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "exportSuccess": "exportSuccess",
+  "restoreSuccess": "restoreSuccess"
 }

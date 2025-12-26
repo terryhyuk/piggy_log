@@ -20,7 +20,7 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
   late TextEditingController amountController;
   late TextEditingController memoController;
 
-  final settingsController = Get.find<SettingsController>();
+  final settingsController = Get.find<SettingController>();
 
   late DateTime selectedDate;
   late String selectedType;
@@ -148,7 +148,7 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      settingsController.formatDate(selectedDate),
+                      settingsController.formatDate(selectedDate)?? '',
                       style: theme.textTheme.bodyMedium,
                     ),
                     TextButton(

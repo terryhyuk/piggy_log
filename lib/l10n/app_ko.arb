@@ -59,5 +59,20 @@
   "enterMonthlyBudget": "월 예산 입력",
   "dateformat": "날짜 형식",
   "errorTransactionDetail": "거래 상세 정보를 열지 못했습니다.",
-  "pleaseEnterCategoryName": "카테고리 이름을 입력해주세요"
+  "pleaseEnterCategoryName": "카테고리 이름을 입력해주세요",
+  "monthlyBudgetHistory": "월간 예산 히스토리",
+  "remaining": "남은 금액",
+  "overBudget": "예산 초과",
+  "budget": "예산",
+  "dataManagement": "데이터 관리",
+  "exportBackup": "데이터 내보내기",
+  "importBackup": "데이터 불러오기",
+  "exportDesc": "데이터를 파일로 내보내 안전하게 보관하세요.",
+  "importDesc": "백업된 파일에서 데이터를 복구합니다.",
+  "warning": "주의",
+  "restoreWarning": "불러오기를 하면 현재 앱의 모든 데이터가 삭제되고 파일 내용으로 대체됩니다. 진행하시겠습니까?",
+  "cancel": "취소",
+  "confirm": "확인",
+  "exportSuccess": "백업 파일이 성공적으로 저장되었습니다.",
+  "restoreSuccess": "데이터가 성공적으로 복구되었습니다."
 }

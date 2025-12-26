@@ -24,7 +24,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   late TextEditingController amountController;
   late TextEditingController memoController;
 
-  final settingsController = Get.find<SettingsController>();
+  final settingsController = Get.find<SettingController>();
 
   String selectedType = 'expense';
   bool isRecurring = false;
@@ -189,7 +189,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               // === Date Picker ===
               TextButton(
                 onPressed: pickDate,
-                child: Text(settingsController.formatDate(selectedDateTime)),
+                child: Text(settingsController.formatDate(selectedDateTime)?? ''),
               ),
 
               // === Action Buttons ===

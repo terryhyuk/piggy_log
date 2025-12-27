@@ -150,9 +150,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                       ],
                       selected: <String>{selectedType},
                       onSelectionChanged: (newSelection) {
-                        setState(() {
                           selectedType = newSelection.first;
-                        });
+                        setState(() {});
                       },
                       style: ButtonStyle(
                         visualDensity: VisualDensity.compact,
@@ -180,9 +179,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                     Checkbox(
                       value: isRecurring,
                       onChanged: (v) {
-                        setState(() {
                           isRecurring = v ?? false;
-                        });
+                        setState(() {});
                       },
                     ),
                     Text(local.recurring),

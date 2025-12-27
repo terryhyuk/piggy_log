@@ -1,5 +1,7 @@
 
 
+// ignore_for_file: non_constant_identifier_names
+
 class SpendingTransaction {
   // Property
   final int? t_id;

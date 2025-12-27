@@ -233,4 +233,13 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get restoreSuccess => '데이터가 성공적으로 복구되었습니다.';
+
+  @override
+  String get categoryNameAlreadyExists => '이미 존재하는 카테고리 이름입니다.';
+
+  @override
+  String get checkDescriptionAndAmount => '내용과 금액을 확인해 주세요.';
+
+  @override
+  String get description => '내용';
 }

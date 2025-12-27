@@ -30,21 +30,28 @@ class _CategoryEditSheetState extends State<CategorySheet> {
   /// Properties for managing category state
   late IconData selectedIcon = Icons.category;
   late Color selectedColor = Colors.grey;
-  late TextEditingController c_nameController = TextEditingController();
+  late TextEditingController cnameController = TextEditingController();
   late String selectedHexColor; // For DB storage in Hex format
+  late AppLocalizations local;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    local = AppLocalizations.of(context)!;
+  }
 
   @override
   void initState() {
     super.initState();
 
     /// Initialize default hex color and load existing data if in Edit Mode
-    selectedHexColor = selectedColor.value.toRadixString(16).padLeft(8, '0');
+    selectedHexColor = selectedColor.toARGB32().toRadixString(16).padLeft(8, '0');
 
     if (widget.initialData != null) {
       /// Edit Mode: Populating existing data into fields
-      c_nameController.text = widget.initialData!['c_name'];
+      cnameController.text = widget.initialData!['c_name'];
       selectedColor = Color(int.parse(widget.initialData!['color'], radix: 16));
-      selectedHexColor = selectedColor.value.toRadixString(16).padLeft(8, '0');
+      selectedHexColor = selectedColor.toARGB32().toRadixString(16).padLeft(8, '0');
 
       selectedIcon = IconData(
         widget.initialData!['icon_codepoint'],
@@ -57,14 +64,14 @@ class _CategoryEditSheetState extends State<CategorySheet> {
   @override
   void dispose() {
     /// Clean up controller to prevent memory leaks
-    c_nameController.dispose();
+    cnameController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final local = AppLocalizations.of(context)!;
+    // final local = AppLocalizations.of(context)!;
 
     return SafeArea(
       /// Prevents UI overlap with iOS bottom home indicator
@@ -127,7 +134,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                             color: theme.colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(18),
                             border: Border.all(
-                              color: theme.colorScheme.outline.withOpacity(0.4),
+                              color: theme.colorScheme.outline.withValues(alpha: 0.4),
                               width: 2,
                             ),
                           ),
@@ -149,13 +156,14 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                       /// Category Name TextField
                       Expanded(
                         child: TextField(
-                          controller: c_nameController,
+                          controller: cnameController,
                           decoration: InputDecoration(
                             labelText: local.categoryName,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
+                          textInputAction: TextInputAction.done
                         ),
                       ),
                     ],
@@ -171,13 +179,12 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                         builder: (_) => const ColorPickerSheet(),
                       );
                       if (picked != null) {
-                        setState(() {
-                          /// Sync selected color and generate Hex string
+                      /// Sync selected color and generate Hex string
                           selectedColor = picked;
-                          selectedHexColor = picked.value
-                              .toRadixString(16)
-                              .padLeft(8, '0');
-                        });
+                          selectedHexColor = picked.toARGB32()
+                          .toRadixString(16)
+                          .padLeft(8, '0');
+                          setState(() {});
                       }
                     },
                     child: Row(
@@ -237,8 +244,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
   /// Handles category persistence and provides UI feedback
   Future<void> saveCategory() async {
     /// Basic validation for category name
-    final local = AppLocalizations.of(context)!;
-    final name = c_nameController.text.trim();
+    final name = cnameController.text.trim();
 
     if(name.isEmpty){
       showSnackBar(
@@ -248,15 +254,33 @@ class _CategoryEditSheetState extends State<CategorySheet> {
         );
         return;
     }
+    final allCategories = await CategoryHandler().getAllCategories();
+  
+  // check if a category with the same name already exists
+  bool isDuplicate = allCategories.any((category) => 
+    category.c_name == name && 
+    (widget.initialData == null || category.id != widget.initialData!['id'])
+  );
+
+  if (isDuplicate) {
+    showSnackBar(
+      "", 
+      local.categoryNameAlreadyExists, 
+      Colors.redAccent
+    );
+    return; // 중복이면 여기서 중단
+  }
 
 
     if (widget.initialData == null) {
       /// Logic for creating a new category
       await addCategory();
       showSnackBar(local.categoryCreated, local.newCategoryAdded, Colors.green);
+      if(!mounted) return;
     } else {
       /// Logic for updating existing category history
-      await editCategory_history();
+      await editCategoryhistory();
+      if(!mounted) return;
       showSnackBar(local.categoryUpdated, local.changesSaved, Colors.blue);
     }
 
@@ -270,7 +294,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
       iconFontFamily: selectedIcon.fontFamily,
       iconFontPackage: selectedIcon.fontPackage,
       color: selectedHexColor,
-      c_name: c_nameController.text.trim(),
+      c_name: cnameController.text.trim(),
     );
 
     await CategoryHandler().insertCategory(category);
@@ -278,14 +302,14 @@ class _CategoryEditSheetState extends State<CategorySheet> {
   }
 
   /// Updates an existing category record in the database
-  Future<void> editCategory_history() async {
+  Future<void> editCategoryhistory() async {
     final category = Category(
       id: widget.initialData!['id'],
       iconCodePoint: selectedIcon.codePoint,
       iconFontFamily: selectedIcon.fontFamily,
       iconFontPackage: selectedIcon.fontPackage,
       color: selectedHexColor,
-      c_name: c_nameController.text.trim(),
+      c_name: cnameController.text.trim(),
     );
 
     await CategoryHandler().updateCategory(category);

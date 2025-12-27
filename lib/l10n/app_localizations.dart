@@ -551,6 +551,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'restoreSuccess'**
   String get restoreSuccess;
+
+  /// No description provided for @categoryNameAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'Category Name Already Exists'**
+  String get categoryNameAlreadyExists;
+
+  /// No description provided for @checkDescriptionAndAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check the description and amount.'**
+  String get checkDescriptionAndAmount;
+
+  /// No description provided for @description.
+  ///
+  /// In en, this message translates to:
+  /// **'description'**
+  String get description;
 }
 
 class _AppLocalizationsDelegate

@@ -110,5 +110,5 @@ Widget build(BuildContext context) {
 }
 
   String _format(double value) =>
-      _settingsController.formatCurrency(value) ?? value.toString();
+      _settingsController.formatCurrency(value);
 }

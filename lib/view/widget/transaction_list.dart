@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get_x/get.dart';
-import 'package:intl/intl.dart';
 import 'package:piggy_log/VM/transaction_handler.dart';
 import 'package:piggy_log/controller/dashboard_controller.dart';
 import 'package:piggy_log/controller/setting_controller.dart';
@@ -88,6 +87,8 @@ class TransactionList extends StatelessWidget {
                     ),
                     SlidableAction(
                       onPressed: (_) async {
+                        final local = AppLocalizations.of(context)!;
+
                         bool? confirmed = await showDialog(
                           context: context,
                           builder: (_) => AlertDialog(
@@ -129,8 +130,8 @@ class TransactionList extends StatelessWidget {
                           await dashboardController.refreshDashboard();
 
                           Get.snackbar(
-                            AppLocalizations.of(context)!.deleted,
-                            "'${trx.t_name}' ${AppLocalizations.of(context)!.wasRemoved}",
+                            local.deleted,
+                            "'${trx.t_name}' ${local.wasRemoved}",
                             snackPosition: SnackPosition.top,
                             backgroundColor: theme.colorScheme.errorContainer,
                             colorText: theme.colorScheme.onErrorContainer,
@@ -147,12 +148,14 @@ class TransactionList extends StatelessWidget {
                 child: ListTile(
                   title: Text(trx.t_name),
                   subtitle: Text(
-                    settingsController.formatDate(date) ??
-                        DateFormat.yMMMd().format(date),
+                    settingsController.formatDate(date)
+                      // ??
+                        // DateFormat.yMMMd().format(date),
                   ),
                   trailing: Text(
-                    settingsController.formatCurrency(trx.amount) ??
-                        trx.amount.toString(),
+                    settingsController.formatCurrency(trx.amount),
+                    // ??
+                        // trx.amount.toString(),
                     style: TextStyle(
                       color: trx.type == 'expense'
                           ? theme.colorScheme.error
@@ -165,7 +168,7 @@ class TransactionList extends StatelessWidget {
                       arguments: trx,
                     )?.then((result) {
                       if (result == true)
-                        settingsController.refreshTrigger.value++;
+                        {settingsController.refreshTrigger.value++;}
                     });
                   },
                 ),

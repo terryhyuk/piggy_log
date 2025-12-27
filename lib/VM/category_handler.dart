@@ -26,6 +26,13 @@ class CategoryHandler {
     return result;
   }
 
+  Future<List<Category>> getAllCategories() async {
+  final db = await databaseHandler.initializeDB();
+  final List<Map<String, dynamic>> maps = await db.query('categories');
+
+  return maps.map((e) => Category.fromMap(e)).toList();
+}
+
   Future<List<Category>> queryCategory() async {
     final db = await databaseHandler.initializeDB();
     final List<Map<String, Object?>> queryCategory = await db.rawQuery("""

@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:piggy_log/VM/transaction_handler.dart';
@@ -20,7 +22,7 @@ class AddTransactionDialog extends StatefulWidget {
 }
 
 class _AddTransactionDialogState extends State<AddTransactionDialog> {
-  late TextEditingController t_nameController;
+  late TextEditingController tNameController;
   late TextEditingController amountController;
   late TextEditingController memoController;
 
@@ -38,14 +40,14 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     /// 기존 거래 수정 시 데이터를 채우고, 새 거래 추가 시 빈 컨트롤러 생성.
     if (widget.transactionToEdit != null) {
       final trx = widget.transactionToEdit!;
-      t_nameController = TextEditingController(text: trx.t_name);
+      tNameController = TextEditingController(text: trx.t_name);
       amountController = TextEditingController(text: trx.amount.toString());
       memoController = TextEditingController(text: trx.memo);
       selectedType = trx.type;
       isRecurring = trx.isRecurring;
       selectedDateTime = DateTime.parse(trx.date);
     } else {
-      t_nameController = TextEditingController();
+      tNameController = TextEditingController();
       amountController = TextEditingController();
       memoController = TextEditingController();
     }
@@ -60,7 +62,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: SingleChildScrollView(
         // Make the dialog scrollable when keyboard is open
-        // 키보드가 올라왔을 때 다이얼로그가 스크롤 가능하도록 설정
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom + 16,
         ),
@@ -83,8 +84,9 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextField(
-                  controller: t_nameController,
-                  decoration: InputDecoration(labelText: local.title),
+                  controller: tNameController,
+                  decoration: InputDecoration(labelText: local.description),
+                  textInputAction: TextInputAction.next,
                 ),
               ),
 
@@ -100,6 +102,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
+                  textInputAction: TextInputAction.done,
                 ),
               ),
 
@@ -112,6 +115,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 child: TextField(
                   controller: memoController,
                   decoration: InputDecoration(labelText: local.memo),
+                  textInputAction: TextInputAction.done,
                   maxLines: 2,
                 ),
               ),
@@ -189,7 +193,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               // === Date Picker ===
               TextButton(
                 onPressed: pickDate,
-                child: Text(settingsController.formatDate(selectedDateTime)?? ''),
+                child: Text(settingsController.formatDate(selectedDateTime)),
               ),
 
               // === Action Buttons ===
@@ -246,39 +250,52 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
   /// Saves or updates the transaction, refreshes data, and closes the dialog.
   /// 거래를 추가 또는 수정하고, 데이터 새로고침 후 다이얼로그를 닫는다.
-  Future<void> saveTransaction() async {
-    final amount = double.tryParse(amountController.text);
-    if (t_nameController.text.trim().isEmpty || amount == null || amount <= 0) {
-      return;
-    }
-
-    final trx = SpendingTransaction(
-      t_id: widget.transactionToEdit?.t_id,
-      c_id: widget.c_id,
-      t_name: t_nameController.text,
-      date:
-          "${selectedDateTime.year}-${selectedDateTime.month.toString().padLeft(2, '0')}-${selectedDateTime.day.toString().padLeft(2, '0')}",
-      type: selectedType,
-      amount: amount,
-      memo: memoController.text,
-      isRecurring: isRecurring,
-    );
-
-    if (widget.transactionToEdit == null) {
-      await TransactionHandler().insertTransaction(
-        trx,
-        customDate: selectedDateTime,
-      );
-    } else {
-      await TransactionHandler().updateTransaction(trx);
-    }
-
-    await settingsController.refreshAllData();
-
-    if (context.mounted) {
-      Navigator.pop(context, true);
-    }
+Future<void> saveTransaction() async {
+  final local = AppLocalizations.of(context)!;
+  
+  // 1. 검증: 이름 빈칸 체크 + 금액이 숫자인지 & 0보다 큰지만 바로 체크
+  if (tNameController.text.trim().isEmpty || 
+      double.tryParse(amountController.text.trim()) == null || 
+      double.tryParse(amountController.text.trim())! <= 0) {
+    
+    Get.snackbar("", local.checkDescriptionAndAmount, 
+      backgroundColor: Colors.orangeAccent);
+    return;
   }
+
+  // 2. 데이터 객체 생성: 컨트롤러 값을 즉시 파싱해서 할당
+  final trx = SpendingTransaction(
+    t_id: widget.transactionToEdit?.t_id,
+    c_id: widget.c_id,
+    t_name: tNameController.text.trim(),
+    date: "${selectedDateTime.year}-${selectedDateTime.month.toString().padLeft(2, '0')}-${selectedDateTime.day.toString().padLeft(2, '0')}",
+    type: selectedType,
+    amount: double.parse(amountController.text.trim()), // 위에서 검증했으니 바로 parse
+    memo: memoController.text.trim(),
+    isRecurring: isRecurring,
+  );
+
+  // 3. DB 로직 (동일)
+  if (widget.transactionToEdit == null) {
+    await TransactionHandler().insertTransaction(trx, customDate: selectedDateTime);
+  } else {
+    await TransactionHandler().updateTransaction(trx);
+  }
+
+  if (!mounted) return;
+
+  await settingsController.refreshAllData();
+  
+  Get.snackbar(
+    widget.transactionToEdit == null ? local.categoryCreated : local.categoryUpdated,
+    widget.transactionToEdit == null ? local.newCategoryAdded : local.changesSaved,
+    backgroundColor: widget.transactionToEdit == null ? Colors.green : Colors.blue,
+    colorText: Colors.white,
+  );
+  if (!mounted) return;
+  Navigator.pop(context, true);
+}
+
 }
 
 

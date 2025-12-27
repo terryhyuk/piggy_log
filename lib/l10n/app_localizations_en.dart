@@ -234,4 +234,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restoreSuccess => 'restoreSuccess';
+
+  @override
+  String get categoryNameAlreadyExists => 'Category Name Already Exists';
+
+  @override
+  String get checkDescriptionAndAmount =>
+      'Please check the description and amount.';
+
+  @override
+  String get description => 'description';
 }

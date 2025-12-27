@@ -4,18 +4,32 @@ import 'package:piggy_log/VM/monthly_budget_handler.dart';
 import 'package:piggy_log/controller/dashboard_controller.dart';
 import 'package:piggy_log/controller/setting_controller.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
-import 'package:piggy_log/view/pages/monthly_history.dart';
 import 'package:piggy_log/view/widget/budget_gauge.dart';
+import 'package:piggy_log/view/widget/budget_summary.dart';
+import 'package:piggy_log/view/widget/budgetpigwidget.dart';
 import 'package:piggy_log/view/widget/chart_widget.dart';
+import 'package:piggy_log/view/widget/expense_summary.dart';
+import 'package:piggy_log/view/widget/recent_transactions_list.dart';
 
-/// This page serves as the main Dashboard of the application.
-/// It displays a summary of monthly expenses, budget status via a gauge bar,
-/// expense distribution charts (Pie/Radar), and a list of recent transactions.
-/// It utilizes GetX for reactive state management.
+///
+/// Dashboard Page
+/// 
+/// Purpose: 
+/// This is the main landing screen of the application. It provides a comprehensive 
+/// overview of the user's financial status, including total expenses, monthly budget, 
+/// spending analysis (charts), and recent transaction history.
+/// 
+/// Key Features:
+/// - Real-time budget tracking with a visual gauge.
+/// - Interactive expense analysis using Pie and Radar charts.
+/// - Quick access to monthly budget settings and date range filtering.
+/// - Reactive UI updates driven by DashboardController and SettingController.
+///
 
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
+
   @override
   State<Dashboard> createState() => _DashboardState();
 }
@@ -26,6 +40,7 @@ class _DashboardState extends State<Dashboard> {
   final SettingController settingsController = Get.find<SettingController>();
   final MonthlyBudgetHandler monthlyBudgetHandler = MonthlyBudgetHandler();
 
+  // State variable to track the selected index in the Pie Chart
   int? selectedPieIndex;
 
   @override
@@ -35,184 +50,233 @@ class _DashboardState extends State<Dashboard> {
     dashbordcontroller.refreshDashboard();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Obx(() {
-          // Reactive triggers to rebuild UI when data changes in controllers
-          settingsController.refreshTrigger.value;
-          dashbordcontroller.dataRefreshTrigger.value;
+  // ==========================================
+  // 1. UI Build Section
+  // ==========================================
+@override
+Widget build(BuildContext context) {
+  return SafeArea(
+    child: SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Obx(() {
+        // 데이터 트리거
+        settingsController.refreshTrigger.value;
+        dashbordcontroller.dataRefreshTrigger.value;
 
-          final monthlyExpense = dashbordcontroller.totalExpense.value;
-          final top3Categories = dashbordcontroller.top3Categories;
-          final recentTransactions = dashbordcontroller.recentTransactions;
-          final currentBudget = dashbordcontroller.monthlyBudget.value;
+        // 지출 퍼센트 계산 (돼지와 게이지 공통 사용)
+        double currentPercent = (dashbordcontroller.monthlyBudget.value > 0)
+            ? (dashbordcontroller.totalExpense.value / dashbordcontroller.monthlyBudget.value)
+            : 0.0;
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. Top Summary Section: Displays Total Expense and Monthly Budget
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Left side: Total Expense details
-                  _buildExpenseSummary(context, monthlyExpense),
-                  // Right side: Monthly Budget details
-                  _buildBudgetSummary(context, currentBudget),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // --- 상단 카드 섹션 ---
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
                 ],
               ),
+              child: Column(
+                children: [
+                  // 1. 요약 정보 (지출액 | 예산)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ExpenseSummary(
+                        expense: dashbordcontroller.totalExpense.value,
+                        onTap: () => _showDateRangePicker(context),
+                        formatCurrency: _formatCurrency,
+                      ),
+                      BudgetSummary(
+                        budget: dashbordcontroller.monthlyBudget.value,
+                        currentSpend: dashbordcontroller.totalExpense.value,
+                        onBudgetTap: _showBudgetDialog,
+                        formatCurrency: _formatCurrency,
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 12),
 
-              const SizedBox(height: 16),
+                  // 2. 돼지 + 바 게이지 (에러 해결 핵심 구역)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end, // 바닥 라인 정렬
+                    children: [
+                      // 돼지 위젯
+                      SizedBox(
+                        width: 90,
+                        height: 90,
+                        child: BudgetPigWidget(percent: currentPercent),
+                      ),
+                      
+                      const SizedBox(width: 8),
 
-              // 2. Budget Progress Section: Visualizes spending vs budget
-              BudgetGauge(
-                currentSpend: monthlyExpense,
-                targetBudget: currentBudget,
+                      // 게이지 바 (Expanded를 써야 'Infinite width' 에러가 안 남!)
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 15), // 돼지 발 위치에 맞게 바닥 띄움
+                          child: BudgetGauge(
+                            currentSpend: dashbordcontroller.totalExpense.value,
+                            targetBudget: dashbordcontroller.monthlyBudget.value,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-
-              const SizedBox(height: 24),
-
-              // 3. Analytics Section: Charts and Top 3 Expense Categories
-              _buildChartSection(context, top3Categories),
-
-              const SizedBox(height: 24),
-
-              // 4. Activity Section: Shows the latest transaction history
-              _buildRecentTransactions(context, recentTransactions),
-            ],
-          );
-        }),
-      ),
-    );
-  }
-
-  // --- UI Component Helpers ---
-
-  /// Builds the expense summary column with a date picker trigger
-  Widget _buildExpenseSummary(BuildContext context, double expense) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: () => _showDateRangePicker(context),
-          child: Text(
-            AppLocalizations.of(context)!.totalExpense,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(_formatCurrency(expense),
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.redAccent)),
-      ],
-    );
-  }
-
-  /// Builds the budget summary column with a budget setup dialog trigger
-  Widget _buildBudgetSummary(BuildContext context, double budget) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        GestureDetector(
-          onTap: () => Get.to(() => const MonthlyHistory()),
-          child: Text(
-            AppLocalizations.of(context)!.monthlyBudget,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
-          ),
-        ),
-        const SizedBox(height: 4),
-        GestureDetector(
-          onTap: () => _showBudgetDialog(),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-            child: Text(
-              budget == 0 ? AppLocalizations.of(context)!.setYourBudget : _formatCurrency(budget),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-          ),
-        ),
-      ],
-    );
-  }
+            
+            const SizedBox(height: 28),
 
-  /// Builds the chart section including Pie and Radar charts
-  Widget _buildChartSection(BuildContext context, List top3) {
-    if (dashbordcontroller.categoryList.isEmpty) {
-      return Center(child: Text(AppLocalizations.of(context)!.noTransactions));
-    }
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          flex: 3,
-          child: ChartsWidget(
-            pieData: dashbordcontroller.makePieData(selectedIndex: selectedPieIndex),
-            onTapCategory: _onSelectCategory,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          flex: 2,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ...top3.asMap().entries.map((entry) {
-                final item = entry.value;
-                final color = dashbordcontroller.categoryColors[entry.key % dashbordcontroller.categoryColors.length];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Text('${item['name']} - ${_formatCurrency(item['total'])}',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: color)),
-                );
-              }),
-              const SizedBox(height: 8),
-              Obx(() {
-                final breakdown = Map<String, double>.from(dashbordcontroller.selectedBreakdown);
-                if (breakdown.isEmpty) return const SizedBox.shrink();
-                return ChartsWidget(radarData: breakdown);
-              }),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+            // --- 차트 섹션 ---
+            ChartsWidget(
+              top3: dashbordcontroller.top3Categories,
+              selectedPieIndex: selectedPieIndex,
+              onTapCategory: _onSelectCategory,
+              formatCurrency: _formatCurrency,
+              dashbordcontroller: dashbordcontroller,
+            ),
+            
+            const SizedBox(height: 24),
 
-  /// Builds the list of recent transactions using Cards
-  Widget _buildRecentTransactions(BuildContext context, List transactions) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(AppLocalizations.of(context)!.recentTransactions,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        ...transactions.map((trx) => Card(
-              child: ListTile(
-                title: Text(trx['t_name']),
-                subtitle: Text(settingsController.formatDate(DateTime.parse(trx['date'])) ?? trx['date']),
-                trailing: Text(_formatCurrency(trx['amount']),
-                    style: TextStyle(color: trx['type'] == 'expense' ? Colors.red : Colors.green)),
-              ),
-            )),
-      ],
-    );
-  }
+            // --- 최근 거래 내역 섹션 ---
+            RecentTransactionsList(
+              transactions: dashbordcontroller.recentTransactions,
+              formatDate: settingsController.formatDate,
+              formatCurrency: _formatCurrency,
+            ),
+          ],
+        );
+      }),
+    ),
+  );
+}
+// @override
+// Widget build(BuildContext context) {
+//   return SafeArea(
+//     child: SingleChildScrollView(
+//       padding: const EdgeInsets.all(16),
+//       child: Obx(() {
+//         // 데이터 트리거
+//         settingsController.refreshTrigger.value;
+//         dashbordcontroller.dataRefreshTrigger.value;
 
-  // --- Logic & Event Handlers ---
+//         return Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Container(
+//               padding: const EdgeInsets.all(20), // 카드 내부 여백
+//               decoration: BoxDecoration(
+//                 color: Theme.of(context).cardColor, // 다크모드 자동 대응
+//                 borderRadius: BorderRadius.circular(24), // 부드러운 곡선
+//                 boxShadow: [
+//                   BoxShadow(
+//                     color: Colors.black.withOpacity(0.05),
+//                     blurRadius: 15,
+//                     offset: const Offset(0, 8),
+//                   ),
+//                 ],
+//               ),
+//               child: Container(
+//                 padding:  const EdgeInsets.all(20),
+//                 decoration: BoxDecoration(
+//                   color: Theme.of(context).cardColor,
+//                   borderRadius: BorderRadius.circular(24),
+//                 ),
+//                 child: Column(
+//                   children: [
+//                     // 기존의 요약 정보 (좌우 배치)
+//                     Row(
+//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                       children: [
+//                         ExpenseSummary(
+//                           expense: dashbordcontroller.totalExpense.value,
+//                           onTap: () => _showDateRangePicker(context),
+//                           formatCurrency: _formatCurrency,
+//                         ),
+//                         BudgetSummary(
+//                           budget: dashbordcontroller.monthlyBudget.value,
+//                           currentSpend: dashbordcontroller.totalExpense.value,
+//                           onBudgetTap: _showBudgetDialog,
+//                           formatCurrency: _formatCurrency,
+//                         ),
+//                       ],
+//                     ),
+//                     const SizedBox(height: 12), // 텍스트와 게이지 사이 간격
+                    
+//                     Row(
+//                       crossAxisAlignment: CrossAxisAlignment.end,
+//                       children: [
+//                         SizedBox(
+//                           width: 90,
+//                           height: 90,
+//                           child: BudgetPigWidget(
+//                             percent: (dashbordcontroller.monthlyBudget.value > 0)
+//                             ? (dashbordcontroller.totalExpense.value / dashbordcontroller.monthlyBudget.value)
+//                             : 0.0
+//                             ),
+//                         ),
+//                       ],
+//                     ),
+//                     const SizedBox(width: 8,),
+//                     // 이제 게이지가 카드 너비에 맞춰지면서 
+//                     // '길어서 징그러운 느낌'이 사라지고 세련되게 변함!
+//                     BudgetGauge(
+//                       currentSpend: dashbordcontroller.totalExpense.value,
+//                       targetBudget: dashbordcontroller.monthlyBudget.value,
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+            
+//             const SizedBox(height: 28), // 섹션 간 간격
 
-  /// Formats double values to localized currency strings
+//             // --- 나머지 섹션들은 그대로 유지 ---
+//             ChartsWidget(
+//               top3: dashbordcontroller.top3Categories,
+//               selectedPieIndex: selectedPieIndex,
+//               onTapCategory: _onSelectCategory,
+//               formatCurrency: _formatCurrency,
+//               dashbordcontroller: dashbordcontroller,
+//             ),
+//             const SizedBox(height: 24),
+
+//             RecentTransactionsList(
+//               transactions: dashbordcontroller.recentTransactions,
+//               formatDate: settingsController.formatDate,
+//               formatCurrency: _formatCurrency,
+//             ),
+//           ],
+//         );
+//       }),
+//     ),
+//   );
+// }
+
+  // -----Function------
+
+  /// Formats numeric values into localized currency strings
   String _formatCurrency(dynamic amount) {
     final value = (amount as num?)?.toDouble() ?? 0.0;
-    return settingsController.formatCurrency(value) ?? value.toString();
+    return settingsController.formatCurrency(value);
   }
 
-  /// Handles category selection to update the Radar chart breakdown
+  /// Handles category selection and updates the detailed breakdown for charts
   void _onSelectCategory(int index) async {
     if (index < 0 || index >= dashbordcontroller.categoryList.length) {
       dashbordcontroller.selectedBreakdown.clear();
-      selectedPieIndex = null;
-      setState(() {});
+      setState(() => selectedPieIndex = null);
       return;
     }
     selectedPieIndex = index;
@@ -221,26 +285,38 @@ class _DashboardState extends State<Dashboard> {
     setState(() {});
   }
 
-  /// Opens a dialog to input and save the monthly budget
+/// Displays a dialog to set the monthly budget.
+  /// Uses AppLocalizations for all strings and Theme for styling.
   Future<void> _showBudgetDialog() async {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final currentBudget = dashbordcontroller.monthlyBudget.value;
+    
     final TextEditingController dialogController =
         TextEditingController(text: currentBudget == 0 ? "" : currentBudget.toString());
 
     final result = await showDialog<double>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.setMonthlyBudget),
+        title: Text(l10n.setMonthlyBudget),
         content: TextField(
           controller: dialogController,
+          autofocus: true,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(hintText: AppLocalizations.of(context)!.enterMonthlyBudget),
+          textInputAction: TextInputAction.done,
+          decoration: InputDecoration(
+            hintText: l10n.enterMonthlyBudget,
+            suffixIcon: Icon(Icons.edit, color: theme.colorScheme.primary),
+          ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(AppLocalizations.of(context)!.cancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(context), 
+            child: Text(l10n.cancel, style: TextStyle(color: theme.colorScheme.secondary))
+          ),
           TextButton(
             onPressed: () => Navigator.pop(context, double.tryParse(dialogController.text.trim())),
-            child: Text(AppLocalizations.of(context)!.save),
+            child: Text(l10n.save, style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -249,20 +325,19 @@ class _DashboardState extends State<Dashboard> {
     if (result != null) {
       final now = DateTime.now();
       final yearMonth = "${now.year}-${now.month.toString().padLeft(2, '0')}";
-      // Save budget to Database
+      
       await monthlyBudgetHandler.saveMonthlyBudget(yearMonth, result);
-      // Trigger global refresh to update all UI components
       await settingsController.refreshAllData();
+      dashbordcontroller.refreshDashboard(); 
     }
   }
 
-  /// Opens a date range picker to filter total expenses by specific dates
+  /// Opens a date range picker to filter total expenses for a specific period
   Future<void> _showDateRangePicker(BuildContext context) async {
     final range = await showDateRangePicker(
       context: context,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
-      // Custom builder logic for styling (omitted for brevity)
     );
 
     if (range != null) {

@@ -74,5 +74,8 @@
   "cancel": "Cancel",
   "confirm": "Confirm",
   "exportSuccess": "exportSuccess",
-  "restoreSuccess": "restoreSuccess"
+  "restoreSuccess": "restoreSuccess",
+  "categoryNameAlreadyExists": "Category Name Already Exists",
+  "checkDescriptionAndAmount": "Please check the description and amount.",
+  "description": "description"
 }

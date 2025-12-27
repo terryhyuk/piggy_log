@@ -40,8 +40,8 @@ class _SettingsPageState extends State<SettingsPage> {
             title: Text(AppLocalizations.of(context)!.language),
             subtitle: Text(settings.language),
             trailing: PopupMenuButton<String>(
-              child: Buildarrow(),
-              onSelected: (String code) => _changeLanguage(code), // 바로 코드 전달
+              child: BuildArrow(),
+              onSelected: (String code) => _changeLanguage(code),
               itemBuilder: (_) => [
                 const PopupMenuItem(value: 'system', child: Text('System')),
                 const PopupMenuItem(value: 'ko', child: Text('한국어')),
@@ -57,13 +57,13 @@ class _SettingsPageState extends State<SettingsPage> {
             title: Text(AppLocalizations.of(context)!.theme),
             subtitle: Text(settings.theme_mode),
             trailing: PopupMenuButton<String>(
-              child: Buildarrow(),
               onSelected: _changeMode,
               itemBuilder: (_) => [
                 const PopupMenuItem(value: 'system', child: Text('System')),
                 const PopupMenuItem(value: 'light', child: Text('Light')),
                 const PopupMenuItem(value: 'dark', child: Text('Dark')),
               ],
+              child: BuildArrow(),
             ),
           ),
 
@@ -72,7 +72,6 @@ class _SettingsPageState extends State<SettingsPage> {
             title: Text(AppLocalizations.of(context)!.currency),
             subtitle: Text(settings.currency_code),
             trailing: PopupMenuButton<String>(
-              child: Buildarrow(),
               onSelected: _changeCurrency,
               itemBuilder: (_) => [
                 const PopupMenuItem(value: 'system', child: Text('System')),
@@ -82,6 +81,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 const PopupMenuItem(value: 'JPY', child: Text('JPY - ¥')),
                 const PopupMenuItem(value: 'THB', child: Text('THB - ฿'))
               ],
+              child: BuildArrow(),
             ),
           ),
 
@@ -90,7 +90,6 @@ class _SettingsPageState extends State<SettingsPage> {
             title: Text(AppLocalizations.of(context)!.dateformat),
             subtitle: Text(settings.date_format),
             trailing: PopupMenuButton<String>(
-              child: Buildarrow(),
               onSelected: _changeDateFormat,
               itemBuilder: (_) => [
                 const PopupMenuItem(value: 'yyyy-MM-dd', child: Text('2025-12-08')),
@@ -98,6 +97,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 const PopupMenuItem(value: 'dd/MM/yyyy', child: Text('08/12/2025')),
                 const PopupMenuItem(value: 'MMM d, yyyy', child: Text('Dec 8, 2025')),
               ],
+              child: BuildArrow(),
             ),
           ),
 
@@ -106,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
             title: Text(AppLocalizations.of(context)!.dataManagement),
             subtitle: Text(AppLocalizations.of(context)!.exportDesc),
             trailing: PopupMenuButton<String>(
-              child: Buildarrow(),
+              child: BuildArrow(),
               onSelected: (value) {
                 if (value == 'export') {
                   Get.find<SettingController>().exportBackup();
@@ -230,19 +230,5 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {});
   }
 
-  // / Displays a warning dialog before overwriting data via import
-  // void _showRestoreConfirmDialog() {
-  //   Get.defaultDialog(
-  //     title: AppLocalizations.of(context)!.warning,
-  //     middleText: AppLocalizations.of(context)!.restoreWarning,
-  //     textCancel: AppLocalizations.of(context)!.cancel,
-  //     textConfirm: AppLocalizations.of(context)!.confirm,
-  //     confirmTextColor: Colors.white,
-  //     buttonColor: Colors.red,
-  //     onConfirm: () {
-  //       Get.back(); // Close dialog
-  //       Get.find<SettingsController>().importBackup(); // Execute restore
-  //     },
-  //   );
-  // }
+  
 } // END

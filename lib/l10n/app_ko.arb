@@ -74,5 +74,8 @@
   "cancel": "취소",
   "confirm": "확인",
   "exportSuccess": "백업 파일이 성공적으로 저장되었습니다.",
-  "restoreSuccess": "데이터가 성공적으로 복구되었습니다."
+  "restoreSuccess": "데이터가 성공적으로 복구되었습니다.",
+  "categoryNameAlreadyExists": "이미 존재하는 카테고리 이름입니다.",
+  "checkDescriptionAndAmount": "내용과 금액을 확인해 주세요.",
+  "description": "내용"
 }

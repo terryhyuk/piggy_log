@@ -148,7 +148,7 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      settingsController.formatDate(selectedDate)?? '',
+                      settingsController.formatDate(selectedDate),
                       style: theme.textTheme.bodyMedium,
                     ),
                     TextButton(

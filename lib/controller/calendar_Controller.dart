@@ -47,12 +47,12 @@ class CalendarController extends GetxController {
   
   /// 화면용 포맷
   String formatCurrency(double amount) {
-    return settingsController.formatCurrency(amount) ?? amount.toString();
+    return settingsController.formatCurrency(amount);
   }
 
   String formatDate(String isoDate) {
     final dt = DateTime.tryParse(isoDate);
     if (dt == null) return isoDate;
-    return settingsController.formatDate(dt) ?? isoDate;
+    return settingsController.formatDate(dt);
   }
 }

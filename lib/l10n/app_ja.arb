@@ -74,5 +74,9 @@
   "cancel": "キャンセル",
   "confirm": "確認",
   "exportSuccess": "バックアップファイルが正常に保存されました。",
-  "restoreSuccess": "データが正常に復元されました。"
+  "restoreSuccess": "データが正常に復元されました。",
+  "categoryNameAlreadyExists": "このカテゴリ名は既に存在します。",
+  "checkTitleAndAmount": "内容と金額を確認してください。",
+  "checkDescriptionAndAmount": "内容と金額を確認してください。",
+  "description": "内容"
 }

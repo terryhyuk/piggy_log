@@ -233,4 +233,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get restoreSuccess => 'データが正常に復元されました。';
+
+  @override
+  String get categoryNameAlreadyExists => 'このカテゴリ名は既に存在します。';
+
+  @override
+  String get checkDescriptionAndAmount => '内容と金額を確認してください。';
+
+  @override
+  String get description => '内容';
 }

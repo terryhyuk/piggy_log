@@ -108,7 +108,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get expense => 'รายจ่าย';
 
   @override
-  String get income => 'ราย득';
+  String get income => 'รายรับ';
 
   @override
   String get selectDate => 'เลือกวันที่';
@@ -223,8 +223,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get warning => 'คำเตือน';
 
   @override
-  String get restoreWarning =>
-      'การนำเข้าข้อมูลจะลบข้อมูลปัจจุบันทั้งหมดและแทนที่ด้วยข้อมูลจากไฟล์ คุณต้องการดำเนินการต่อหรือไม่?';
+  String get restoreWarning => 'กู้คืนคำเตือน?';
 
   @override
   String get confirm => 'ยืนยัน';
@@ -234,4 +233,13 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get restoreSuccess => 'กู้คืนข้อมูลสำเร็จแล้ว';
+
+  @override
+  String get categoryNameAlreadyExists => 'หมวดหมู่ชื่อมีอยู่แล้ว';
+
+  @override
+  String get checkDescriptionAndAmount => 'กรุณาตรวจสอบรายละเอียดและจำนวนเงิน';
+
+  @override
+  String get description => 'รายละเอียด';
 }

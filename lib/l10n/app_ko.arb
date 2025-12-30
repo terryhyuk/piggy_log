@@ -77,5 +77,13 @@
   "restoreSuccess": "데이터가 성공적으로 복구되었습니다.",
   "categoryNameAlreadyExists": "이미 존재하는 카테고리 이름입니다.",
   "checkDescriptionAndAmount": "내용과 금액을 확인해 주세요.",
-  "description": "내용"
+  "description": "내용",
+  "noTransactions": "지출 내역이 없습니다.",
+  "viewAnalysis": "분석보기",
+  "spendingAnalysis": "지출 분석",
+  "categoryBalance": "카테고리 밸런스",
+  "weeklySpendingTrend": "요일별 지출 추이",
+  "analysisStep1": "분석 완료! 데이터가 10개 이상 쌓였어요 꿀! 🐷",
+  "analysisStep2": "위에는 레이더 차트로 지출 밸런스를 볼 수 있고,",
+  "analysisStep3": "아래는 꺾은선 그래프를 통해 어느 요일에 지출이 많았는지 볼 수 있어요!"
 }

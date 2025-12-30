@@ -78,5 +78,13 @@
   "categoryNameAlreadyExists": "このカテゴリ名は既に存在します。",
   "checkTitleAndAmount": "内容と金額を確認してください。",
   "checkDescriptionAndAmount": "内容と金額を確認してください。",
-  "description": "内容"
+  "description": "内容",
+  "noTransactions": "支出履歴がありません。",
+  "viewAnalysis": "分析を見る",
+  "spendingAnalysis": "支出分析",
+  "categoryBalance": "カテゴリーバランス",
+  "weeklySpendingTrend": "曜日別支出推移",
+  "analysisStep1": "分析完了！データが10件以上集まったぶー！🐷",
+  "analysisStep2": "上のレーダーチャートでバランスを確認して、",
+  "analysisStep3": "下の折れ線グラフで支出の多い曜日をチェックだぶー！"
 }

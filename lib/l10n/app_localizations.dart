@@ -219,7 +219,7 @@ abstract class AppLocalizations {
   /// No description provided for @noTransactions.
   ///
   /// In en, this message translates to:
-  /// **'No Transactions'**
+  /// **'No transactions found.'**
   String get noTransactions;
 
   /// No description provided for @recentTranscations.
@@ -569,6 +569,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'description'**
   String get description;
+
+  /// No description provided for @viewAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'View Analysis'**
+  String get viewAnalysis;
+
+  /// No description provided for @spendingAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending Analysis'**
+  String get spendingAnalysis;
+
+  /// No description provided for @categoryBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Category Balance'**
+  String get categoryBalance;
+
+  /// No description provided for @weeklySpendingTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Spending Trend'**
+  String get weeklySpendingTrend;
+
+  /// No description provided for @analysisStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis complete! You\'ve got 10+ records now! 🐷'**
+  String get analysisStep1;
+
+  /// No description provided for @analysisStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the Radar Chart above for your balance,'**
+  String get analysisStep2;
+
+  /// No description provided for @analysisStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'and the Line Chart below for your weekly peak spending!'**
+  String get analysisStep3;
 }
 
 class _AppLocalizationsDelegate

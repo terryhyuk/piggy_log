@@ -1,14 +1,20 @@
 import 'package:piggy_log/VM/database_handler.dart';
 import 'package:piggy_log/model/spending_transaction.dart';
+import 'package:sqflite/sqlite_api.dart';
 
 class TransactionHandler {
   final DatabaseHandler databaseHandler = DatabaseHandler();
+
+  Future<Database> _getDb() async {
+    return await databaseHandler.database;
+  }
 
 Future<int> insertTransaction(
     SpendingTransaction res, {
     DateTime? customDate, // 선택적 날짜
   }) async {
-  final db = await databaseHandler.initializeDB();
+  // final db = await databaseHandler.initializeDB();
+  final db = await _getDb();
 
   // 1️⃣ 지정 날짜가 있으면 사용, 없으면 오늘
   DateTime date = customDate ?? DateTime.now();
@@ -49,7 +55,8 @@ Future<int> insertTransaction(
 
   // Get Transactions By Category
   Future<List<SpendingTransaction>> getTransactionsByCategory(int categoryId) async {
-    final db = await databaseHandler.initializeDB();
+    // final db = await databaseHandler.initializeDB();
+    final db = await _getDb();
 
     final result = await db.rawQuery(
       """
@@ -65,7 +72,8 @@ Future<int> insertTransaction(
 
   // Update Transaction
   Future<int> updateTransaction(SpendingTransaction trx) async {
-    final db = await databaseHandler.initializeDB();
+    // final db = await databaseHandler.initializeDB();
+    final db = await _getDb();
 
     return await db.update(
       'spending_transactions',
@@ -85,7 +93,8 @@ Future<int> insertTransaction(
 
   // Get total spending for a category
 Future<double> getCategoryTotal(int categoryId) async {
-  final db = await databaseHandler.initializeDB();
+  // final db = await databaseHandler.initializeDB();
+  final db = await _getDb();
 
   final List<Map<String, dynamic>> result = await db.rawQuery(
     """
@@ -103,7 +112,8 @@ Future<double> getCategoryTotal(int categoryId) async {
 
   // delete Transaction
   Future<void> deleteTransaction(int transactionId) async {
-    final db = await databaseHandler.initializeDB();
+    // final db = await databaseHandler.initializeDB();
+    final db = await _getDb();
     await db.delete(
       'spending_transactions',
       where: 't_id = ?',

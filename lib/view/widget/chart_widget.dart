@@ -1,229 +1,202 @@
-import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:piggy_log/controller/dashboard_controller.dart';
+import 'package:piggy_log/controller/setting_controller.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
+import 'package:piggy_log/view/pages/radar_chart_page.dart'; 
 
-class ChartsWidget extends StatelessWidget {
-  final List top3;
-  final int? selectedPieIndex;
-  final void Function(int index) onTapCategory;
-  final String Function(dynamic) formatCurrency;
+class ChartsWidget extends StatefulWidget {
+  const ChartsWidget({super.key});
+
+  @override
+  State<ChartsWidget> createState() => _ChartsWidgetState();
+}
+
+class _ChartsWidgetState extends State<ChartsWidget> {
+  final DashboardController dashbordcontroller = Get.find<DashboardController>();
+  final SettingController settingsController = Get.find<SettingController>();
   
-  final DashboardController dashbordcontroller;
-
-  const ChartsWidget({
-    super.key,
-    required this.top3,
-    required this.selectedPieIndex,
-    required this.onTapCategory,
-    required this.formatCurrency,
-    required this.dashbordcontroller
-  });
+  int? selectedPieIndex; 
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
-    if (dashbordcontroller.categoryList.isEmpty) {
-      return Center(child: Text(AppLocalizations.of(context)!.noTransactions));
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 1. 왼쪽 파이 차트 (기존 로직 그대로)
-        Expanded(
-          flex: 3,
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: PieChart(
-              PieChartData(
-                sections: dashbordcontroller.makePieData(selectedIndex: selectedPieIndex),
-                centerSpaceRadius: 40,
-                sectionsSpace: 4,
-                pieTouchData: PieTouchData(
-                  touchCallback: (event, response) {
-                    if (event is! FlTapUpEvent) return;
-                    final index = response?.touchedSection?.touchedSectionIndex ?? -1;
-                    onTapCategory(index);
-                  },
-                ),
-              ),
-            ),
+    return Obx(() {
+      // 💡 데이터가 없을 때의 처리
+      if (dashbordcontroller.categoryList.isEmpty) {
+        return SizedBox(
+          height: 250,
+          child: Center(
+            child: Text(l10n.noTransactions),
           ),
-        ),
-        const SizedBox(width: 12),
+        );
+      }
 
-        // 2. 오른쪽 Top 3 & 레이더 차트 (대시보드에서 이사 온 놈들)
-        Expanded(
-          flex: 2,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      return Column(
+        children: [
+          Stack(
+            alignment: Alignment.center,
             children: [
-              ...top3.asMap().entries.map((entry) {
-                final item = entry.value;
-                final color = dashbordcontroller.categoryColors[entry.key % dashbordcontroller.categoryColors.length];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Text(
-                    '${item['name']}\n${formatCurrency(item['total'])}',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: color),
-                  ),
-                );
-              }),
-              const SizedBox(height: 12),
-              
-              Obx(() {
-                final radarData = Map<String, double>.from(dashbordcontroller.selectedBreakdown);
-                if (radarData.isEmpty) return const SizedBox.shrink();
-
-                final labels = radarData.keys.toList();
-                final values = radarData.values.toList();
-                while (values.length < 3) {
-                  values.add(0);
-                  labels.add("");
-                }
-
-                return SizedBox(
-                  height: 150,
-                  child: RadarChart(
-                    RadarChartData(
-                      // === 여기서부터는 테리님 기존 RadarChart 설정 복붙! ===
-                      ticksTextStyle: TextStyle(color: theme.colorScheme.surface),
-                      gridBorderData: BorderSide(
-                        color: Color.lerp(theme.colorScheme.surface, theme.colorScheme.shadow, 0.24)!,
-                        width: 1.2,
-                      ),
-                      radarBorderData: BorderSide(
-                        color: Color.lerp(theme.colorScheme.surface, theme.colorScheme.primary, 0.7)!,
-                        width: 1.2,
-                      ),
-                      borderData: FlBorderData(show: false),
-                      radarBackgroundColor: Colors.transparent,
-                      getTitle: (index, angle) {
-                        String label = labels[index];
-                        if (label.length > 6) {
-                          label = '${label.substring(0, 5)}..';
+              // 1. Pie Chart Layer
+              AspectRatio(
+                aspectRatio: 1.3,
+                child: PieChart(
+                  PieChartData(
+                    sections: _makePieData(selectedPieIndex),
+                    centerSpaceRadius: 85, // 💡 중앙 버튼과 텍스트를 위한 공간
+                    sectionsSpace: 3,
+                    pieTouchData: PieTouchData(
+                      // 터치 인식 범위를 늘려 시뮬레이터 클릭 미스 방지
+                      // touchExtraThreshold: 10,
+                      touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                        if (event is FlTapUpEvent) {
+                          int? newIndex;
+                          if (pieTouchResponse != null && pieTouchResponse.touchedSection != null) {
+                            newIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                          } else {
+                            newIndex = null;
+                          }
+                          // 로컬 상태 업데이트
+                          setState(() {
+                            selectedPieIndex = newIndex;
+                          });
                         }
-                        return RadarChartTitle(text: label, angle: 0);
                       },
-                      dataSets: [
-                        RadarDataSet(
-                          dataEntries: values.map((v) => RadarEntry(value: v)).toList(),
-                          borderColor: theme.colorScheme.primary,
-                          borderWidth: 2,
-                          entryRadius: 0,
-                          fillColor: Color.lerp(theme.colorScheme.surface, theme.colorScheme.primary, 0.1)!,
-                        ),
-                      ],
-                      radarShape: RadarShape.polygon,
                     ),
                   ),
-                );
-              }),
+                ),
+              ),
+
+              // 2. Center Information Layer (Name, Amount, and Button)
+              // 💡 버튼을 중앙 레이어에 배치하여 터치 충돌을 원천 차단합니다.
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (selectedPieIndex != null && 
+                      dashbordcontroller.getSelectedCategoryName(selectedPieIndex).isNotEmpty) ...[
+                    Text(
+                      dashbordcontroller.getSelectedCategoryName(selectedPieIndex),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                  ],
+                  
+                  if (selectedPieIndex != null && 
+                      dashbordcontroller.getSelectedCategoryAmount(selectedPieIndex) != null) ...[
+                    Text(
+                      settingsController.formatCurrency(
+                        dashbordcontroller.getSelectedCategoryAmount(selectedPieIndex)!
+                      ),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold, 
+                        color: theme.colorScheme.primary
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // 💡 분석보기 버튼을 중앙에 고정
+                    _buildAnalysisButton(),
+                  ] else ...[
+                    // 💡 아무것도 선택되지 않았을 때 안내 문구 (선택 사항)
+                    Text(
+                      AppLocalizations.of(context)!.selectCategory,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ],
+      );
+    });
+  }
+
+  /// Generates the visual slices of the Pie Chart.
+  List<PieChartSectionData> _makePieData(int? selectedIndex) {
+    double total = dashbordcontroller.totalExpense.value;
+
+    return dashbordcontroller.categoryList.asMap().entries.map((entry) {
+      int index = entry.key;
+      var data = entry.value;
+      double value = (data['total_expense'] as num).toDouble();
+      bool isSelected = selectedIndex == index;
+      
+      final double percentage = total > 0 ? (value / total) * 100 : 0;
+
+      return PieChartSectionData(
+        value: value,
+        title: isSelected ? "${percentage.toStringAsFixed(1)}%" : "", 
+        radius: isSelected ? 35 : 25, 
+        color: dashbordcontroller.categoryColors[index % dashbordcontroller.categoryColors.length],
+        titleStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+        // 💡 Badge를 제거하여 터치 레이어 간섭 방지
+        badgeWidget: null,
+      );
+    }).toList();
+  }
+
+  /// Builds the "View Analysis" button located in the center of the chart.
+  Widget _buildAnalysisButton() {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () async {
+          if (selectedPieIndex != null) {
+            // 컨트롤러에 선택 정보 동기화 및 데이터 로드
+            dashbordcontroller.selectedPieIndex.value = selectedPieIndex;
+            await dashbordcontroller.loadRadarData(selectedPieIndex!);
+            
+            // 레이더 차트 페이지로 이동
+            Get.to(() => const RadarChartPage());
+          }
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.viewAnalysis,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onPrimaryContainer,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Icon(Icons.chevron_right, size: 14, color: theme.colorScheme.onPrimaryContainer),
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
-// import 'package:flutter/material.dart';
-// import 'package:fl_chart/fl_chart.dart';
-
-// class ChartsWidget extends StatelessWidget {
-//   final List<PieChartSectionData>? pieData;
-//   final Map<String, double>? radarData;
-//   final void Function(int index)? onTapCategory;
-
-//   const ChartsWidget({
-//     super.key,
-//     this.pieData,
-//     this.radarData,
-//     this.onTapCategory,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final theme = Theme.of(context);
-
-//     if (pieData != null) {
-//       return AspectRatio(
-//         aspectRatio: 1,
-//         child: PieChart(
-//           PieChartData(
-//             sections: pieData!,
-//             centerSpaceRadius: 40,
-//             sectionsSpace: 4,
-//             pieTouchData: PieTouchData(
-//               touchCallback: (event, response) {
-//                 if (event is! FlTapUpEvent) return;
-//                 final index = response?.touchedSection?.touchedSectionIndex ?? -1;
-//                 onTapCategory?.call(index);
-//               },
-//             ),
-//           ),
-//         ),
-//       );
-//     }
-
-//     if (radarData != null) {
-//       final labels = radarData!.keys.toList();
-//       final values = radarData!.values.toList();
-
-//       while (values.length < 3) {
-//         values.add(0);
-//         labels.add("");
-//       }
-
-//       return SizedBox(
-//         height: 180,
-//         child: RadarChart(
-//           RadarChartData(
-//             ticksTextStyle: TextStyle(color: theme.colorScheme.surface),
-//             gridBorderData: BorderSide(
-//               color: Color.lerp(theme.colorScheme.surface, theme.colorScheme.shadow, 0.24)!,
-//               width: 1.2,
-//             ),
-//             radarBorderData: BorderSide(
-//               color: Color.lerp(theme.colorScheme.surface, theme.colorScheme.primary, 0.7)!,
-//               width: 1.2,
-//             ),
-//             borderData: FlBorderData(show: false),
-//             radarBackgroundColor: Colors.transparent,
-//             getTitle: (index, angle) {
-//               // 라벨 텍스트 가져오기
-//               String label = labels[index];
-              
-//               // 6자가 넘어가면 잘라내고 '...' 추가 (숫자는 앱 디자인에 맞춰 조절하세요)
-//               if (label.length > 6) {
-//                 label = '${label.substring(0, 5)}..';
-//               }
-
-//               return RadarChartTitle(
-//                 text: label, 
-//                 angle: 0,
-//               );
-//             },
-//             // getTitle: (index, angle) => RadarChartTitle(
-//             //   text: labels[index],
-//             //   angle: 0),
-//             dataSets: [
-//               RadarDataSet(
-//                 dataEntries: values.map((v) => RadarEntry(value: v)).toList(),
-//                 borderColor: theme.colorScheme.primary,
-//                 borderWidth: 2,
-//                 entryRadius: 0,
-//                 fillColor: Color.lerp(theme.colorScheme.surface, theme.colorScheme.primary, 0.1)!,
-//               ),
-//             ],
-//             radarShape: RadarShape.polygon,
-//           ),
-//         ),
-//       );
-//     }
-
-//     return const SizedBox.shrink();
-//   }
-// }

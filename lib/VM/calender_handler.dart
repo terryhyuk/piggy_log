@@ -1,11 +1,18 @@
 import 'package:piggy_log/VM/database_handler.dart';
+import 'package:sqflite/sqflite.dart';
 
 class CalenderHandler {
-  final DatabaseHandler handler = DatabaseHandler();
+  final DatabaseHandler databaseHandler = DatabaseHandler();
+
+    Future<Database> _getDb() async {
+    // .initializeDB() 대신 .database (getter)를 호출!
+    return await databaseHandler.database; 
+  }
 
   // total (expense - income)
   Future<Map<String, double>> getDailyTotals()async{
-    final db = await handler.initializeDB();
+    // final db = await databaseHandler.initializeDB();
+    final db = await _getDb();
     final result = await db.rawQuery(
       """
       SELECT date, SUM(CASE WHEN type='expense' THEN -amount ELSE amount END) as total
@@ -22,7 +29,8 @@ class CalenderHandler {
   }
 
 Future<List<Map<String, dynamic>>> getTransactionsByDate(String date) async {
-  final db = await handler.initializeDB();
+  // final db = await databaseHandler.initializeDB();
+  final db = await _getDb();
   final result = await db.rawQuery(
     """
     SELECT t_id, t_name, amount, type, memo, c_id, isRecurring

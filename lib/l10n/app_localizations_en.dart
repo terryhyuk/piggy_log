@@ -66,7 +66,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setYourBudget => 'Set Your Budget';
 
   @override
-  String get noTransactions => 'No Transactions';
+  String get noTransactions => 'No transactions found.';
 
   @override
   String get recentTranscations => 'Recent Transactions';
@@ -244,4 +244,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get description => 'description';
+
+  @override
+  String get viewAnalysis => 'View Analysis';
+
+  @override
+  String get spendingAnalysis => 'Spending Analysis';
+
+  @override
+  String get categoryBalance => 'Category Balance';
+
+  @override
+  String get weeklySpendingTrend => 'Weekly Spending Trend';
+
+  @override
+  String get analysisStep1 =>
+      'Analysis complete! You\'ve got 10+ records now! 🐷';
+
+  @override
+  String get analysisStep2 => 'Check the Radar Chart above for your balance,';
+
+  @override
+  String get analysisStep3 =>
+      'and the Line Chart below for your weekly peak spending!';
 }

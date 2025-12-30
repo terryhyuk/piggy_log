@@ -13,19 +13,18 @@ import 'package:piggy_log/view/widget/recent_transactions_list.dart';
 
 ///
 /// Dashboard Page
-/// 
-/// Purpose: 
-/// This is the main landing screen of the application. It provides a comprehensive 
-/// overview of the user's financial status, including total expenses, monthly budget, 
+///
+/// Purpose:
+/// This is the main landing screen of the application. It provides a comprehensive
+/// overview of the user's financial status, including total expenses, monthly budget,
 /// spending analysis (charts), and recent transaction history.
-/// 
+///
 /// Key Features:
 /// - Real-time budget tracking with a visual gauge.
 /// - Interactive expense analysis using Pie and Radar charts.
 /// - Quick access to monthly budget settings and date range filtering.
 /// - Reactive UI updates driven by DashboardController and SettingController.
 ///
-
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -36,7 +35,8 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   // Dependency Injection: Accessing controllers for state management
-  final DashboardController dashbordcontroller = Get.find<DashboardController>();
+  final DashboardController dashbordcontroller =
+      Get.find<DashboardController>();
   final SettingController settingsController = Get.find<SettingController>();
   final MonthlyBudgetHandler monthlyBudgetHandler = MonthlyBudgetHandler();
 
@@ -53,216 +53,138 @@ class _DashboardState extends State<Dashboard> {
   // ==========================================
   // 1. UI Build Section
   // ==========================================
-@override
-Widget build(BuildContext context) {
-  return SafeArea(
-    child: SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Obx(() {
-        // 데이터 트리거
-        settingsController.refreshTrigger.value;
-        dashbordcontroller.dataRefreshTrigger.value;
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 💡 테마 변수 추출
 
-        // 지출 퍼센트 계산 (돼지와 게이지 공통 사용)
-        double currentPercent = (dashbordcontroller.monthlyBudget.value > 0)
-            ? (dashbordcontroller.totalExpense.value / dashbordcontroller.monthlyBudget.value)
-            : 0.0;
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Obx(() {
+          settingsController.refreshTrigger.value;
+          dashbordcontroller.dataRefreshTrigger.value;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // --- 상단 카드 섹션 ---
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  // 1. 요약 정보 (지출액 | 예산)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ExpenseSummary(
-                        expense: dashbordcontroller.totalExpense.value,
-                        onTap: () => _showDateRangePicker(context),
-                        formatCurrency: _formatCurrency,
-                      ),
-                      BudgetSummary(
-                        budget: dashbordcontroller.monthlyBudget.value,
-                        currentSpend: dashbordcontroller.totalExpense.value,
-                        onBudgetTap: _showBudgetDialog,
-                        formatCurrency: _formatCurrency,
-                      ),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 12),
+          double currentPercent = (dashbordcontroller.monthlyBudget.value > 0)
+              ? (dashbordcontroller.totalExpense.value /
+                    dashbordcontroller.monthlyBudget.value)
+              : 0.0;
 
-                  // 2. 돼지 + 바 게이지 (에러 해결 핵심 구역)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end, // 바닥 라인 정렬
-                    children: [
-                      // 돼지 위젯
-                      SizedBox(
-                        width: 90,
-                        height: 90,
-                        child: BudgetPigWidget(percent: currentPercent),
-                      ),
-                      
-                      const SizedBox(width: 8),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // --- 1. 상단 예산 요약 카드 ---
+              Container(
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.shadowColor.withValues(alpha: 0.04),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ExpenseSummary(
+                          expense: dashbordcontroller.totalExpense.value,
+                          onTap: () => _showDateRangePicker(context),
+                          formatCurrency: _formatCurrency,
+                        ),
+                        BudgetSummary(
+                          budget: dashbordcontroller.monthlyBudget.value,
+                          currentSpend: dashbordcontroller.totalExpense.value,
+                          onBudgetTap: _showBudgetDialog,
+                          formatCurrency: _formatCurrency,
+                        ),
+                      ],
+                    ),
 
-                      // 게이지 바 (Expanded를 써야 'Infinite width' 에러가 안 남!)
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 15), // 돼지 발 위치에 맞게 바닥 띄움
-                          child: BudgetGauge(
-                            currentSpend: dashbordcontroller.totalExpense.value,
-                            targetBudget: dashbordcontroller.monthlyBudget.value,
+                    const SizedBox(height: 16),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          width: 90,
+                          height: 90,
+                          child: BudgetPigWidget(percent: currentPercent),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: BudgetGauge(
+                              currentSpend:
+                                  dashbordcontroller.totalExpense.value,
+                              targetBudget:
+                                  dashbordcontroller.monthlyBudget.value,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            
-            const SizedBox(height: 28),
 
-            // --- 차트 섹션 ---
-            ChartsWidget(
-              top3: dashbordcontroller.top3Categories,
-              selectedPieIndex: selectedPieIndex,
-              onTapCategory: _onSelectCategory,
-              formatCurrency: _formatCurrency,
-              dashbordcontroller: dashbordcontroller,
-            ),
-            
-            const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
-            // --- 최근 거래 내역 섹션 ---
-            RecentTransactionsList(
-              transactions: dashbordcontroller.recentTransactions,
-              formatDate: settingsController.formatDate,
-              formatCurrency: _formatCurrency,
-            ),
-          ],
-        );
-      }),
-    ),
-  );
-}
-// @override
-// Widget build(BuildContext context) {
-//   return SafeArea(
-//     child: SingleChildScrollView(
-//       padding: const EdgeInsets.all(16),
-//       child: Obx(() {
-//         // 데이터 트리거
-//         settingsController.refreshTrigger.value;
-//         dashbordcontroller.dataRefreshTrigger.value;
+              Padding(
+                padding: const EdgeInsets.only(left: 4, bottom: 12),
+                child: Text(
+                  AppLocalizations.of(context)!.spendingAnalysis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                  ),
+                ),
+              ),
 
-//         return Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Container(
-//               padding: const EdgeInsets.all(20), // 카드 내부 여백
-//               decoration: BoxDecoration(
-//                 color: Theme.of(context).cardColor, // 다크모드 자동 대응
-//                 borderRadius: BorderRadius.circular(24), // 부드러운 곡선
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black.withOpacity(0.05),
-//                     blurRadius: 15,
-//                     offset: const Offset(0, 8),
-//                   ),
-//                 ],
-//               ),
-//               child: Container(
-//                 padding:  const EdgeInsets.all(20),
-//                 decoration: BoxDecoration(
-//                   color: Theme.of(context).cardColor,
-//                   borderRadius: BorderRadius.circular(24),
-//                 ),
-//                 child: Column(
-//                   children: [
-//                     // 기존의 요약 정보 (좌우 배치)
-//                     Row(
-//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                       children: [
-//                         ExpenseSummary(
-//                           expense: dashbordcontroller.totalExpense.value,
-//                           onTap: () => _showDateRangePicker(context),
-//                           formatCurrency: _formatCurrency,
-//                         ),
-//                         BudgetSummary(
-//                           budget: dashbordcontroller.monthlyBudget.value,
-//                           currentSpend: dashbordcontroller.totalExpense.value,
-//                           onBudgetTap: _showBudgetDialog,
-//                           formatCurrency: _formatCurrency,
-//                         ),
-//                       ],
-//                     ),
-//                     const SizedBox(height: 12), // 텍스트와 게이지 사이 간격
-                    
-//                     Row(
-//                       crossAxisAlignment: CrossAxisAlignment.end,
-//                       children: [
-//                         SizedBox(
-//                           width: 90,
-//                           height: 90,
-//                           child: BudgetPigWidget(
-//                             percent: (dashbordcontroller.monthlyBudget.value > 0)
-//                             ? (dashbordcontroller.totalExpense.value / dashbordcontroller.monthlyBudget.value)
-//                             : 0.0
-//                             ),
-//                         ),
-//                       ],
-//                     ),
-//                     const SizedBox(width: 8,),
-//                     // 이제 게이지가 카드 너비에 맞춰지면서 
-//                     // '길어서 징그러운 느낌'이 사라지고 세련되게 변함!
-//                     BudgetGauge(
-//                       currentSpend: dashbordcontroller.totalExpense.value,
-//                       targetBudget: dashbordcontroller.monthlyBudget.value,
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-            
-//             const SizedBox(height: 28), // 섹션 간 간격
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: theme.cardColor, // 💡 카드 배경색 사용
+                  borderRadius: BorderRadius.circular(24),
+                  // 💡 핵심: 다른 카드들과 통일감을 주는 그림자 설정
+                  // Adding BoxShadow to create a 'floating' elevation effect.
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05), // 아주 연한 검정색
+                      blurRadius: 15, // 그림자 퍼짐 정도
+                      offset: const Offset(0, 8), // 그림자 방향 (아래쪽으로)
+                    ),
+                  ],
+                  // 선택사항: 아주 연한 테두리를 추가하면 더 선명해 보여
+                  border: Border.all(
+                    color: theme.dividerColor.withValues(alpha: 0.05),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20), // 내부 여백도 넉넉히!
+                  child: ChartsWidget(),
+                ),
+              ),
 
-//             // --- 나머지 섹션들은 그대로 유지 ---
-//             ChartsWidget(
-//               top3: dashbordcontroller.top3Categories,
-//               selectedPieIndex: selectedPieIndex,
-//               onTapCategory: _onSelectCategory,
-//               formatCurrency: _formatCurrency,
-//               dashbordcontroller: dashbordcontroller,
-//             ),
-//             const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
-//             RecentTransactionsList(
-//               transactions: dashbordcontroller.recentTransactions,
-//               formatDate: settingsController.formatDate,
-//               formatCurrency: _formatCurrency,
-//             ),
-//           ],
-//         );
-//       }),
-//     ),
-//   );
-// }
+              // --- 3. 최근 거래 내역 섹션 ---
+              RecentTransactionsList(
+                transactions: dashbordcontroller.recentTransactions,
+                formatDate: settingsController.formatDate,
+                formatCurrency: _formatCurrency,
+              ),
+            ],
+          );
+        }),
+      ),
+    );
+  }
 
   // -----Function------
 
@@ -272,28 +194,29 @@ Widget build(BuildContext context) {
     return settingsController.formatCurrency(value);
   }
 
-  /// Handles category selection and updates the detailed breakdown for charts
-  void _onSelectCategory(int index) async {
-    if (index < 0 || index >= dashbordcontroller.categoryList.length) {
-      dashbordcontroller.selectedBreakdown.clear();
-      setState(() => selectedPieIndex = null);
-      return;
-    }
-    selectedPieIndex = index;
-    final selectedId = dashbordcontroller.categoryList[index]['id'] as int;
-    await dashbordcontroller.loadBreakdown(selectedId);
-    setState(() {});
-  }
+  // /// Handles category selection and updates the detailed breakdown for charts
+  // void _onSelectCategory(int index) async {
+  //   if (index < 0 || index >= dashbordcontroller.categoryList.length) {
+  //     dashbordcontroller.selectedBreakdown.clear();
+  //     setState(() => selectedPieIndex = null);
+  //     return;
+  //   }
+  //   selectedPieIndex = index;
+  //   final selectedId = dashbordcontroller.categoryList[index]['id'] as int;
+  //   await dashbordcontroller.loadBreakdown(selectedId);
+  //   setState(() {});
+  // }
 
-/// Displays a dialog to set the monthly budget.
+  /// Displays a dialog to set the monthly budget.
   /// Uses AppLocalizations for all strings and Theme for styling.
   Future<void> _showBudgetDialog() async {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final currentBudget = dashbordcontroller.monthlyBudget.value;
-    
-    final TextEditingController dialogController =
-        TextEditingController(text: currentBudget == 0 ? "" : currentBudget.toString());
+
+    final TextEditingController dialogController = TextEditingController(
+      text: currentBudget == 0 ? "" : currentBudget.toString(),
+    );
 
     final result = await showDialog<double>(
       context: context,
@@ -311,12 +234,24 @@ Widget build(BuildContext context) {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context), 
-            child: Text(l10n.cancel, style: TextStyle(color: theme.colorScheme.secondary))
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              l10n.cancel,
+              style: TextStyle(color: theme.colorScheme.secondary),
+            ),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, double.tryParse(dialogController.text.trim())),
-            child: Text(l10n.save, style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
+            onPressed: () => Navigator.pop(
+              context,
+              double.tryParse(dialogController.text.trim()),
+            ),
+            child: Text(
+              l10n.save,
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -325,10 +260,10 @@ Widget build(BuildContext context) {
     if (result != null) {
       final now = DateTime.now();
       final yearMonth = "${now.year}-${now.month.toString().padLeft(2, '0')}";
-      
+
       await monthlyBudgetHandler.saveMonthlyBudget(yearMonth, result);
       await settingsController.refreshAllData();
-      dashbordcontroller.refreshDashboard(); 
+      dashbordcontroller.refreshDashboard();
     }
   }
 
@@ -341,10 +276,32 @@ Widget build(BuildContext context) {
     );
 
     if (range != null) {
+      // 💡 1. 날짜 형식을 yyyy-MM-dd로 추출
       String start = range.start.toString().split(' ')[0];
       String end = range.end.toString().split(' ')[0];
-      double newTotal = await dashbordcontroller.handler.getMonthlyTotalExpense(startDate: start, endDate: end);
-      dashbordcontroller.totalExpense.value = newTotal;
+
+      // 💡 2. 컨트롤러의 RxString에 먼저 값을 저장 (이게 핵심!)
+      // Updating the controller's observable dates before refreshing.
+      dashbordcontroller.startDate.value = start;
+      dashbordcontroller.endDate.value = end;
+
+      // 💡 3. 그 다음 리프레시 호출 (파이차트 데이터도 여기서 다시 불러옴)
+      await dashbordcontroller.refreshDashboard();
     }
   }
+
+  // Future<void> _showDateRangePicker(BuildContext context) async {
+  //   final range = await showDateRangePicker(
+  //     context: context,
+  //     firstDate: DateTime(2020),
+  //     lastDate: DateTime.now(),
+  //   );
+
+  //   if (range != null) {
+  //     String start = range.start.toString().split(' ')[0];
+  //     String end = range.end.toString().split(' ')[0];
+  //     double newTotal = await dashbordcontroller.handler.getMonthlyTotalExpense(startDate: start, endDate: end);
+  //     dashbordcontroller.totalExpense.value = newTotal;
+  //   }
+  // }
 }

@@ -66,7 +66,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get setYourBudget => '예산 설정';
 
   @override
-  String get noTransactions => '거래 내역 없음';
+  String get noTransactions => '지출 내역이 없습니다.';
 
   @override
   String get recentTranscations => '최근 거래';
@@ -242,4 +242,25 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get description => '내용';
+
+  @override
+  String get viewAnalysis => '분석보기';
+
+  @override
+  String get spendingAnalysis => '지출 분석';
+
+  @override
+  String get categoryBalance => '카테고리 밸런스';
+
+  @override
+  String get weeklySpendingTrend => '요일별 지출 추이';
+
+  @override
+  String get analysisStep1 => '분석 완료! 데이터가 10개 이상 쌓였어요 꿀! 🐷';
+
+  @override
+  String get analysisStep2 => '위에는 레이더 차트로 지출 밸런스를 볼 수 있고,';
+
+  @override
+  String get analysisStep3 => '아래는 꺾은선 그래프를 통해 어느 요일에 지출이 많았는지 볼 수 있어요!';
 }

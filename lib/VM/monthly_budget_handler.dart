@@ -1,11 +1,17 @@
 import 'package:piggy_log/VM/database_handler.dart';
+import 'package:sqflite/sqlite_api.dart';
 
 class MonthlyBudgetHandler {
   final DatabaseHandler databaseHandler = DatabaseHandler();
 
+  Future<Database> _getDb() async {
+    return await databaseHandler.database;
+  }
+
   /// 이번달 예산 불러오기 (없으면 0 리턴)
 Future<double> getMonthlyBudget(String yearMonth) async {
-  final db = await databaseHandler.initializeDB();
+  // final db = await databaseHandler.initializeDB();
+  final db = await _getDb();
 
   // 1. 먼저 이번 달 예산이 있는지 확인
   final res = await db.query(
@@ -37,7 +43,8 @@ Future<double> getMonthlyBudget(String yearMonth) async {
   /// 이번달 예산 저장 (없으면 insert, 있으면 update)
   
   Future<void> saveMonthlyBudget(String yearMonth, double targetAmount) async {
-  final db = await databaseHandler.initializeDB();
+  // final db = await databaseHandler.initializeDB();
+  final db = await _getDb();
 
   // 1. 해당 월/카테고리에 이미 예산이 있는지 확인
   final List<Map<String, dynamic>> existing = await db.query(
@@ -82,7 +89,8 @@ Future<double> getMonthlyBudget(String yearMonth) async {
 
   /// 모든 월별 예산 기록 가져오기 (히스토리용)
   Future<List<Map<String, dynamic>>> getAllMonthlyBudgets() async {
-    final db = await databaseHandler.initializeDB();
+    // final db = await databaseHandler.initializeDB();
+    final db = await _getDb();
 
     // 전체 예산(c_id = 0) 기록만 최신순으로 가져옵니다.
     final List<Map<String, dynamic>> res = await db.query(

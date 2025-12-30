@@ -66,7 +66,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get setYourBudget => '予算を設定';
 
   @override
-  String get noTransactions => '取引なし';
+  String get noTransactions => '支出履歴がありません。';
 
   @override
   String get recentTranscations => '最近の取引';
@@ -242,4 +242,25 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get description => '内容';
+
+  @override
+  String get viewAnalysis => '分析を見る';
+
+  @override
+  String get spendingAnalysis => '支出分析';
+
+  @override
+  String get categoryBalance => 'カテゴリーバランス';
+
+  @override
+  String get weeklySpendingTrend => '曜日別支出推移';
+
+  @override
+  String get analysisStep1 => '分析完了！データが10件以上集まったぶー！🐷';
+
+  @override
+  String get analysisStep2 => '上のレーダーチャートでバランスを確認して、';
+
+  @override
+  String get analysisStep3 => '下の折れ線グラフで支出の多い曜日をチェックだぶー！';
 }

@@ -2,14 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:piggy_log/VM/database_handler.dart';
 import 'package:piggy_log/model/settings.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sql.dart';
 
 class SettingsHandler {
   final DatabaseHandler databaseHandler = DatabaseHandler();
 
+  Future<Database> _getDb() async {
+    // .initializeDB() 대신 .database (getter)를 호출!
+    return await databaseHandler.database; 
+  }
+
 /// Insert default settings on first app launch
   Future<int> insertDefaultSettings() async {
-  final db = await databaseHandler.initializeDB();
+  // final db = await databaseHandler.initializeDB();
+  final db = await _getDb();
   final systemLocale =
       WidgetsBinding.instance.platformDispatcher.locale.toString();
 
@@ -31,7 +38,8 @@ class SettingsHandler {
 
   // Update DB with settings
   Future<int> updateSettings(Settings settings) async {
-    final db = await databaseHandler.initializeDB();
+    // final db = await databaseHandler.initializeDB();
+    final db = await _getDb();
     return await db.update(
       'settings',
       {
@@ -48,7 +56,8 @@ class SettingsHandler {
 
   /// Fetch settings
   Future<Settings?> getSettings() async {
-    final db = await databaseHandler.initializeDB();
+    // final db = await databaseHandler.initializeDB();
+    final db = await _getDb();
     final data = await db.query('settings', where: 'id = ?', whereArgs: [1]);
 
     if (data.isNotEmpty) {
@@ -62,7 +71,8 @@ class SettingsHandler {
 
   /// Get all data from all tables for a full backup
   Future<Map<String, List<Map<String, dynamic>>>> getAllAppData() async {
-    final db = await databaseHandler.initializeDB();
+    // final db = await databaseHandler.initializeDB();
+    final db = await _getDb();
     return {
       'categories': await db.query('categories'),
       'spending_transactions': await db.query('spending_transactions'),
@@ -73,7 +83,8 @@ class SettingsHandler {
 
   /// Wipe everything before restore (except settings if you want to keep current)
   Future<void> clearAllAppData() async {
-    final db = await databaseHandler.initializeDB();
+    // final db = await databaseHandler.initializeDB();
+    final db = await _getDb();
     await db.transaction((txn) async {
       await txn.delete('spending_transactions');
       await txn.delete('monthly_budget');
@@ -85,7 +96,8 @@ class SettingsHandler {
   
   /// Bulk insert for any table
   Future<void> insertTableData(String tableName, List<Map<String, dynamic>> dataList) async {
-    final db = await databaseHandler.initializeDB();
+    // final db = await databaseHandler.initializeDB();
+    final db = await _getDb();
     await db.transaction((txn) async {
       await txn.execute('PRAGMA foreign_keys = OFF');
       for (var data in dataList) {

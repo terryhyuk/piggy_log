@@ -77,5 +77,13 @@
   "restoreSuccess": "restoreSuccess",
   "categoryNameAlreadyExists": "Category Name Already Exists",
   "checkDescriptionAndAmount": "Please check the description and amount.",
-  "description": "description"
+  "description": "description",
+  "noTransactions": "No transactions found.",
+  "viewAnalysis": "View Analysis",
+  "spendingAnalysis": "Spending Analysis",
+  "categoryBalance": "Category Balance",
+  "weeklySpendingTrend": "Weekly Spending Trend",
+  "analysisStep1": "Analysis complete! You've got 10+ records now! 🐷",
+  "analysisStep2": "Check the Radar Chart above for your balance,",
+  "analysisStep3": "and the Line Chart below for your weekly peak spending!"
 }

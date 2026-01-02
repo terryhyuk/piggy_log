@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:piggy_log/view/widget/animatedShake.dart';
 import '../../model/category.dart';
 
-/// Single Category Card widget
-/// - Supports shaking animation in edit mode
-/// - Shows Edit/Delete buttons in edit mode
-/// - Provides tap & long press callbacks
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    An interactive category grid item featuring micro-interactions and 
+//    adaptive UI depth. Utilizes conditional styling for theme-specific 
+//    shadow rendering.
+//
+//  * TODO: 
+//    - Abstract the 'Edit Overlay' into a reusable badge component.
+//    - Optimize shadow performance by using 'RepaintBoundary' if grid grows.
+// -----------------------------------------------------------------------------
 
 class CategoryCard extends StatelessWidget {
   final Category category;
@@ -28,7 +34,6 @@ class CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // final isDark = theme.brightness == Brightness.dark;
     final color = Color(int.parse(category.color, radix: 16));
 
     return GestureDetector(
@@ -36,7 +41,7 @@ class CategoryCard extends StatelessWidget {
       onLongPress: onLongPress,
       child: Stack(
         children: [
-          // --- Card with optional shadow (light only) ---
+          // Main Card Body: Implements custom shadow depth for elevated UX.
           Positioned.fill(
             child: AnimatedShake(
               isActive: isEditMode,
@@ -46,7 +51,7 @@ class CategoryCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: theme.brightness == Brightness.dark
                       ? [
-                          // Dark mode → 살짝 떠 있는 느낌
+                          // [Dark Mode] Subtle elevation using low-alpha black shadows.
                           BoxShadow(
                             color: Colors.black.withAlpha((0.1 * 255).round()),
                             offset: const Offset(0, 2),
@@ -54,7 +59,7 @@ class CategoryCard extends StatelessWidget {
                           ),
                         ]
                       : [
-                          // Light mode → 기존 floating card 느낌
+                          // [Light Mode] Multi-layered shadows to mimic a 'floating' aesthetic.
                           BoxShadow(
                             color: Colors.black.withAlpha((0.15 * 255).round()),
                             offset: const Offset(0, 5),
@@ -83,7 +88,7 @@ class CategoryCard extends StatelessWidget {
             ),
           ),
 
-          // --- Edit & Delete buttons (visible only in edit mode) ---
+          // Edit/Delete Action Overlays (Visible in Edit Mode).
           if (isEditMode)
             Positioned(
               right: 4,
@@ -92,11 +97,11 @@ class CategoryCard extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.edit),
-                    onPressed: onEditPress,
+                    onPressed: onEditPress?.call,
                   ),
                   IconButton(
                     icon: const Icon(Icons.close, size: 20),
-                    onPressed: onDeletePress,
+                    onPressed: onDeletePress?.call,
                   ),
                 ],
               ),

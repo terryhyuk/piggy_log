@@ -3,16 +3,20 @@ import 'package:get_x/get.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 import 'package:piggy_log/view/pages/monthly_history.dart';
 
-///
-/// BudgetSummary Widget
-/// 
-/// Purpose:
-/// Displays the current monthly budget and provides navigation to history 
-/// or a dialog to update the budget.
-///
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    Financial compliance monitor that provides real-time budget status.
+//    Implements a 'Alert-driven UI' pattern where visual elements react 
+//    dynamically to spending thresholds (Over-budget state).
+//
+//  * TODO: 
+//    - Add a progress bar (LinearProgressIndicator) to visualize budget consumption.
+//    - Move 'isOverBudget' logic to the controller for better state consistency.
+// -----------------------------------------------------------------------------
+
 class BudgetSummary extends StatelessWidget {
   final double budget;
-  final double currentSpend; // Added to compare with budget for the warning trigger
+  final double currentSpend; 
   final VoidCallback onBudgetTap;
   final String Function(double) formatCurrency;
 
@@ -26,13 +30,13 @@ class BudgetSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Check if the user has exceeded their assigned budget
+    /// Evaluation Logic: Identifies critical budget violations.
     final bool isOverBudget = budget > 0 && currentSpend > budget;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // Section Title: Navigate to Monthly History on tap
+        // Navigation Header: Entry point to historical data review.
         GestureDetector(
           onTap: () => Get.to(() => const MonthlyHistory()),
           child: Text(
@@ -46,7 +50,7 @@ class BudgetSummary extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         
-        // Budget Amount: Show warning icon and change color if over budget
+        // Dynamic Budget Info: Interactive area for budget configuration.
         GestureDetector(
           onTap: onBudgetTap,
           child: Container(
@@ -54,18 +58,17 @@ class BudgetSummary extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Display a red warning triangle only when the budget is exceeded
+                /// Critical Alert: Visible only when spending exceeds the limit.
                 if (isOverBudget)
                   const Padding(
                     padding: EdgeInsets.only(right: 4),
                     child: Icon(
-                      Icons.warning_amber_rounded, // The "Red Triangle" warning icon
+                      Icons.warning_amber_rounded,
                       color: Colors.red,
                       size: 20,
                     ),
                   ),
                 
-                // Formatted Budget Amount
                 Text(
                   budget == 0 
                       ? AppLocalizations.of(context)!.setYourBudget 
@@ -73,7 +76,7 @@ class BudgetSummary extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16, 
                     fontWeight: FontWeight.bold,
-                    // Changes the text color to red if over budget to alert the user
+                    /// Reactive Styling: Visual shift to Red for immediate recognition.
                     color: isOverBudget ? Colors.red : null,
                   ),
                 ),

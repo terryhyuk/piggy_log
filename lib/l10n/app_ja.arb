@@ -86,5 +86,6 @@
   "weeklySpendingTrend": "曜日別支出推移",
   "analysisStep1": "分析完了！データが10件以上集まったぶー！🐷",
   "analysisStep2": "上のレーダーチャートでバランスを確認して、",
-  "analysisStep3": "下の折れ線グラフで支出の多い曜日をチェックだぶー！"
+  "analysisStep3": "下の棒グラフで支出の多い曜日をチェックだぶー！",
+  "weeklyTrend": "週間の支出推移"
 }

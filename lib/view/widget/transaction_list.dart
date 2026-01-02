@@ -8,23 +8,16 @@ import 'package:piggy_log/l10n/app_localizations.dart';
 import 'package:piggy_log/view/pages/transactions_detail.dart';
 import 'package:piggy_log/view/widget/add_transaction_dialog.dart';
 
-/// TransactionList - Category Transaction List View
-///
-/// Displays all transactions for a specific category with swipe-to-edit/delete.
-/// Core list component for Simple Spending Tracker (Canada Edition).
-///
-/// Features:
-/// ✅ Swipe right → Edit transaction (AddTransactionDialog)
-/// ✅ Swipe right → Delete with confirmation dialog
-/// ✅ Real-time reactive updates via Obx() + refreshTrigger
-/// ✅ Currency formatting (CAD support via SettingsController)
-/// ✅ Material 3 colors (error/primary for expense/income)
-/// ✅ Slidable actions with smooth DrawerMotion animation
-///
-/// Data flow:
-/// CategoryId → TransactionHandler.getTransactionsByCategory() → ListView
-///
-/// Auto-refreshes: Dashboard + Category lists on delete/edit
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    Reactive UI component for category-specific transaction listings. 
+//    Integrates Slidable actions for intuitive mobile UX.
+//
+//  * TODO: 
+//    - Transition from FutureBuilder to GetX Controller state management 
+//      to separate business logic from the UI build method.
+//    - Implement Pagination/SliverList for better performance with large datasets.
+// -----------------------------------------------------------------------------
 
 class TransactionList extends StatelessWidget {
   final int categoryId;
@@ -38,19 +31,21 @@ class TransactionList extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Obx(() {
+      // Accessing refreshTrigger to rebuild the widget when data changes
       settingsController.refreshTrigger.value;
 
       return FutureBuilder(
         future: transactionHandler.getTransactionsByCategory(categoryId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const Center(child: CircularProgressIndicator());
           }
+          
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Text(
                 AppLocalizations.of(context)!.noTransactionsFound,
-                style: TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
             );
@@ -77,7 +72,9 @@ class TransactionList extends StatelessWidget {
                             transactionToEdit: trx,
                           ),
                         ).then(
-                          (_) => settingsController.refreshTrigger.value++,
+                          (_) {
+                            settingsController.refreshTrigger.value++;
+                          },
                         );
                       },
                       backgroundColor: theme.colorScheme.surfaceContainer,
@@ -92,26 +89,20 @@ class TransactionList extends StatelessWidget {
                         bool? confirmed = await showDialog(
                           context: context,
                           builder: (_) => AlertDialog(
-                            title: Text(
-                              AppLocalizations.of(context)!.confirmDelete,
-                            ),
+                            title: Text(local.confirmDelete),
                             content: Text(
-                              "'${trx.t_name}' ${AppLocalizations.of(context)!.deleteConfirm}",
+                              "'${trx.t_name}' ${local.deleteConfirm}",
                             ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),
-                                child: Text(
-                                  AppLocalizations.of(context)!.cancel,
-                                ),
+                                child: Text(local.cancel),
                               ),
                               TextButton(
                                 onPressed: () => Navigator.pop(context, true),
                                 child: Text(
-                                  AppLocalizations.of(context)!.delete,
-                                  style: TextStyle(
-                                    color: theme.colorScheme.error,
-                                  ),
+                                  local.delete,
+                                  style: TextStyle(color: theme.colorScheme.error),
                                 ),
                               ),
                             ],
@@ -119,14 +110,11 @@ class TransactionList extends StatelessWidget {
                         );
 
                         if (confirmed == true) {
-                          await TransactionHandler().deleteTransaction(
-                            trx.t_id!,
-                          );
+                          await TransactionHandler().deleteTransaction(trx.t_id!);
 
+                          // Notify controllers to refresh UI state
                           settingsController.refreshTrigger.value++;
-
-                          final dashboardController =
-                              Get.find<DashboardController>();
+                          final dashboardController = Get.find<DashboardController>();
                           await dashboardController.refreshDashboard();
 
                           Get.snackbar(
@@ -147,15 +135,9 @@ class TransactionList extends StatelessWidget {
                 ),
                 child: ListTile(
                   title: Text(trx.t_name),
-                  subtitle: Text(
-                    settingsController.formatDate(date)
-                      // ??
-                        // DateFormat.yMMMd().format(date),
-                  ),
+                  subtitle: Text(settingsController.formatDate(date)),
                   trailing: Text(
                     settingsController.formatCurrency(trx.amount),
-                    // ??
-                        // trx.amount.toString(),
                     style: TextStyle(
                       color: trx.type == 'expense'
                           ? theme.colorScheme.error
@@ -167,8 +149,9 @@ class TransactionList extends StatelessWidget {
                       () => const TransactionsDetail(),
                       arguments: trx,
                     )?.then((result) {
-                      if (result == true)
-                        {settingsController.refreshTrigger.value++;}
+                      if (result == true) {
+                        settingsController.refreshTrigger.value++;
+                      }
                     });
                   },
                 ),

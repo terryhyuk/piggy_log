@@ -558,11 +558,11 @@ abstract class AppLocalizations {
   /// **'Category Name Already Exists'**
   String get categoryNameAlreadyExists;
 
-  /// No description provided for @checkDescriptionAndAmount.
+  /// No description provided for @checkTitleAndAmount.
   ///
   /// In en, this message translates to:
   /// **'Please check the description and amount.'**
-  String get checkDescriptionAndAmount;
+  String get checkTitleAndAmount;
 
   /// No description provided for @description.
   ///
@@ -597,7 +597,7 @@ abstract class AppLocalizations {
   /// No description provided for @analysisStep1.
   ///
   /// In en, this message translates to:
-  /// **'Analysis complete! You\'ve got 10+ records now! 🐷'**
+  /// **'Analysis Complete! 10+ records found! 🐷'**
   String get analysisStep1;
 
   /// No description provided for @analysisStep2.
@@ -609,8 +609,14 @@ abstract class AppLocalizations {
   /// No description provided for @analysisStep3.
   ///
   /// In en, this message translates to:
-  /// **'and the Line Chart below for your weekly peak spending!'**
+  /// **'and the Bar Chart below for your weekly peak spending!'**
   String get analysisStep3;
+
+  /// No description provided for @weeklyTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Spending Trend'**
+  String get weeklyTrend;
 }
 
 class _AppLocalizationsDelegate

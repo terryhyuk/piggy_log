@@ -238,7 +238,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get categoryNameAlreadyExists => 'หมวดหมู่ชื่อมีอยู่แล้ว';
 
   @override
-  String get checkDescriptionAndAmount => 'กรุณาตรวจสอบรายละเอียดและจำนวนเงิน';
+  String get checkTitleAndAmount => 'กรุณาตรวจสอบรายละเอียดและจำนวนเงิน';
 
   @override
   String get description => 'รายละเอียด';
@@ -264,5 +264,8 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get analysisStep3 =>
-      'และดูแผนภูมิเส้นด้านล่างว่าวันไหนใช้จ่ายเยอะที่สุดนะครับ!';
+      'และดูแผนภูมิแท่งด้านล่างว่าวันไหนใช้จ่ายเยอะที่สุดนะครับ!';
+
+  @override
+  String get weeklyTrend => 'แนวโน้มรายสัปดาห์';
 }

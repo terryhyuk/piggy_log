@@ -7,15 +7,17 @@ import 'package:piggy_log/model/category.dart';
 import 'package:piggy_log/view/widget/color_picker_sheet.dart';
 import 'icon_picker_sheet.dart';
 
-// --------------------------------------------------------------
-//  * CategorySheet - Category Creation & Edition Bottom Sheet
-//  * * A responsive UI component for managing expense categories.
-//  * - Icon selection via IconPickerSheet
-//  * - Color selection via ColorPickerSheet
-//  * - Category name input with validation
-//  * - Cross-platform responsive layout (iOS/Android/Tablet)
-//  * - Dynamic theme support (Light/Dark mode)
-//  --------------------------------------------------------------
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    Unified form for category orchestration. Enforces data integrity through 
+//    pre-persistence validation and maintains a consistent visual language 
+//    via centralized picker integrations.
+//
+//  * TODO: 
+//    - Offload business logic (validation, DB calls) to a dedicated Controller 
+//      to transform this into a pure 'Dumb Widget'.
+//    - Implement a 'Debounced' duplicate check for real-time user feedback.
+// -----------------------------------------------------------------------------
 
 class CategorySheet extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -27,11 +29,10 @@ class CategorySheet extends StatefulWidget {
 }
 
 class _CategoryEditSheetState extends State<CategorySheet> {
-  /// Properties for managing category state
   late IconData selectedIcon = Icons.category;
   late Color selectedColor = Colors.grey;
   late TextEditingController cnameController = TextEditingController();
-  late String selectedHexColor; // For DB storage in Hex format
+  late String selectedHexColor; 
   late AppLocalizations local;
 
   @override
@@ -44,15 +45,14 @@ class _CategoryEditSheetState extends State<CategorySheet> {
   void initState() {
     super.initState();
 
-    /// Initialize default hex color and load existing data if in Edit Mode
     selectedHexColor = selectedColor.toARGB32().toRadixString(16).padLeft(8, '0');
 
     if (widget.initialData != null) {
-      /// Edit Mode: Populating existing data into fields
       cnameController.text = widget.initialData!['c_name'];
       selectedColor = Color(int.parse(widget.initialData!['color'], radix: 16));
-      selectedHexColor = selectedColor.toARGB32().toRadixString(16).padLeft(8, '0');
+      selectedHexColor = widget.initialData!['color'];
 
+      // Reconstructing IconData from stored database metadata.
       selectedIcon = IconData(
         widget.initialData!['icon_codepoint'],
         fontFamily: widget.initialData!['icon_font_family'],
@@ -63,7 +63,6 @@ class _CategoryEditSheetState extends State<CategorySheet> {
 
   @override
   void dispose() {
-    /// Clean up controller to prevent memory leaks
     cnameController.dispose();
     super.dispose();
   }
@@ -71,49 +70,36 @@ class _CategoryEditSheetState extends State<CategorySheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // final local = AppLocalizations.of(context)!;
 
     return SafeArea(
-      /// Prevents UI overlap with iOS bottom home indicator
       top: false,
       child: SingleChildScrollView(
+        // Handles layout adjustments when the software keyboard is active.
         padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         child: LayoutBuilder(
-          /// Calculating responsive sizes for cross-device compatibility
           builder: (context, constraints) {
             double maxW = constraints.maxWidth;
-            double iconBox = maxW * 0.26;  /// Responsive container size
+            double iconBox = maxW * 0.26;
             double iconSize = maxW * 0.13;
         
             return Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: theme.colorScheme.surface,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(22),
-                ),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  /// ---------- Header ----------
                   Text(
-                    widget.initialData == null
-                        ? local.addCategory      /// "Add Category"
-                        : local.editCategory,    /// "Edit Category"
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ) ?? const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                        ),
+                    widget.initialData == null ? local.addCategory : local.editCategory,
+                    style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700) ?? 
+                           const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 22),
         
-                  /// ---------- Icon & Name Input Section ----------
                   Row(
                     children: [
-                      /// Icon Selection Trigger (Displays '+' by default)
                       GestureDetector(
                         onTap: () async {
                           final result = await showModalBottomSheet(
@@ -122,9 +108,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                             builder: (_) => const IconPickerSheet(),
                           );
                           if (result != null) {
-                              /// Update UI with the selected icon
-                              selectedIcon = result['icon'];
-                            setState(() {});
+                            setState(() => selectedIcon = result['icon']);
                           }
                         },
                         child: Container(
@@ -139,38 +123,26 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                             ),
                           ),
                           child: selectedIcon == Icons.category
-                              ? Icon(
-                                  Icons.add, // Placeholder '+' icon
-                                  size: iconSize * 0.8,
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                )
-                              : Icon(
-                                  selectedIcon, // Selected category icon
-                                  size: iconSize,
-                                  color: selectedColor,
-                                ),
+                              ? Icon(Icons.add, size: iconSize * 0.8, color: theme.colorScheme.onSurfaceVariant)
+                              : Icon(selectedIcon, size: iconSize, color: selectedColor),
                         ),
                       ),
                       const SizedBox(width: 20),
         
-                      /// Category Name TextField
                       Expanded(
                         child: TextField(
                           controller: cnameController,
                           decoration: InputDecoration(
                             labelText: local.categoryName,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          textInputAction: TextInputAction.done
+                          textInputAction: TextInputAction.done,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 32),
         
-                  /// ---------- Color Picker Section ----------
                   GestureDetector(
                     onTap: () async {
                       final Color? picked = await showModalBottomSheet<Color>(
@@ -179,12 +151,10 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                         builder: (_) => const ColorPickerSheet(),
                       );
                       if (picked != null) {
-                      /// Sync selected color and generate Hex string
+                        setState(() {
                           selectedColor = picked;
-                          selectedHexColor = picked.toARGB32()
-                          .toRadixString(16)
-                          .padLeft(8, '0');
-                          setState(() {});
+                          selectedHexColor = picked.toARGB32().toRadixString(16).padLeft(8, '0');
+                        });
                       }
                     },
                     child: Row(
@@ -192,7 +162,6 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                       children: [
                         Text(local.color, style: theme.textTheme.bodyMedium),
                         SizedBox(width: maxW * 0.07),
-                        /// Color Preview Circle
                         Container(
                           width: 34,
                           height: 34,
@@ -206,11 +175,9 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                   ),
                   const SizedBox(height: 38),
         
-                  /// ---------- Action Buttons ----------
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      /// Cancel Action
                       ElevatedButton(
                         onPressed: () => Navigator.pop(context),
                         style: ElevatedButton.styleFrom(
@@ -219,8 +186,6 @@ class _CategoryEditSheetState extends State<CategorySheet> {
                         ),
                         child: Text(local.cancel),
                       ),
-        
-                      /// Save Action (Create or Update)
                       ElevatedButton(
                         onPressed: saveCategory,
                         style: ElevatedButton.styleFrom(
@@ -241,53 +206,44 @@ class _CategoryEditSheetState extends State<CategorySheet> {
     );
   }
 
-  /// Handles category persistence and provides UI feedback
+  /// Orchestrates validation and persistence logic for the category record.
   Future<void> saveCategory() async {
-    /// Basic validation for category name
     final name = cnameController.text.trim();
 
-    if(name.isEmpty){
-      showSnackBar(
-        "",
-        local.pleaseEnterCategoryName, 
-        Colors.orange,
-        );
-        return;
+    if (name.isEmpty) {
+      showSnackBar("", local.pleaseEnterCategoryName, Colors.orange);
+      return;
     }
+
     final allCategories = await CategoryHandler().getAllCategories();
   
-  // check if a category with the same name already exists
-  bool isDuplicate = allCategories.any((category) => 
-    category.c_name == name && 
-    (widget.initialData == null || category.id != widget.initialData!['id'])
-  );
-
-  if (isDuplicate) {
-    showSnackBar(
-      "", 
-      local.categoryNameAlreadyExists, 
-      Colors.redAccent
+    // Ensuring category names remain unique within the user's dataset.
+    bool isDuplicate = allCategories.any((category) => 
+      category.c_name == name && 
+      (widget.initialData == null || category.id != widget.initialData!['id'])
     );
-    return; // 중복이면 여기서 중단
-  }
 
-
-    if (widget.initialData == null) {
-      /// Logic for creating a new category
-      await addCategory();
-      showSnackBar(local.categoryCreated, local.newCategoryAdded, Colors.green);
-      if(!mounted) return;
-    } else {
-      /// Logic for updating existing category history
-      await editCategoryhistory();
-      if(!mounted) return;
-      showSnackBar(local.categoryUpdated, local.changesSaved, Colors.blue);
+    if (isDuplicate) {
+      showSnackBar("", local.categoryNameAlreadyExists, Colors.redAccent);
+      return;
     }
 
-    Navigator.pop(context);
+    try {
+      if (widget.initialData == null) {
+        await addCategory();
+        showSnackBar(local.categoryCreated, local.newCategoryAdded, Colors.green);
+      } else {
+        await editCategoryhistory();
+        showSnackBar(local.categoryUpdated, local.changesSaved, Colors.blue);
+      }
+      
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      debugPrint("Database Error: Failed to save category: $e");
+    }
   }
 
-  /// Persists a new category record to the database
+  /// Maps state to Category model and performs database insertion.
   Future<void> addCategory() async {
     final category = Category(
       iconCodePoint: selectedIcon.codePoint,
@@ -301,7 +257,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
     await Get.find<SettingController>().refreshAllData();
   }
 
-  /// Updates an existing category record in the database
+  /// Maps state to Category model and performs database update.
   Future<void> editCategoryhistory() async {
     final category = Category(
       id: widget.initialData!['id'],
@@ -316,7 +272,7 @@ class _CategoryEditSheetState extends State<CategorySheet> {
     await Get.find<SettingController>().refreshAllData();
   }
 
-  /// Global Snackbar for user action feedback
+  /// Displays consistent system-level feedback to the user.
   void showSnackBar(String title, String message, Color bgColor) {
     Get.snackbar(
       title,

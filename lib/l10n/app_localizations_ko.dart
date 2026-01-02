@@ -238,7 +238,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get categoryNameAlreadyExists => '이미 존재하는 카테고리 이름입니다.';
 
   @override
-  String get checkDescriptionAndAmount => '내용과 금액을 확인해 주세요.';
+  String get checkTitleAndAmount => 'Please check the description and amount.';
 
   @override
   String get description => '내용';
@@ -262,5 +262,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get analysisStep2 => '위에는 레이더 차트로 지출 밸런스를 볼 수 있고,';
 
   @override
-  String get analysisStep3 => '아래는 꺾은선 그래프를 통해 어느 요일에 지출이 많았는지 볼 수 있어요!';
+  String get analysisStep3 => '아래 막대그래프에서 어느 요일에 지출이 가장 많은지 확인해봐!';
+
+  @override
+  String get weeklyTrend => '주간 지출 추이';
 }

@@ -85,5 +85,6 @@
   "weeklySpendingTrend": "요일별 지출 추이",
   "analysisStep1": "분석 완료! 데이터가 10개 이상 쌓였어요 꿀! 🐷",
   "analysisStep2": "위에는 레이더 차트로 지출 밸런스를 볼 수 있고,",
-  "analysisStep3": "아래는 꺾은선 그래프를 통해 어느 요일에 지출이 많았는지 볼 수 있어요!"
+  "analysisStep3": "아래 막대그래프에서 어느 요일에 지출이 가장 많은지 확인해봐!",
+  "weeklyTrend": "주간 지출 추이"
 }

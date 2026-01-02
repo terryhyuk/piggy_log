@@ -4,6 +4,18 @@ import 'package:get_x/get.dart';
 import 'package:piggy_log/controller/dashboard_controller.dart';
 import 'package:piggy_log/controller/setting_controller.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
+import 'package:piggy_log/view/widget/animated_piggy_message.dart';
+
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    Advanced analytical dashboard utilizing multi-dimensional charts.
+//    Implements a 'Storytelling UX' via a sequential messaging system 
+//    (PiggyTalk) and minimalist data visualization for high readability.
+//
+//  * TODO: 
+//    - Export chart as Image/PDF for user sharing features.
+//    - Add a comparison layer (e.g., Previous Month vs Current) on the Radar Chart.
+// -----------------------------------------------------------------------------
 
 class RadarChartPage extends StatefulWidget {
   const RadarChartPage({super.key});
@@ -12,46 +24,20 @@ class RadarChartPage extends StatefulWidget {
   State<RadarChartPage> createState() => _RadarChartPageState();
 }
 
-class _RadarChartPageState extends State<RadarChartPage>
-    with SingleTickerProviderStateMixin {
+class _RadarChartPageState extends State<RadarChartPage> {
   final DashboardController controller = Get.find<DashboardController>();
   final SettingController settingsController = Get.find<SettingController>();
 
-  late AnimationController _pigController;
-  late Animation<Offset> _pigAnimation;
-
-  // State for sequential message control
+  // State Management for Character Animation
   String _currentPiggyMessage = "";
   bool _isAnimating = false;
   bool _hasFinishedTalking = false;
 
-  @override
-  void initState() {
-    super.initState();
-    // Bouncy animation for the piggy
-    _pigController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    )..repeat(reverse: true);
-
-    _pigAnimation =
-        Tween<Offset>(
-          begin: const Offset(0, 0),
-          end: const Offset(0, -0.2),
-        ).animate(
-          CurvedAnimation(parent: _pigController, curve: Curves.easeOutQuad),
-        );
-  }
-
-  @override
-  void dispose() {
-    _pigController.dispose();
-    super.dispose();
-  }
-
-  // Logic to rotate messages and then clear everything
+  /// PiggyTalk Engine: Orchestrates a multi-step analysis commentary.
   void _startPiggyTalk(AppLocalizations l10n) async {
+    // Prevent overlapping animation sequences.
     if (_isAnimating || _hasFinishedTalking) return;
+    
     _isAnimating = true;
 
     final messages = [
@@ -60,17 +46,13 @@ class _RadarChartPageState extends State<RadarChartPage>
       l10n.analysisStep3,
     ];
 
-    for (var msg in messages) {
+    for (int i = 0; i < messages.length; i++) {
       if (mounted) {
-        setState(() {
-          _currentPiggyMessage = msg;
-        });
+        setState(() => _currentPiggyMessage = messages[i]);
       }
-      // Duration to read each message
       await Future.delayed(const Duration(milliseconds: 2500));
     }
 
-    // After all messages, clear the message to trigger the exit animation
     if (mounted) {
       setState(() {
         _currentPiggyMessage = "";
@@ -97,71 +79,53 @@ class _RadarChartPageState extends State<RadarChartPage>
             ? controller.categoryList[controller.selectedPieIndex.value!]['id']
             : null;
 
-        if (categoryId == null)
-          return const Center(child: CircularProgressIndicator());
+        if (categoryId == null) return const Center(child: CircularProgressIndicator());
 
         return FutureBuilder<List<Map<String, dynamic>>>(
           future: controller.handler.getCategoryDetailedList(categoryId),
           builder: (context, snapshot) {
-            if (!snapshot.hasData)
-              return const Center(child: CircularProgressIndicator());
+            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
             final detailedList = snapshot.data!;
-            if (detailedList.isEmpty)
-              return Center(child: Text(l10n.noTransactions));
+            if (detailedList.isEmpty) return Center(child: Text(l10n.noTransactions));
 
-            // Weekly data processing
+            // Data Transformation: Aggregates expenditure per weekday.
             List<double> daySums = List.filled(7, 0.0);
             for (var t in detailedList) {
               try {
                 final date = DateTime.parse(t['date']);
                 daySums[date.weekday - 1] += (t['amount'] as num).toDouble();
-              } catch (e) {}
+              } catch (e) {
+                // Ignore parsing errors for corrupted date strings.
+              }
             }
-            final List<FlSpot> weeklySpots = List.generate(
-              7,
-              (i) => FlSpot(i.toDouble(), daySums[i]),
-            );
-
-            bool showPiggy = detailedList.length >= 10;
 
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Column(
                 children: [
-                  // --- 1. Radar Chart ---
                   _buildSectionTitle(l10n.categoryBalance, theme),
                   const SizedBox(height: 12),
                   _buildRadarCard(theme),
 
                   const SizedBox(height: 20),
 
-                  // --- 2. Animated Piggy & Bubble (Disappears together) ---
-                  if (showPiggy)
+                  // Mascot Interaction: Triggered automatically upon reaching data threshold.
+                  if (detailedList.length >= 10)
                     Builder(
                       builder: (context) {
-                        // 💡 빌드가 끝난 '후'에 애니메이션을 시작하도록 예약!
-                        // Starting the animation AFTER the build phase to avoid setState errors.
-                        if (_currentPiggyMessage.isEmpty &&
-                            !_isAnimating &&
-                            !_hasFinishedTalking) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            _startPiggyTalk(l10n);
-                          });
+                        if (_currentPiggyMessage.isEmpty && !_isAnimating && !_hasFinishedTalking) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) => _startPiggyTalk(l10n));
                         }
-                        return _buildAnimatedPiggySection(
-                          _currentPiggyMessage,
-                          theme,
-                        );
+                        return AnimatedPiggyMessage(message: _currentPiggyMessage);
                       },
                     ),
 
                   const SizedBox(height: 20),
 
-                  // --- 3. Line Chart ---
                   _buildSectionTitle(l10n.weeklySpendingTrend, theme),
                   const SizedBox(height: 12),
-                  _buildLineChartCard(theme, weeklySpots),
+                  _buildBarChartCard(theme, daySums),
 
                   const SizedBox(height: 50),
                 ],
@@ -173,63 +137,10 @@ class _RadarChartPageState extends State<RadarChartPage>
     );
   }
 
-  // --- Helper Widget: Piggy + Bubble with Exit Animation ---
-  Widget _buildAnimatedPiggySection(String message, ThemeData theme) {
-    bool isVisible = message.isNotEmpty;
-
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.easeInOut,
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 500),
-        opacity: isVisible ? 1.0 : 0.0,
-        child: isVisible
-            ? Padding(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SlideTransition(
-                      position: _pigAnimation,
-                      child: Image.asset(
-                        'images/pig_happy.png',
-                        width: 60,
-                        height: 60,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 400),
-                        child: Container(
-                          key: ValueKey<String>(message),
-                          margin: const EdgeInsets.only(left: 10, top: 10),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primaryContainer,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(4),
-                              topRight: Radius.circular(20),
-                              bottomRight: Radius.circular(20),
-                              bottomLeft: Radius.circular(20),
-                            ),
-                          ),
-                          child: Text(
-                            message,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            : const SizedBox(width: double.infinity, height: 0),
-      ),
-    );
-  }
+  // --- UI Architecture Components ---
 
   Widget _buildRadarCard(ThemeData theme) {
+    /// Minimalist Radar Configuration: Ticks and default labels removed for cleaner UX.
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -242,18 +153,9 @@ class _RadarChartPageState extends State<RadarChartPage>
           aspectRatio: 1.2,
           child: RadarChart(
             RadarChartData(
-              ticksTextStyle: const TextStyle(
-                color: Colors.transparent,
-                fontSize: 0,
-              ),
-              gridBorderData: BorderSide(
-                color: theme.dividerColor.withAlpha(25),
-                width: 1,
-              ),
-              radarBorderData: BorderSide(
-                color: theme.colorScheme.primary.withAlpha(76),
-                width: 1,
-              ),
+              ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 0),
+              gridBorderData: BorderSide(color: theme.dividerColor.withAlpha(25), width: 1),
+              radarBorderData: BorderSide(color: theme.colorScheme.primary.withAlpha(76), width: 1),
               dataSets: [
                 RadarDataSet(
                   dataEntries: controller.radarDataEntries,
@@ -264,12 +166,9 @@ class _RadarChartPageState extends State<RadarChartPage>
                 ),
               ],
               getTitle: (index, angle) {
-                if (index >= controller.radarLabels.length)
-                  return const RadarChartTitle(text: '');
+                if (index >= controller.radarLabels.length) return const RadarChartTitle(text: '');
                 String label = controller.radarLabels[index];
-                return RadarChartTitle(
-                  text: label.length > 6 ? '${label.substring(0, 5)}..' : label,
-                );
+                return RadarChartTitle(text: label.length > 6 ? '${label.substring(0, 5)}..' : label);
               },
               radarShape: RadarShape.polygon,
               tickCount: 3,
@@ -280,76 +179,77 @@ class _RadarChartPageState extends State<RadarChartPage>
     );
   }
 
-  Widget _buildLineChartCard(ThemeData theme, List<FlSpot> spots) {
+  Widget _buildBarChartCard(ThemeData theme, List<double> daySums) {
+    /// Adaptive Scaling: Dynamically adjusts maxY to prevent bar overflow.
+    double maxVal = daySums.reduce((a, b) => a > b ? a : b);
+    double maxY = maxVal == 0 ? 10000 : maxVal * 1.3;
+
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: theme.dividerColor.withAlpha(25)),
+        side: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1)),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(
-          top: 30,
-          bottom: 20,
-          left: 10,
-          right: 25,
-        ),
+        padding: const EdgeInsets.only(top: 30, bottom: 20, left: 10, right: 10),
         child: AspectRatio(
           aspectRatio: 1.5,
-          child: LineChart(
-            LineChartData(
+          child: BarChart(
+            BarChartData(
+              alignment: BarChartAlignment.spaceAround,
+              maxY: maxY,
+              barTouchData: BarTouchData(
+                touchTooltipData: BarTouchTooltipData(
+                  getTooltipColor: (group) => theme.colorScheme.secondaryContainer,
+                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                    return BarTooltipItem(
+                      settingsController.formatCurrency(rod.toY),
+                      TextStyle(color: theme.colorScheme.onSecondaryContainer, fontWeight: FontWeight.bold),
+                    );
+                  },
+                ),
+              ),
               gridData: const FlGridData(show: false),
+              borderData: FlBorderData(show: false),
               titlesData: FlTitlesData(
+                show: true,
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
                     getTitlesWidget: (value, _) {
-                      const days = [
-                        'Mon',
-                        'Tue',
-                        'Wed',
-                        'Thu',
-                        'Fri',
-                        'Sat',
-                        'Sun',
-                      ];
-                      if (value >= 0 && value < 7) {
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            days[value.toInt()],
-                            style: const TextStyle(fontSize: 10),
-                          ),
-                        );
-                      }
-                      return const Text('');
+                      const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          days[value.toInt()],
+                          style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                        ),
+                      );
                     },
                   ),
                 ),
-                leftTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                topTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                rightTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
+                leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
-              borderData: FlBorderData(show: false),
-              lineBarsData: [
-                LineChartBarData(
-                  spots: spots,
-                  isCurved: true,
-                  color: theme.colorScheme.primary,
-                  barWidth: 4,
-                  dotData: const FlDotData(show: true),
-                  belowBarData: BarAreaData(
-                    show: true,
-                    color: theme.colorScheme.primary.withAlpha(25),
-                  ),
-                ),
-              ],
+              barGroups: List.generate(7, (i) {
+                return BarChartGroupData(
+                  x: i,
+                  barRods: [
+                    BarChartRodData(
+                      toY: daySums[i],
+                      color: theme.colorScheme.primary,
+                      width: 16,
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                      backDrawRodData: BackgroundBarChartRodData(
+                        show: true,
+                        toY: maxY,
+                        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                      ),
+                    ),
+                  ],
+                );
+              }),
             ),
           ),
         ),
@@ -360,13 +260,7 @@ class _RadarChartPageState extends State<RadarChartPage>
   Widget _buildSectionTitle(String title, ThemeData theme) {
     return Align(
       alignment: Alignment.centerLeft,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 4),
-        child: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-      ),
+      child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
     );
   }
 }

@@ -16,33 +16,35 @@ import 'package:piggy_log/model/settings.dart';
 import 'package:piggy_log/view/splashScrrenPage.dart';
 import 'package:sqflite/sqflite.dart';
 
-// -----------------------------------------------------------------------------------------------------------
-//  * SettingController.dart
-//  * * This class serves as the 'Brain' of the Piggy Log app.
-//  * Its primary responsibilities include:
-//  * 1. App Configuration: Managing Theme (Light/Dark), Language (Locale), and Date/Currency formats.
-//  * 2. Data Persistence: Saving and loading user preferences via SettingsHandler.
-//  * 3. Backup & Restore: Exporting/Importing the SQLite database (.db) with full data integrity.
-//  * 4. System Reboot: Refreshing all controllers and the UI state after a data restore to prevent crashes.
-// -----------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent:
+//    Acts as the central system coordinator. Manages application-wide states 
+//    including L10n, Theme, and critical Disaster Recovery (Backup/Restore).
+//    Implemented a 'Hard Reboot' strategy to maintain data integrity across 
+//    database migrations and restores.
+// -----------------------------------------------------------------------------
 
 class SettingController extends GetxController {
   final SettingsHandler _handler = SettingsHandler();
 
+  // Reactive state triggers for UI synchronization
   RxInt refreshTrigger = 0.obs;
   Rxn<Settings> settings = Rxn<Settings>();
   var themeMode = Rxn<ThemeMode>();
   var locale = Rxn<Locale?>();
+  
+  // Formatters cached for performance
   NumberFormat? currencyFormat;
   DateFormat? dateFormat;
 
   @override
   void onInit() {
     super.onInit();
+    // Schedule loading to prevent blocking the initial frame
     Future.microtask(() => loadSettings());
   }
 
-  // Load app settings from Database
+  /// Synchronizes local app settings with the SQLite storage.
   Future<void> loadSettings() async {
     settings.value = await _handler.getSettings();
 
@@ -51,6 +53,7 @@ class SettingController extends GetxController {
       settings.value = await _handler.getSettings();
     }
 
+    // Apply persisted configurations
     themeMode.value = _parseThemeMode(settings.value!.theme_mode);
     _initCurrencyFormat();
     _initDateFormat();
@@ -112,27 +115,22 @@ class SettingController extends GetxController {
 
   String _getCurrencySymbol(String code) {
     return switch (code) {
-      'USD' => '\$',
-      'CAD' => '\$',
-      'KRW' => '₩',
-      'JPY' => '¥',
-      'THB' => '฿',
-      _ => '\$',
+      'USD' => '\$', 'CAD' => '\$', 'KRW' => '₩',
+      'JPY' => '¥', 'THB' => '฿', _ => '\$',
     };
   }
 
+  /// Configures the NumberFormat based on selected currency and region.
   void _initCurrencyFormat() {
     final lang = settings.value?.language ?? 'en';
     final String localeStr = switch (lang) {
-      'ko' => 'ko_KR',
-      'ja' => 'ja_JP',
-      'th' => 'th_TH',
-      _ => 'en_US',
+      'ko' => 'ko_KR', 'ja' => 'ja_JP', 'th' => 'th_TH', _ => 'en_US',
     };
 
     final symbol = settings.value?.currency_symbol ?? '\$';
     final code = settings.value?.currency_code ?? 'system';
 
+    // Zero-decimal logic for specific currencies (KRW, JPY)
     int decimalDigits;
     if (code == 'system') {
       final systemLocale = WidgetsBinding.instance.platformDispatcher.locale.toString();
@@ -153,10 +151,10 @@ class SettingController extends GetxController {
     dateFormat = DateFormat(formatStr);
   }
 
-  // Returns formatted date, ensures it never returns null for UI safety
   String formatDate(DateTime date) => dateFormat?.format(date) ?? '';
   String formatCurrency(double amount) => currencyFormat?.format(amount) ?? '0';
 
+  /// Forces all active controllers to sync with current settings.
   Future<void> refreshAllData() async {
     refreshTrigger.value++;
     if (Get.isRegistered<DashboardController>()) {
@@ -169,7 +167,7 @@ class SettingController extends GetxController {
     }
   }
 
-  // Export DB file to external storage
+  /// Physical database export to binary (.db) file.
   Future<void> exportBackup() async {
     try {
       final dbPath = await getDatabasesPath();
@@ -177,6 +175,7 @@ class SettingController extends GetxController {
 
       if (!await dbFile.exists()) return;
 
+      // Close DB briefly to ensure file handle safety
       await _handler.databaseHandler.closeDB();
       Uint8List bytes = await dbFile.readAsBytes();
 
@@ -193,12 +192,11 @@ class SettingController extends GetxController {
       }
     } catch (e) {
       await _handler.databaseHandler.initializeDB();
-      debugPrint("Export error: $e");
       Get.snackbar("Error", "Export failed.");
     }
   }
 
-  // Import DB file and reboot all controllers EXCEPT itself
+  /// Restoration Logic: Performs a safe system-wide reboot after data injection.
   Future<void> importBackup() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.any);
@@ -208,46 +206,23 @@ class SettingController extends GetxController {
       final dbPath = await getDatabasesPath();
       final dbFile = File(join(dbPath, 'piggy_log.db'));
 
-      // 1. Close current DB and Overwrite with backup
+      // 1. Overwrite existing local DB with backup file
       await _handler.databaseHandler.closeDB();
       await selectedFile.copy(dbFile.path);
 
-      // 2. Re-initialize Database connection
+      // 2. Refresh database instance
       await _handler.databaseHandler.initializeDB();
 
-      // 3. Move to SplashScreen first to safely detach UI listeners
+      // 3. UX Safety: Navigate to Splash to detach active listeners
       Get.offAll(() => const SplashScreen());
-
-      // 4. Give UI brief moment to settle before clearing memory
       await Future.delayed(const Duration(milliseconds: 500));
 
-// 5. Clean up (SettingController 제외 싹 제거)
-      if (Get.isRegistered<TabbarController>()) Get.delete<TabbarController>(force: true);
-      if (Get.isRegistered<DashboardController>()) Get.delete<DashboardController>(force: true);
-      if (Get.isRegistered<DashboardHandler>()) Get.delete<DashboardHandler>(force: true);
-      if (Get.isRegistered<CategoryController>()) Get.delete<CategoryController>(force: true);
-      if (Get.isRegistered<CalendarController>()) Get.delete<CalendarController>(force: true);
+      // 4. Memory Purge: Clear all controllers to prevent stale data usage
+      _purgeAllControllers();
 
-      // 6. Re-register (순서가 중요합니다: 핸들러 먼저, 그 다음 컨트롤러)
-      Get.put(TabbarController());
-      await loadSettings(); 
+      // 5. System Re-injection: Rebooting core controllers and handlers
+      _reinitializeCoreSystems();
 
-      // ⚠️ 핸들러를 먼저 등록해서 컨트롤러가 이를 참조할 수 있게 함
-      Get.put(DashboardHandler()); 
-      final dash = Get.put(DashboardController()); // 변수에 담기
-      
-      Get.put(CategoryController());
-      Get.put(CalendarController());
-
-      // 6-1. [핵심 추가] 새 DB 데이터를 실제로 긁어오라고 명령
-      // 이 명령이 있어야 '삭제된 상태'의 DB를 대시보드가 인지합니다.
-      await dash.refreshDashboard();
-      // 7. Re-apply restored theme mode
-      if (settings.value != null) {
-        Get.changeThemeMode(_parseThemeMode(settings.value!.theme_mode));
-      }
-
-      // 8. Success Feedback
       Get.snackbar(
         AppLocalizations.of(Get.context!)!.restoreSuccess,
         AppLocalizations.of(Get.context!)!.restoreSuccess,
@@ -258,12 +233,35 @@ class SettingController extends GetxController {
 
     } catch (e) {
       await _handler.databaseHandler.initializeDB();
-      debugPrint("Import error: $e");
       Get.snackbar("Error", "Restore failed.");
     }
   }
 
-  // Show confirmation dialog before starting restore
+  void _purgeAllControllers() {
+    if (Get.isRegistered<TabbarController>()) Get.delete<TabbarController>(force: true);
+    if (Get.isRegistered<DashboardController>()) Get.delete<DashboardController>(force: true);
+    if (Get.isRegistered<DashboardHandler>()) Get.delete<DashboardHandler>(force: true);
+    if (Get.isRegistered<CategoryController>()) Get.delete<CategoryController>(force: true);
+    if (Get.isRegistered<CalendarController>()) Get.delete<CalendarController>(force: true);
+  }
+
+  Future<void> _reinitializeCoreSystems() async {
+    Get.put(TabbarController());
+    await loadSettings(); 
+
+    // Re-establish Dependency Injection Graph
+    Get.put(DashboardHandler()); 
+    final dash = Get.put(DashboardController()); 
+    Get.put(CategoryController());
+    Get.put(CalendarController());
+
+    await dash.refreshDashboard();
+
+    if (settings.value != null) {
+      Get.changeThemeMode(_parseThemeMode(settings.value!.theme_mode));
+    }
+  }
+
   Future<void> importBackupdialog() async {
     Get.defaultDialog(
       title: AppLocalizations.of(Get.context!)!.warning,

@@ -239,8 +239,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryNameAlreadyExists => 'Category Name Already Exists';
 
   @override
-  String get checkDescriptionAndAmount =>
-      'Please check the description and amount.';
+  String get checkTitleAndAmount => 'Please check the description and amount.';
 
   @override
   String get description => 'description';
@@ -258,13 +257,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weeklySpendingTrend => 'Weekly Spending Trend';
 
   @override
-  String get analysisStep1 =>
-      'Analysis complete! You\'ve got 10+ records now! 🐷';
+  String get analysisStep1 => 'Analysis Complete! 10+ records found! 🐷';
 
   @override
   String get analysisStep2 => 'Check the Radar Chart above for your balance,';
 
   @override
   String get analysisStep3 =>
-      'and the Line Chart below for your weekly peak spending!';
+      'and the Bar Chart below for your weekly peak spending!';
+
+  @override
+  String get weeklyTrend => 'Weekly Spending Trend';
 }

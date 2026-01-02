@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
-/// A professional-grade progress bar that visualizes budget usage.
-/// 
-/// Features:
-/// - Dynamic gradients synchronized with spending thresholds (50%, 70%).
-/// - Smooth [AnimatedContainer] for width transitions.
-/// - Over-budget visualization with negative percentage display.
-/// 
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    A reactive progress visualizer designed for financial compliance tracking.
+//    Features a 'Context-Aware Styling' engine that synchronizes color gradients 
+//    with the mascot's emotional states (Safe/Warning/Critical).
+//
+//  * TODO: 
+//    - Implement a 'Pulse' animation when usage exceeds 100% for better affordance.
+//    - Consider adding a 'Target Marker' overlay to indicate fixed savings goals.
+// -----------------------------------------------------------------------------
+
 class BudgetGauge extends StatelessWidget {
   final double currentSpend;
   final double targetBudget;
@@ -22,11 +26,10 @@ class BudgetGauge extends StatelessWidget {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
-    // Calculate usage ratio and percentage
+    /// Calculation: Derives usage ratio and manages over-budget labeling.
     final double usageRatio = targetBudget > 0 ? (currentSpend / targetBudget) : 0.0;
     final double actualPercent = usageRatio * 100;
     
-    // Determine display text: Show usage % or negative over-budget %
     String displayText;
     if (actualPercent > 100) {
       final int overPercent = (actualPercent - 100).toInt();
@@ -35,24 +38,20 @@ class BudgetGauge extends StatelessWidget {
       displayText = "${actualPercent.toInt()}%";
     }
 
-    // Configure gradient colors based on spending thresholds
-    // Logic synchronized with BudgetPigWidget's emotional states
+    /// Adaptive Theming: Maps gradient intensity to expenditure risk levels.
     final List<Color> gradientColors;
     if (usageRatio >= 0.7) {
-      // Danger zone: Red gradient for high alert (Angry Pig state)
-      gradientColors = [Colors.orange, Colors.redAccent];
+      gradientColors = [Colors.orange, Colors.redAccent]; 
     } else if (usageRatio >= 0.5) {
-      // Warning zone: Orange gradient (Worried Pig state)
-      gradientColors = [Colors.yellow, Colors.orange];
+      gradientColors = [Colors.yellow, Colors.orange]; 
     } else {
-      // Safe zone: Green gradient (Happy Pig state)
-      gradientColors = [const Color(0xFF81F600), Colors.green];
+      gradientColors = [const Color(0xFF81F600), Colors.green]; 
     }
 
     return Stack(
       alignment: Alignment.center,
       children: [
-        // 1. Background Track
+        // Background Track: Styled for theme-specific contrast.
         Container(
           height: 22,
           width: double.infinity,
@@ -61,17 +60,18 @@ class BudgetGauge extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        // 2. Animated Progress Bar with Gradient
+
+        // Animated Progress Layer: Employs a cubic curve for a premium motion feel.
         LayoutBuilder(
           builder: (context, constraints) {
-            // Clamp bar width to a maximum of 100% (container width)
+            // Clamping ensures the bar stays within the visual bounds even during spikes.
             final double barWidth = constraints.maxWidth * usageRatio.clamp(0.0, 1.0);
             
             return Align(
               alignment: Alignment.centerLeft,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 600),
-                curve: Curves.easeOutCubic, // Smooth deceleration curve
+                curve: Curves.easeOutCubic, 
                 width: barWidth,
                 height: 22,
                 decoration: BoxDecoration(
@@ -86,13 +86,13 @@ class BudgetGauge extends StatelessWidget {
             );
           },
         ),
-        // 3. Label Overlay
+
+        // Value Label: Dynamically adjusts color to ensure optimal readability.
         Text(
           displayText,
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.bold,
-            // Dynamic color adjustment for readability against dark/light bars
             color: (usageRatio > 0.5) ? Colors.white : theme.colorScheme.onSurface,
           ),
         ),

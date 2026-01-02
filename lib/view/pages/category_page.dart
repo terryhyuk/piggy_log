@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_x/get.dart';
 import 'package:piggy_log/VM/category_handler.dart';
-import 'package:piggy_log/controller/calendar_controller.dart';
 import 'package:piggy_log/controller/category_controller.dart';
-import 'package:piggy_log/controller/dashboard_controller.dart';
 import 'package:piggy_log/controller/setting_controller.dart';
 import 'package:piggy_log/controller/tabbar_controller.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
@@ -13,6 +11,13 @@ import 'package:piggy_log/view/widget/button_widget.dart';
 import 'package:piggy_log/view/widget/category_card.dart';
 import 'package:piggy_log/view/widget/category_sheet.dart';
 
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    Managing the spending category grid. This page handles dynamic list 
+//    sorting, global edit-mode transitions via GetX, and ensures data 
+//    consistency across the dashboard through forced refreshes after deletion.
+// -----------------------------------------------------------------------------
+
 class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});
 
@@ -21,18 +26,12 @@ class CategoryPage extends StatefulWidget {
 }
 
 class _CategoryPageState extends State<CategoryPage> {
-  // Properties
   final CategoryHandler categoryHandler = CategoryHandler();
   final TabbarController tabController = Get.find<TabbarController>();
 
-  // 1. categories 리스트는 StatefulWidget 로컬 상태(List<Category>)로 복원합니다.
+  // Local state to manage the category list for fast UI updates.
   List<Category> categories = [];
 
-  // 로컬 isEditMode 변수는 제거하고, TabbarController의 상태를 사용합니다.
-
-  // 다른 컨트롤러들을 미리 찾아서 로직에 사용합니다.
-  final dashboardController = Get.find<DashboardController>();
-  final calController = Get.find<CalendarController>();
   final settingsController = Get.find<SettingController>();
   final categoryController = Get.find<CategoryController>();
 
@@ -45,15 +44,12 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // Exit edit mode when tapping outside
+      // UX: Exit edit mode automatically when tapping outside of action cards.
       onTap: () {
-        // TabbarController의 상태를 확인하고 변경합니다.
-        // 이 변경은 아래 GridView 내부의 Obx를 트리거합니다.
         if (tabController.isCategoryEditMode.value) {
           tabController.isCategoryEditMode.value = false;
         }
       },
-      // 2. Scaffold 전체를 감싸던 Obx를 제거합니다.
       child: Scaffold(
         appBar: AppBar(title: Text(AppLocalizations.of(context)!.categories)),
         body: GridView.builder(
@@ -63,47 +59,32 @@ class _CategoryPageState extends State<CategoryPage> {
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
           ),
-          itemCount: categories.length + 1, // categories 로컬 상태 사용
+          itemCount: categories.length + 1, 
           itemBuilder: (context, index) {
-            // Add Category button
+            // Index 0 is reserved for the 'Add Category' trigger button.
             if (index == 0) {
               return ButtonWidget(onTap: _openCategorySheet);
             }
 
+            // Offset by 1 to map the remaining grid items to the category list.
             final category = categories[index - 1];
 
-            // 3. Obx를 CategoryCard만 감싸도록 최소화하여 GetX 오류를 피합니다.
-            // -> isCategoryEditMode.value의 변화에만 반응합니다.
             return Obx(() {
-              final bool currentIsEditMode =
-                  tabController.isCategoryEditMode.value;
+              final bool currentIsEditMode = tabController.isCategoryEditMode.value;
 
               return CategoryCard(
                 category: category,
-                // Obx 내부에서 구독하는 상태를 전달합니다.
                 isEditMode: currentIsEditMode,
-
-                // Normal tap → open edit sheet
                 onTap: () {
-                  // 편집 모드가 아닐 때만 이동
                   if (!currentIsEditMode) {
-                    Get.to(() => TransactionsHistory(), arguments: category);
+                    Get.to(() => const TransactionsHistory(), arguments: category);
                   }
                 },
-                // Long press → enter edit mode
                 onLongPress: () {
-                  // GetX 상태 변경만 합니다.
                   tabController.isCategoryEditMode.value = true;
-                  // setState()는 필요 없습니다. Obx가 알아서 CategoryCard를 업데이트합니다.
                 },
-                // Edit button
-                onEditPress: () {
-                  _openCategorySheet(category: category);
-                },
-                // Delete button
-                onDeletePress: () {
-                  _openDeleteDialog(category);
-                },
+                onEditPress: () => _openCategorySheet(category: category),
+                onDeletePress: () => _openDeleteDialog(category),
               );
             });
           },
@@ -112,16 +93,20 @@ class _CategoryPageState extends State<CategoryPage> {
     );
   }
 
-  // Load categories from database
-  _loadCategories() async {
+  /// Fetches category records from the database and updates the local state.
+  Future<void> _loadCategories() async {
     final list = await categoryHandler.queryCategory();
-    // 4. categories 업데이트는 StatefulWidget의 setState()를 사용합니다.
+    
+    // sorting logic: Ensure that the 'categories' reflect the order from the DB.
     categories = list;
-    setState(() {});
+    
+    if (mounted) {
+      setState(() {});
+    }
   }
 
-  // Open bottom sheet for creating or editing categories
-  _openCategorySheet({Category? category}) {
+  /// Displays the BottomSheet for either creating a new category or editing an existing one.
+  void _openCategorySheet({Category? category}) {
     final Map<String, dynamic>? data = category == null
         ? null
         : {
@@ -137,19 +122,18 @@ class _CategoryPageState extends State<CategoryPage> {
       context: context,
       isScrollControlled: true,
       builder: (_) => CategorySheet(initialData: data),
-    ).then(
-      (_) => _loadCategories(),
-    ); // 카테고리 추가/수정 후 setState()를 포함한 _loadCategories 호출
+    ).then((_) {
+      _loadCategories();
+    });
   }
 
-  _openDeleteDialog(Category category) {
+  /// Confirmation dialog for permanent category deletion.
+  void _openDeleteDialog(Category category) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.deleteCategory),
-        content: Text(
-          "${AppLocalizations.of(context)!.delete} '${category.c_name}'?",
-        ),
+        content: Text("${AppLocalizations.of(context)!.delete} '${category.c_name}'?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -157,20 +141,15 @@ class _CategoryPageState extends State<CategoryPage> {
           ),
           TextButton(
             onPressed: () async {
-              // 1. DB에서 카테고리 삭제
               await categoryHandler.deleteCategory(category.id!);
-
-              // 2. 현재 페이지의 카테고리 목록(List) 업데이트
               _loadCategories();
-
-              // 3. ✅ 핵심: 모든 컨트롤러 싹 다 새로고침 (SettingsController에 만든 함수)
+              
+              // Multi-Controller Sync: Updates total budget and UI triggers across the app.
               await settingsController.refreshAllData();
-              // 4. (추가로 필요한 경우에만 유지)
               categoryController.notifyChange();
 
-              Navigator.pop(context); // 다이얼로그 닫기
+              if (mounted) Navigator.pop(context);
 
-              // 스낵바 알림
               Get.snackbar(
                 AppLocalizations.of(context)!.deleteCategory,
                 "${AppLocalizations.of(context)!.delete} '${category.c_name}'",
@@ -189,4 +168,4 @@ class _CategoryPageState extends State<CategoryPage> {
       ),
     );
   }
-} // END
+}

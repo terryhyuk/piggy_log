@@ -238,7 +238,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get categoryNameAlreadyExists => 'このカテゴリ名は既に存在します。';
 
   @override
-  String get checkDescriptionAndAmount => '内容と金額を確認してください。';
+  String get checkTitleAndAmount => '内容と金額を確認してください。';
 
   @override
   String get description => '内容';
@@ -262,5 +262,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get analysisStep2 => '上のレーダーチャートでバランスを確認して、';
 
   @override
-  String get analysisStep3 => '下の折れ線グラフで支出の多い曜日をチェックだぶー！';
+  String get analysisStep3 => '下の棒グラフで支出の多い曜日をチェックだぶー！';
+
+  @override
+  String get weeklyTrend => '週間の支出推移';
 }

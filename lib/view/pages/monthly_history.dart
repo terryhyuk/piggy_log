@@ -5,6 +5,17 @@ import 'package:piggy_log/VM/monthly_budget_handler.dart';
 import 'package:piggy_log/controller/setting_controller.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    Provides a comparative analysis of historical budgets vs actual expenses.
+//    Aggregates data by synchronizing the MonthlyBudget table with the 
+//    Transaction ledger through dynamic date range calculations.
+//
+//  * TODO: 
+//    - Implement 'Swipe-to-Delete' for specific history months.
+//    - Add a visual progress bar within each list item for better UX.
+// -----------------------------------------------------------------------------
+
 class MonthlyHistory extends StatefulWidget {
   const MonthlyHistory({super.key});
 
@@ -26,27 +37,27 @@ class _MonthlyHistoryState extends State<MonthlyHistory> {
     _loadHistory();
   }
 
+  /// Aggregates budget records and computes corresponding expense sums.
   Future<void> _loadHistory() async {
     setState(() => _isLoading = true);
 
-    // 1. 모든 예산 기록 가져오기 (이 함수가 구현되어 있다고 가정)
-    // 예: [{yearMonth: "2025-12", budget: 4000.0}, ...]
+    // Fetch all budget records persisted in the database.
     final budgets = await _budgetHandler.getAllMonthlyBudgets();
-
     List<Map<String, dynamic>> combinedList = [];
 
     for (var b in budgets) {
-      String ym = b['yearMonth'];
-      // 2. 해당 월의 시작일과 종료일 계산 (예: 2025-12-01 ~ 2025-12-31)
+      String ym = b['yearMonth']; // Format: YYYY-MM
+
+      // [Logic] Calculate the date range for the current iteration month.
       String startDate = "$ym-01";
       DateTime lastDay = DateTime(
         int.parse(ym.split('-')[0]),
         int.parse(ym.split('-')[1]) + 1,
-        0,
+        0, // Returns the last day of the previous month.
       );
       String endDate = "$ym-${lastDay.day.toString().padLeft(2, '0')}";
 
-      // 3. 테리님의 통합 함수로 해당 월의 총 지출액 가져오기
+      // Intersect with transaction ledger to find total expenditure.
       double expense = await _dbHandler.getMonthlyTotalExpense(
         startDate: startDate,
         endDate: endDate,
@@ -54,61 +65,72 @@ class _MonthlyHistoryState extends State<MonthlyHistory> {
 
       combinedList.add({
         'month': ym,
-        'budget': b['targetAmount'], // b['budget'] -> b['targetAmount']로 변경
+        'budget': b['targetAmount'],
         'expense': expense,
       });
     }
 
-    setState(() {
-      _historyData = combinedList;
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _historyData = combinedList;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    // 1. AppBar 타이틀에 바로 적용
-    appBar: AppBar(
-      title: Text(AppLocalizations.of(context)!.monthlyBudgetHistory),
-    ),
-    body: _isLoading 
-      ? const Center(child: CircularProgressIndicator())
-      : ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: _historyData.length,
-          itemBuilder: (context, index) {
-            final item = _historyData[index];
-            final double remaining = item['budget'] - item['expense'];
+  Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
 
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                title: Text(item['month'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 2. monthlyBudget 바로 쓰기
-                    Text("${AppLocalizations.of(context)!.monthlyBudget}: ${_format(item['budget'])}"), 
-                    // 3. expense 바로 쓰기
-                    Text("${AppLocalizations.of(context)!.expense}: ${_format(item['expense'])}", 
-                         style: TextStyle(color: item['expense'] > item['budget'] ? Colors.red : Colors.black)),
-                  ],
-                ),
-                trailing: Text(
-                  remaining >= 0 ? "+${_format(remaining)}" : _format(remaining),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: remaining >= 0 ? Colors.blue : Colors.red,
+    return Scaffold(
+      appBar: AppBar(title: Text(local.monthlyBudgetHistory)),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _historyData.length,
+              itemBuilder: (context, index) {
+                final item = _historyData[index];
+                final double remaining = item['budget'] - item['expense'];
+
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: ListTile(
+                    title: Text(
+                      item['month'],
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${local.monthlyBudget}: ${_format(item['budget'])}",
+                        ),
+                        Text(
+                          "${local.expense}: ${_format(item['expense'])}",
+                          style: TextStyle(
+                            color: item['expense'] > item['budget']
+                                ? Colors.red
+                                : Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                    trailing: Text(
+                      remaining >= 0
+                          ? "+${_format(remaining)}"
+                          : _format(remaining),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: remaining >= 0 ? Colors.blue : Colors.red,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            );
-          },
-        ),
-  );
-}
+                );
+              },
+            ),
+    );
+  }
 
-  String _format(double value) =>
-      _settingsController.formatCurrency(value);
+  String _format(double value) => _settingsController.formatCurrency(value);
 }

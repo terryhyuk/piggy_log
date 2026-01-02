@@ -5,6 +5,13 @@ import 'package:piggy_log/controller/setting_controller.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 import 'package:piggy_log/model/spending_transaction.dart';
 
+// -----------------------------------------------------------------------------
+//  * TransactionsDetail - Transaction Management & Editor
+//  * -----------------------------------------------------------------------------
+//  * [Description]
+//  * Provides a detailed view and editing interface for existing transactions.
+//  * Supports updating information and permanent deletion with confirmation.
+//  -----------------------------------------------------------------------------
 
 class TransactionsDetail extends StatefulWidget {
   const TransactionsDetail({super.key});
@@ -29,9 +36,7 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
   @override
   void initState() {
     super.initState();
-
-    /// Initialize UI fields with transaction data passed by arguments.
-    /// 전달받은 거래 데이터를 UI 컨트롤러에 초기화한다.
+    // Hydrate state from navigation arguments
     trx = Get.arguments as SpendingTransaction;
 
     titleController = TextEditingController(text: trx.t_name);
@@ -66,9 +71,6 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
           ),
         ],
       ),
-
-      /// Main editable form area
-      /// 거래 상세 내용을 편집할 수 있는 메인 폼 영역
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -79,129 +81,84 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // === Title ===
                 TextField(
                   controller: titleController,
                   decoration: InputDecoration(labelText: local.title),
                 ),
                 const SizedBox(height: 16),
-
-                // === Amount ===
                 TextField(
                   controller: amountController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(labelText: local.amount),
                 ),
                 const SizedBox(height: 16),
-
-                // === Type Selector ===
+                // Transaction Type Selector
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    /// Equal-width SegmentedButton for multi-language layout.
-                    /// 다국어 UI에서도 동일한 폭을 유지하도록 SegmentedButton 균등 분배.
                     final segmentWidth = (constraints.maxWidth - 16) / 2;
                     return SegmentedButton<String>(
                       segments: <ButtonSegment<String>>[
                         ButtonSegment(
                           value: 'expense',
-                          label: SizedBox(
-                            width: segmentWidth,
-                            child: Center(child: Text(local.expense)),
-                          ),
+                          label: SizedBox(width: segmentWidth, child: Center(child: Text(local.expense))),
                           icon: const Icon(Icons.remove_circle_outline),
                         ),
                         ButtonSegment(
                           value: 'income',
-                          label: SizedBox(
-                            width: segmentWidth,
-                            child: Center(child: Text(local.income)),
-                          ),
+                          label: SizedBox(width: segmentWidth, child: Center(child: Text(local.income))),
                           icon: const Icon(Icons.add_circle_outline),
                         ),
                       ],
                       selected: <String>{selectedType},
                       onSelectionChanged: (newSelection) {
-                        setState(() {
-                          selectedType = newSelection.first;
-                        });
+                        setState(() => selectedType = newSelection.first);
                       },
-                      style: ButtonStyle(
-                        shape: WidgetStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        backgroundColor: WidgetStateProperty.resolveWith(
-                          (states) => states.contains(WidgetState.selected)
-                              ? theme.colorScheme.primaryContainer
-                              : theme.colorScheme.surface,
-                        ),
+                      style: SegmentedButton.styleFrom(
+                        selectedBackgroundColor: theme.colorScheme.primaryContainer,
                       ),
                     );
                   },
                 ),
                 const SizedBox(height: 16),
-
-                // === Date Picker ===
+                // Date Selection Row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      settingsController.formatDate(selectedDate),
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                    TextButton(
-                      onPressed: pickDate,
-                      child: Text(local.selectDate),
-                    ),
+                    Text(settingsController.formatDate(selectedDate)),
+                    TextButton(onPressed: pickDate, child: Text(local.selectDate)),
                   ],
                 ),
                 const SizedBox(height: 16),
-
-                // === Memo ===
                 TextField(
                   controller: memoController,
                   maxLines: 3,
                   decoration: InputDecoration(labelText: local.memo),
                 ),
                 const SizedBox(height: 16),
-
-                // === Recurring Checkbox ===
+                // Recurring Toggle
                 Row(
                   children: [
                     Checkbox(
                       value: isRecurring,
-                      onChanged: (v) {
-                        setState(() {
-                          isRecurring = v ?? false;
-                        });
-                      },
+                      onChanged: (v) => setState(() => isRecurring = v ?? false),
                     ),
                     Text(local.recurring),
                   ],
                 ),
-
                 const SizedBox(height: 32),
-
-                // === Action Buttons ===
+                // Action Buttons
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Get.back(),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: theme.colorScheme.error,
-                        ),
+                        style: OutlinedButton.styleFrom(foregroundColor: theme.colorScheme.error),
                         child: Text(local.cancel),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: save,
-                        child: Text(local.save),
-                      ),
+                      child: ElevatedButton(onPressed: save, child: Text(local.save)),
                     ),
                   ],
                 ),
@@ -213,8 +170,7 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
     );
   }
 
-  /// Opens a date picker to let user choose a new date.
-  /// 날짜 선택 다이얼로그를 열어 사용자가 새로운 날짜를 고를 수 있게 한다.
+  /// pickDate: Triggers the system date picker
   Future<void> pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -222,30 +178,19 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
     );
-
-    if (picked != null) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
+    if (picked != null) setState(() => selectedDate = picked);
   }
 
-  /// Saves the updated transaction to the database and closes the screen.
-  /// 수정된 거래를 DB에 저장하고 화면을 닫는다.
+  /// save: Validates and updates the transaction in the database
   Future<void> save() async {
     final amount = double.tryParse(amountController.text);
-    if (titleController.text.trim().isEmpty || amount == null || amount <= 0) {
-      return;
-    }
-
-    final dateStr =
-        "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+    if (titleController.text.trim().isEmpty || amount == null || amount <= 0) return;
 
     final updated = SpendingTransaction(
       t_id: trx.t_id,
       c_id: trx.c_id,
       t_name: titleController.text,
-      date: dateStr,
+      date: "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}",
       type: selectedType,
       amount: amount,
       memo: memoController.text,
@@ -257,8 +202,7 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
     Get.back(result: true);
   }
 
-  /// Shows a delete confirmation dialog and removes the transaction if confirmed.
-  /// 삭제 확인 다이얼로그를 표시하고 사용자가 승인하면 거래를 삭제한다.
+  /// deleteTransaction: Shows a confirmation dialog before permanent removal
   void deleteTransaction() {
     final local = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
@@ -273,8 +217,8 @@ class _TransactionsDetailState extends State<TransactionsDetail> {
       onConfirm: () async {
         await TransactionHandler().deleteTransaction(trx.t_id!);
         await settingsController.refreshAllData();
-        Get.back(); // close dialog
-        Get.back(result: true); // close detail page
+        Get.back(); // Close dialog
+        Get.back(result: true); // Return to list
       },
     );
   }

@@ -1,6 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 import '../../model/category_colors.dart';
+
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    Provides a standardized color selection interface. 
+//    Utilizes a centralized palette to maintain visual consistency across 
+//    category-related UI components.
+//
+//  * TODO: 
+//    - Support dynamic palette generation based on the active app theme.
+//    - Add accessibility labels (Semantics) for each color option.
+// -----------------------------------------------------------------------------
+
 class ColorPickerSheet extends StatefulWidget {
   const ColorPickerSheet({super.key});
 
@@ -15,6 +27,7 @@ class _ColorPickerSheetState extends State<ColorPickerSheet> {
   @override
   void initState() {
     super.initState();
+    // Synchronizing with the global category color scheme.
     palette = CategoryColors.palette;
   }
 
@@ -33,7 +46,7 @@ class _ColorPickerSheetState extends State<ColorPickerSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// ----- Header -----
+          // Header: Navigation and Title
           Row(
             children: [
               Text(
@@ -52,9 +65,10 @@ class _ColorPickerSheetState extends State<ColorPickerSheet> {
 
           const SizedBox(height: 16),
 
-          /// ----- Grid of Colors -----
+          // Interactive Color Palette
           Expanded(
             child: GridView.builder(
+              // Using BouncingScrollPhysics for a native, high-quality scrolling feel.
               physics: const BouncingScrollPhysics(),
               itemCount: palette.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -65,12 +79,14 @@ class _ColorPickerSheetState extends State<ColorPickerSheet> {
               itemBuilder: (context, index) {
                 final Color color = palette[index];
                 final bool isSelected = selectedColor == color;
+                
                 return GestureDetector(
                   onTap: () => _onSelectColor(color),
                   child: Container(
                     decoration: BoxDecoration(
                       color: color,
                       shape: BoxShape.circle,
+                      // Selection feedback via dynamic border contrast.
                       border: Border.all(
                         color: isSelected 
                             ? theme.colorScheme.onSurface
@@ -88,9 +104,10 @@ class _ColorPickerSheetState extends State<ColorPickerSheet> {
     );
   }
 
-  _onSelectColor(Color color) {
+  /// Notifies the parent context of the selected color and closes the sheet.
+  void _onSelectColor(Color color) {
     selectedColor = color;
-    setState(() {});
+    setState(() {}); 
     Navigator.pop(context, color);
   }
 }

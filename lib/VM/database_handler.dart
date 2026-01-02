@@ -1,8 +1,12 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: Centralized DB management via Singleton for consistency.
+//  * TODO: Implement migrations & backup validation.
+// -----------------------------------------------------------------------------
+
 class DatabaseHandler {
-  // Singleton instance
   static final DatabaseHandler _instance = DatabaseHandler._internal();
   static Database? _database;
 
@@ -10,17 +14,14 @@ class DatabaseHandler {
 
   factory DatabaseHandler() => _instance;
 
-  /// Global access point for the database.
-  /// It checks if the database is already open before initializing.
+  /// Returns an active database connection.
   Future<Database> get database async {
-    if (_database != null && _database!.isOpen) {
-      return _database!;
-    }
+    if (_database != null && _database!.isOpen) return _database!;
     _database = await initializeDB();
     return _database!;
   }
 
-  /// Original initialization logic.
+  /// Initializes SQLite database and core schema.
   Future<Database> initializeDB() async {
     String path = await getDatabasesPath();
     String dbPath = join(path, 'piggy_log.db');
@@ -28,53 +29,49 @@ class DatabaseHandler {
     Database db = await openDatabase(
       dbPath,
       onCreate: (db, version) async {
-        // category table
         await db.execute("""
-          create table categories (
-            id integer primary key autoincrement,
-            c_name text not null,
-            icon_codepoint integer not null,
-            icon_font_family text,
-            icon_font_package text,
-            color text not null
+          CREATE TABLE categories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            c_name TEXT NOT NULL,
+            icon_codepoint INTEGER NOT NULL,
+            icon_font_family TEXT,
+            icon_font_package TEXT,
+            color TEXT NOT NULL
           )
         """);
 
-        // transactions table
         await db.execute("""
-          create table spending_transactions (
-            t_id integer primary key autoincrement,
-            c_id integer not null,
-            t_name text not null,
-            date text not null,
-            type text not null,
-            amount real not null,
-            memo text,
-            isRecurring integer not null default 0,
-            foreign key(c_id) references categories(id)
+          CREATE TABLE spending_transactions (
+            t_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            c_id INTEGER NOT NULL,
+            t_name TEXT NOT NULL,
+            date TEXT NOT NULL,
+            type TEXT NOT NULL,
+            amount REAL NOT NULL,
+            memo TEXT,
+            isRecurring INTEGER NOT NULL DEFAULT 0,
+            FOREIGN KEY(c_id) REFERENCES categories(id)
           )
         """);
 
-        // monthly budget table
         await db.execute("""
-          create table monthly_budget (
-            m_id integer primary key autoincrement,
-            c_id integer not null,
-            yearMonth text not null,
-            targetAmount real not null,
-            foreign key(c_id) references categories(id)
+          CREATE TABLE monthly_budget (
+            m_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            c_id INTEGER NOT NULL,
+            yearMonth TEXT NOT NULL,
+            targetAmount REAL NOT NULL,
+            FOREIGN KEY(c_id) REFERENCES categories(id)
           )
         """);
 
-        // settings table
         await db.execute("""
-          create table settings (
-            id integer primary key,
-            language text not null,
-            currency_code text not null,
-            currency_symbol text not null,
-            date_format text not null,
-            theme_mode text not null
+          CREATE TABLE settings (
+            id INTEGER PRIMARY KEY,
+            language TEXT NOT NULL,
+            currency_code TEXT NOT NULL,
+            currency_symbol TEXT NOT NULL,
+            date_format TEXT NOT NULL,
+            theme_mode TEXT NOT NULL
           )
         """);
 
@@ -84,128 +81,27 @@ class DatabaseHandler {
     );
 
     await _createPiggyTable(db);
-
-    // 3. 이제 모든 준비가 끝났으니 db를 돌려줌
     return db;
-    
   }
 
-  /// Helper method to create piggy table
+  /// Ensures piggy_status table exists.
   Future<void> _createPiggyTable(Database db) async {
-    /* Ensures the piggy_status table exists without version bump */
     await db.execute("""
-      create table if not exists piggy_status (
-        id integer primary key autoincrement,
-        p_name text not null,
-        p_level integer default 1,
-        total_savings real default 0.0,
-        last_update text
+      CREATE TABLE IF NOT EXISTS piggy_status (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        p_name TEXT NOT NULL,
+        p_level INTEGER DEFAULT 1,
+        total_savings REAL DEFAULT 0.0,
+        last_update TEXT
       )
     """);
   }
 
-  /// Safely close the database connection.
-  /// Used during backup/restore to prevent file corruption.
+  /// Closes the database safely.
   Future<void> closeDB() async {
     if (_database != null && _database!.isOpen) {
       await _database!.close();
-      _database = null; // Important: Clear the reference after closing
+      _database = null;
     }
   }
 }
-
-
-// import 'package:path/path.dart';
-// import 'package:sqflite/sqflite.dart';
-
-// /// Handles the initialization and creation of the local SQLite database.
-// /// This class creates all tables required by the app (categories, transactions, monthly budgets).
-// class DatabaseHandler {
-//   /// Opens the SQLite database. If it does not exist, it will be created.
-//   Future<Database> initializeDB() async {
-//     String path = await getDatabasesPath();
-
-//     return openDatabase(
-//       join(path, 'piggy_log.db'),
-
-//       /// Runs only when the database is created for the first time.
-//       onCreate: (db, version) async {
-
-//         // -------------------------------
-//         // category table
-//         // stores user-created categories.
-//         // icon is saved as codePoint + fontFamily information.
-//         // -------------------------------
-//         await db.execute("""
-//           create table categories (
-//             id integer primary key autoincrement,
-//             c_name text not null,
-//             icon_codepoint integer not null,
-//             icon_font_family text,
-//             icon_font_package text,
-//             color text not null
-//           )
-//         """);
-
-//         // -------------------------------
-//         // transactions table
-//         // each record is linked to a category through c_id.
-//         // -------------------------------
-//         await db.execute("""
-//           create table spending_transactions (
-//             t_id integer primary key autoincrement,
-//             c_id integer not null,
-//             t_name text not null,
-//             date text not null,
-//             type text not null,
-//             amount real not null,
-//             memo text,
-//             isRecurring integer not null default 0,
-//             foreign key(c_id) references categories(id)
-//           )
-//         """);
-
-//         // -------------------------------
-//         // monthly budget table
-//         // stores budget goals for each category per year-month format.
-//         // -------------------------------
-//         await db.execute("""
-//           create table monthly_budget (
-//             m_id integer primary key autoincrement,
-//             c_id integer not null,
-//             yearMonth text not null,
-//             targetAmount real not null,
-//             foreign key(c_id) references categories(id)
-//           )
-//         """);
-
-//         // -------------------------------
-//         // settings table
-//         // stores app settings.
-//         // -------------------------------
-//         await db.execute(
-//           """
-//           create table settings (
-//           id integer primary key,
-//           language text not null,
-//           currency_code text not null,
-//           currency_symbol text not null,
-//           date_format text not null,
-//           theme_mode text not null
-//           )
-//         """);
-//       },
-
-//       version: 1, // database version
-//     );
-//   }
-
-//   // DatabaseHandler 클래스 맨 밑에 추가
-// Future<void> closeDB() async {
-//   String path = await getDatabasesPath();
-//   // 열려있는 경로의 DB를 강제로 찾아서 닫아버리는 기능입니다.
-//   final db = await openDatabase(join(path, 'piggy_log.db'));
-//   await db.close();
-// }
-  
-// } // END

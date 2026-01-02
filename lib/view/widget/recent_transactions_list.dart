@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    Displaying a streamlined list of recent activities with a focus on 
+//    visual hierarchy and custom color blending for a premium UI feel.
+//
+//  * TODO: 
+//    - Abstract the 'Transaction Card' into a separate reusable widget.
+//    - Add a 'View All' navigation trigger for better user flow.
+// -----------------------------------------------------------------------------
+
 class RecentTransactionsList extends StatelessWidget {
   final List transactions;
   final String Function(DateTime) formatDate;
@@ -26,19 +36,20 @@ class RecentTransactionsList extends StatelessWidget {
         ),
         const SizedBox(height: 8),
 
-        /// ---------- Recent Transactions ----------
+        /// Builds dynamic transaction cards with sophisticated UI styling.
         ...transactions.map((trx) {
-          // 1. Color Parsing (ARGB hex)
+          // [Logic] Dynamic Color Parsing
           final String? hex = trx['color'];
           final Color color = (hex != null && hex.length == 8)
               ? Color(int.parse(hex, radix: 16))
               : Colors.grey;
 
-          // 💡 오빠가 맘에 들어한 부드러운 배경색 (withOpacity 대신 lerp 사용)
-          // Creates a more sophisticated look by blending with the surface color.
+          // [Design] Color Blending Strategy
+          // Blending the category color with the surface color using lerp 
+          // to achieve a cohesive 'Material 3' look.
           final Color bgColor = Color.lerp(theme.colorScheme.surface, color, 0.15)!;
 
-          // 2. IconData Parsing
+          // [Logic] Icon Reconstruction from DB metadata
           final int? code = trx['icon_codepoint'] as int?;
           final IconData icon = (code != null && code != 0)
               ? IconData(
@@ -49,7 +60,7 @@ class RecentTransactionsList extends StatelessWidget {
               : Icons.category;
 
           return Card(
-            elevation: 0, // 너무 떠 보이지 않게 조절
+            elevation: 0,
             margin: const EdgeInsets.symmetric(vertical: 4),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -57,7 +68,6 @@ class RecentTransactionsList extends StatelessWidget {
             ),
             child: ListTile(
               leading: CircleAvatar(
-                // 💡 투명도 대신 lerp 배경색 적용해서 더 깔끔하게
                 backgroundColor: bgColor,
                 child: Icon(icon, size: 20, color: color),
               ),
@@ -67,12 +77,17 @@ class RecentTransactionsList extends StatelessWidget {
               ),
               subtitle: Text(
                 formatDate(DateTime.parse(trx['date'])),
-                style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurfaceVariant, 
+                  fontSize: 12,
+                ),
               ),
               trailing: Text(
                 formatCurrency(trx['amount']),
                 style: TextStyle(
-                  color: trx['type'] == 'expense' ? Colors.redAccent : Colors.green,
+                  color: trx['type'] == 'expense' 
+                      ? Colors.redAccent 
+                      : Colors.green,
                   fontWeight: FontWeight.bold,
                 ),
               ),

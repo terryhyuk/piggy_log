@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    Orchestrates the visual state of individual calendar cells. 
+//    Solves overlapping state conflicts (Today vs Selected vs Event) 
+//    using a layered Stack architecture with responsive scaling.
+//
+//  * TODO: 
+//    - Abstract the 'Marker' logic into a customizable decoration builder.
+//    - Implement 'RepaintBoundary' to optimize calendar scrolling performance.
+// -----------------------------------------------------------------------------
+
 class CalendarBuildWidget extends StatelessWidget {
   final DateTime day;
   final bool isSelected;
   final bool isToday;
-  final bool hasTx;
+  final bool hasTx; 
   final Color textColor;
   final Color markerColor;
 
@@ -23,6 +34,8 @@ class CalendarBuildWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
 
+    // [Logic] Responsive Geometry Engine
+    // Ensuring consistent aspect ratio across various device widths.
     final screenWidth = MediaQuery.of(context).size.width;
     final cellSize = (screenWidth / 7).clamp(40.0, 56.0);
     final innerSize = cellSize * 0.85;
@@ -33,14 +46,17 @@ class CalendarBuildWidget extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
+          // Day Container: Implements visual blending for the selected state.
           Container(
             width: innerSize,
             height: innerSize,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
+              // Subtle tinting via lerp to maintain visual hierarchy.
               color: isSelected
                   ? Color.lerp(Colors.transparent, primary, 0.15)!
                   : Colors.transparent,
+              // High-contrast border to emphasize the current real-time date.
               border: isToday
                   ? Border.all(color: primary, width: 2)
                   : null,
@@ -56,6 +72,7 @@ class CalendarBuildWidget extends StatelessWidget {
             ),
           ),
 
+          // Event Marker: Provides non-intrusive feedback for transaction data.
           if (hasTx)
             Positioned(
               bottom: cellSize * 0.12,

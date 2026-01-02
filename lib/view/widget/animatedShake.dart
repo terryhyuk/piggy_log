@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// A widget that shakes its child when [isActive] is true.
-/// Handles app lifecycle to pause/resume animation correctly.
 class AnimatedShake extends StatefulWidget {
   final Widget child;
   final bool isActive;
@@ -25,7 +23,6 @@ class _AnimatedShakeState extends State<AnimatedShake>
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addObserver(this);
 
     _controller = AnimationController(
@@ -47,15 +44,8 @@ class _AnimatedShakeState extends State<AnimatedShake>
     super.didChangeAppLifecycleState(state);
 
     if (state == AppLifecycleState.resumed) {
-      if (widget.isActive) {
-        if (!_controller.isAnimating) {
-          _controller.repeat(reverse: true);
-        }
-      } else {
-        if (_controller.isAnimating) {
-          _controller.stop();
-          _controller.reset();
-        }
+      if (widget.isActive && !_controller.isAnimating) {
+        _controller.repeat(reverse: true);
       }
     } else if (state == AppLifecycleState.paused) {
       if (_controller.isAnimating) {

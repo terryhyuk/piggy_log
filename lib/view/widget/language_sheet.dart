@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
-
 import '../../l10n/app_localizations.dart';
+
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    Provides a modal interface for real-time locale switching. 
+//    Designed to support dynamic i18n updates with a clean selection UI.
+//
+//  * TODO: 
+//    - Move hardcoded language lists to a global configuration or assets file.
+//    - Implement a 'LanguageManager' service to centralize locale logic.
+// -----------------------------------------------------------------------------
 
 class LanguageSheet extends StatelessWidget {
   final String currentLanguage;
@@ -10,6 +19,9 @@ class LanguageSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    
+    /// Supported locale configurations. 
+    /// 'system' allows the app to follow the OS level language settings.
     final languages = [
       {'label': 'System Default', 'code': 'system'},
       {'label': 'English', 'code': 'en'},
@@ -35,18 +47,24 @@ class LanguageSheet extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
+          /// Mapping language list to interactive ListTiles
           ...languages.map((lang) {
+            final isSelected = currentLanguage == lang['code'];
+            
             return ListTile(
               title: Text(
                 lang['label']!,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: currentLanguage == lang['code'] ? FontWeight.bold : null,
+                  fontWeight: isSelected ? FontWeight.bold : null,
                 ),
               ),
-              trailing: currentLanguage == lang['code']
+              trailing: isSelected
                   ? Icon(Icons.check, color: theme.colorScheme.primary)
                   : null,
-              onTap: () => Navigator.pop(context, lang),
+              onTap: () {
+                // Returns the selected language map to the caller
+                Navigator.pop(context, lang);
+              },
             );
           }).toList(),
 

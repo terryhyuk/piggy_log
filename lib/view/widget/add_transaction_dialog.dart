@@ -7,9 +7,20 @@ import 'package:piggy_log/controller/setting_controller.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 import 'package:piggy_log/model/spending_transaction.dart';
 
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    A multi-purpose transaction gateway that handles both creation and 
+//    modifications. It enforces data integrity through strict validation 
+//    and ensures high UX stability with keyboard-aware padding.
+//
+//  * TODO: 
+//    - Abstract the form fields into a separate 'TransactionForm' widget.
+//    - Implement a 'Currency Input Formatter' to handle localized separators.
+// -----------------------------------------------------------------------------
+
 class AddTransactionDialog extends StatefulWidget {
-  final int c_id;
-  final SpendingTransaction? transactionToEdit;
+  final int c_id; 
+  final SpendingTransaction? transactionToEdit; 
 
   const AddTransactionDialog({
     super.key,
@@ -35,9 +46,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   @override
   void initState() {
     super.initState();
-
-    /// Initialize controllers with existing transaction or empty fields.
-    /// 기존 거래 수정 시 데이터를 채우고, 새 거래 추가 시 빈 컨트롤러 생성.
+    // [Logic] Initializes the form state based on the presence of existing data.
     if (widget.transactionToEdit != null) {
       final trx = widget.transactionToEdit!;
       tNameController = TextEditingController(text: trx.t_name);
@@ -61,7 +70,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: SingleChildScrollView(
-        // Make the dialog scrollable when keyboard is open
+        // Dynamic bottom padding prevents the software keyboard from obscuring input fields.
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom + 16,
         ),
@@ -80,7 +89,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 ),
               ),
 
-              // === Transaction Title ===
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextField(
@@ -90,42 +98,28 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 ),
               ),
 
-              // === Transaction Amount ===
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: TextField(
                   controller: amountController,
                   decoration: InputDecoration(labelText: local.amount),
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   textInputAction: TextInputAction.done,
                 ),
               ),
 
-              // === Transaction Memo ===
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: TextField(
                   controller: memoController,
                   decoration: InputDecoration(labelText: local.memo),
-                  textInputAction: TextInputAction.done,
                   maxLines: 2,
                 ),
               ),
 
-              // === Transaction Type Selector ===
+              // Transaction Type Selector: Uses SegmentedButton for a native OS feel.
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final segmentWidth = (constraints.maxWidth - 16) / 2;
@@ -133,73 +127,49 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                       segments: <ButtonSegment<String>>[
                         ButtonSegment(
                           value: 'expense',
-                          label: SizedBox(
-                            width: segmentWidth,
-                            child: Center(child: Text(local.expense)),
-                          ),
+                          label: SizedBox(width: segmentWidth, child: Center(child: Text(local.expense))),
                           icon: const Icon(Icons.remove_circle_outline),
                         ),
                         ButtonSegment(
                           value: 'income',
-                          label: SizedBox(
-                            width: segmentWidth,
-                            child: Center(child: Text(local.income)),
-                          ),
+                          label: SizedBox(width: segmentWidth, child: Center(child: Text(local.income))),
                           icon: const Icon(Icons.add_circle_outline),
                         ),
                       ],
                       selected: <String>{selectedType},
                       onSelectionChanged: (newSelection) {
-                          selectedType = newSelection.first;
-                        setState(() {});
+                        setState(() => selectedType = newSelection.first);
                       },
-                      style: ButtonStyle(
-                        visualDensity: VisualDensity.compact,
-                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        backgroundColor: WidgetStateProperty.resolveWith(
-                          (states) => states.contains(WidgetState.selected)
-                              ? theme.colorScheme.primaryContainer
-                              : theme.colorScheme.surface,
-                        ),
+                      style: SegmentedButton.styleFrom(
+                        selectedBackgroundColor: theme.colorScheme.primaryContainer,
+                        selectedForegroundColor: theme.colorScheme.onPrimaryContainer,
                       ),
                     );
                   },
                 ),
               ),
 
-              // === Recurring Checkbox ===
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
                   children: [
                     Checkbox(
                       value: isRecurring,
-                      onChanged: (v) {
-                          isRecurring = v ?? false;
-                        setState(() {});
-                      },
+                      onChanged: (v) => setState(() => isRecurring = v ?? false),
                     ),
                     Text(local.recurring),
+                    const Spacer(),
+                    TextButton.icon(
+                      onPressed: pickDate,
+                      icon: const Icon(Icons.calendar_today, size: 18),
+                      label: Text(settingsController.formatDate(selectedDateTime)),
+                    ),
                   ],
                 ),
               ),
 
-              // === Date Picker ===
-              TextButton(
-                onPressed: pickDate,
-                child: Text(settingsController.formatDate(selectedDateTime)),
-              ),
-
-              // === Action Buttons ===
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                  vertical: 8.0,
-                ),
+                padding: const EdgeInsets.all(16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -214,11 +184,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                         backgroundColor: theme.colorScheme.primary,
                       ),
                       onPressed: saveTransaction,
-                      child: Text(
-                        widget.transactionToEdit == null
-                            ? local.save
-                            : local.update,
-                      ),
+                      child: Text(widget.transactionToEdit == null ? local.save : local.update),
                     ),
                   ],
                 ),
@@ -230,8 +196,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     );
   }
 
-  /// Opens a date picker to select transaction date.
-  /// 거래 날짜를 선택하는 DatePicker를 연다.
+  /// Triggers a system date picker with localized date constraints.
   Future<void> pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -239,61 +204,51 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
     );
-    if (picked != null) {
-      setState(() {
-        selectedDateTime = picked;
-      });
+    if (picked != null) setState(() => selectedDateTime = picked);
+  }
+
+  /// Validates input, persists the record, and triggers a global UI refresh.
+  Future<void> saveTransaction() async {
+    final local = AppLocalizations.of(context)!;
+    final String name = tNameController.text.trim();
+    final String amountStr = amountController.text.trim();
+    final double? amount = double.tryParse(amountStr);
+
+    // [Validation] Ensures non-empty descriptions and positive financial values.
+    if (name.isEmpty || amount == null || amount <= 0) {
+      Get.snackbar("", local.checkTitleAndAmount, backgroundColor: Colors.orangeAccent);
+      return;
     }
-  }
 
-  /// Saves or updates the transaction, refreshes data, and closes the dialog.
-  /// 거래를 추가 또는 수정하고, 데이터 새로고침 후 다이얼로그를 닫는다.
-Future<void> saveTransaction() async {
-  final local = AppLocalizations.of(context)!;
-  
-  // 1. 검증: 이름 빈칸 체크 + 금액이 숫자인지 & 0보다 큰지만 바로 체크
-  if (tNameController.text.trim().isEmpty || 
-      double.tryParse(amountController.text.trim()) == null || 
-      double.tryParse(amountController.text.trim())! <= 0) {
+    final trx = SpendingTransaction(
+      t_id: widget.transactionToEdit?.t_id,
+      c_id: widget.c_id,
+      t_name: name,
+      date: "${selectedDateTime.year}-${selectedDateTime.month.toString().padLeft(2, '0')}-${selectedDateTime.day.toString().padLeft(2, '0')}",
+      type: selectedType,
+      amount: amount,
+      memo: memoController.text.trim(),
+      isRecurring: isRecurring,
+    );
+
+    if (widget.transactionToEdit == null) {
+      await TransactionHandler().insertTransaction(trx, customDate: selectedDateTime);
+    } else {
+      await TransactionHandler().updateTransaction(trx);
+    }
+
+    if (!mounted) return;
     
-    Get.snackbar("", local.checkDescriptionAndAmount, 
-      backgroundColor: Colors.orangeAccent);
-    return;
+    // Critical: Synchronizes the application state with the database persistence layer.
+    await settingsController.refreshAllData(); 
+    
+    Get.snackbar(
+      widget.transactionToEdit == null ? local.categoryCreated : local.categoryUpdated,
+      widget.transactionToEdit == null ? local.newCategoryAdded : local.changesSaved,
+      backgroundColor: widget.transactionToEdit == null ? Colors.green : Colors.blue,
+      colorText: Colors.white,
+    );
+    
+    Navigator.pop(context, true);
   }
-
-  // 2. 데이터 객체 생성: 컨트롤러 값을 즉시 파싱해서 할당
-  final trx = SpendingTransaction(
-    t_id: widget.transactionToEdit?.t_id,
-    c_id: widget.c_id,
-    t_name: tNameController.text.trim(),
-    date: "${selectedDateTime.year}-${selectedDateTime.month.toString().padLeft(2, '0')}-${selectedDateTime.day.toString().padLeft(2, '0')}",
-    type: selectedType,
-    amount: double.parse(amountController.text.trim()), // 위에서 검증했으니 바로 parse
-    memo: memoController.text.trim(),
-    isRecurring: isRecurring,
-  );
-
-  // 3. DB 로직 (동일)
-  if (widget.transactionToEdit == null) {
-    await TransactionHandler().insertTransaction(trx, customDate: selectedDateTime);
-  } else {
-    await TransactionHandler().updateTransaction(trx);
-  }
-
-  if (!mounted) return;
-
-  await settingsController.refreshAllData();
-  
-  Get.snackbar(
-    widget.transactionToEdit == null ? local.categoryCreated : local.categoryUpdated,
-    widget.transactionToEdit == null ? local.newCategoryAdded : local.changesSaved,
-    backgroundColor: widget.transactionToEdit == null ? Colors.green : Colors.blue,
-    colorText: Colors.white,
-  );
-  if (!mounted) return;
-  Navigator.pop(context, true);
 }
-
-}
-
-

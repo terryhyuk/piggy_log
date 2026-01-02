@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 
-/// A widget that displays an animated pig character whose expression 
-/// and effects change based on the budget consumption percentage.
-///
-/// Thresholds:
-/// - < 50%: Happy state with floating hearts.
-/// - 50% ~ 70%: Worried state with a sweat mark.
-/// - >= 70%: Angry state with steam effects.
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    A gamified budget visualizer that provides emotional feedback through 
+//    dynamic asset layering and micro-animations. 
+//    Features a lightweight, controller-less animation engine for efficiency.
+//
+//  * TODO: 
+//    - Transition from PNG assets to Lottie or Rive for smoother vector animations.
+//    - Refactor the threshold logic into a separate state-machine.
+// -----------------------------------------------------------------------------
+
 class BudgetPigWidget extends StatelessWidget {
-  final double percent; // Expenditure ratio (0.0 to 1.0 or more)
+  /// Expenditure ratio (e.g., 0.5 for 50%)
+  final double percent; 
 
   const BudgetPigWidget({super.key, required this.percent});
 
@@ -19,12 +24,12 @@ class BudgetPigWidget extends StatelessWidget {
       height: 90,
       child: Stack(
         alignment: Alignment.center,
-        clipBehavior: Clip.none, // Allows effects to float outside the 90x90 box
+        clipBehavior: Clip.none, // Allows effects to overflow for a dynamic feel.
         children: [
-          // 1. Core Character Body
+          // 1. Base Mascot Layer
           _buildPigBody(),
           
-          // 2. Conditional Animation Layers
+          // 2. Conditional Feedback Layer (Hearts, Sweat, or Steam)
           if (percent < 0.5) _buildHappyHearts(),
           if (percent >= 0.5 && percent < 0.7) _buildWorriedSweat(),
           if (percent >= 0.7) _buildAngrySteam(),
@@ -33,7 +38,7 @@ class BudgetPigWidget extends StatelessWidget {
     );
   }
 
-  /// Determines the pig's image based on the spending threshold.
+  /// Determines the mascot's emotional state based on spending thresholds.
   Widget _buildPigBody() {
     String img = 'pig_happy.png';
     if (percent >= 0.7) {
@@ -44,7 +49,7 @@ class BudgetPigWidget extends StatelessWidget {
     return Image.asset('images/$img', width: 75);
   }
 
-  /// Floating heart animation for the "Happy" state (< 50%).
+  /// Low-spending state: Sequential rising heart animations.
   Widget _buildHappyHearts() {
     return Stack(
       clipBehavior: Clip.none,
@@ -64,7 +69,7 @@ class BudgetPigWidget extends StatelessWidget {
     );
   }
 
-  /// Sweat/Mark animation for the "Worried" state (50% - 70%).
+  /// Mid-spending state: Vertical translation for a dripping sweat effect.
   Widget _buildWorriedSweat() {
     return _InfiniteAnimation(
       duration: const Duration(milliseconds: 800),
@@ -79,7 +84,7 @@ class BudgetPigWidget extends StatelessWidget {
     );
   }
 
-  /// Steam animation for the "Angry" state (>= 70%).
+  /// High-spending state: Pulsating steam effects on both sides.
   Widget _buildAngrySteam() {
     return _InfiniteAnimation(
       duration: const Duration(milliseconds: 500),
@@ -93,7 +98,6 @@ class BudgetPigWidget extends StatelessWidget {
     );
   }
 
-  /// Helper to create individual steam positioned elements.
   Widget _buildSteamEffect(double value, {required bool isLeft}) {
     return Positioned(
       bottom: 28,
@@ -110,8 +114,7 @@ class BudgetPigWidget extends StatelessWidget {
   }
 }
 
-/// A helper widget that creates an infinite loop animation 
-/// by resetting the target value upon completion.
+/// Lightweight helper for creating looping animations without AnimationControllers.
 class _InfiniteAnimation extends StatefulWidget {
   final Widget Function(double value) builder;
   final Duration duration;
@@ -131,7 +134,6 @@ class _InfiniteAnimationState extends State<_InfiniteAnimation> {
       tween: Tween(begin: 0.0, end: _target),
       duration: _target == 0 ? Duration.zero : widget.duration,
       onEnd: () {
-        // Use Future.microtask to avoid "setState() or markNeedsBuild() called during build" error
         Future.microtask(() {
           if (mounted) {
             setState(() {

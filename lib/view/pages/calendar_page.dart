@@ -8,6 +8,17 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:piggy_log/controller/calendar_controller.dart';
 import 'package:piggy_log/view/pages/transactions_detail.dart';
 
+// -----------------------------------------------------------------------------
+//  * Refactoring Intent: 
+//    Implements a robust monthly ledger view. Features optimized event loading 
+//    (markers) and bidirectional data synchronization between the calendar 
+//    and transaction detail pages.
+//
+//  * TODO: 
+//    - Implement multi-dot markers for combined income/expense visualization.
+//    - Add 'Swipe-to-Action' for quick editing directly from the list.
+// -----------------------------------------------------------------------------
+
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
 
@@ -22,13 +33,13 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   void initState() {
     super.initState();
+    // Hydrate daily spending aggregates for the marker system.
     calController.loadDailyTotals();
     calController.selectDate(DateTime.now());
 
-    // Settings changes will trigger refresh
+    // Reactive Listener: Triggers a partial UI rebuild when global settings change.
     settingsController.refreshTrigger.listen((_) {
       if (!mounted) return;
-      
       calController.loadDailyTotals();
       calController.selectDate(calController.selectedDay.value);
       setState(() {});
@@ -37,21 +48,21 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   Widget build(BuildContext context) {
-    final textColor =
-        Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black;
-    final markerColor = Theme.of(context).colorScheme.primary;
+    final theme = Theme.of(context);
+    final textColor = theme.textTheme.bodyMedium?.color ?? Colors.black;
+    final markerColor = theme.colorScheme.primary;
 
     return Scaffold(
       body: SafeArea(
         child: Obx(() {
           return Column(
             children: [
+              // 1. TableCalendar: Main interactive calendar component
               TableCalendar(
                 firstDay: DateTime(2020),
                 lastDay: DateTime(2100),
                 onPageChanged: (focusedDay) {
                   calController.focusedDay.value = focusedDay;
-
                   calController.selectedDay.value = focusedDay;
                   calController.selectedDateTransactions.clear();
                   calController.selectedDayTotal.value = 0.0;
@@ -70,12 +81,11 @@ class _CalendarPageState extends State<CalendarPage> {
                   isTodayHighlighted: false,
                   outsideDaysVisible: false,
                 ),
+                // Loader logic for day markers (event dots)
                 eventLoader: (day) {
                   final key = calController.dateKey(day);
-                  return calController.dailyTotals[key] != null &&
-                          calController.dailyTotals[key]! > 0
-                      ? [calController.dailyTotals[key]!]
-                      : [];
+                  final amount = calController.dailyTotals[key];
+                  return (amount != null && amount > 0) ? [amount] : [];
                 },
                 calendarBuilders: CalendarBuilders(
                   markerBuilder: (context, day, events) {
@@ -90,50 +100,23 @@ class _CalendarPageState extends State<CalendarPage> {
                     }
                     return null;
                   },
-                  defaultBuilder: (context, day, focusedDay) {
-                    final key = calController.dateKey(day);
-                    final hasTx = calController.dailyTotals.containsKey(key);
-                    return CalendarBuildWidget(
-                      day: day,
-                      isSelected: false,
-                      isToday: false,
-                      hasTx: hasTx,
-                      textColor: textColor,
-                      markerColor: markerColor,
-                    );
-                  },
-                  todayBuilder: (context, day, focusedDay) {
-                    final key = calController.dateKey(day);
-                    final hasTx = calController.dailyTotals.containsKey(key);
-                    return CalendarBuildWidget(
-                      day: day,
-                      isSelected: false,
-                      isToday: true,
-                      hasTx: hasTx,
-                      textColor: textColor,
-                      markerColor: markerColor,
-                    );
-                  },
-                  selectedBuilder: (context, day, focusedDay) {
-                    final key = calController.dateKey(day);
-                    final hasTx = calController.dailyTotals.containsKey(key);
-                    return CalendarBuildWidget(
-                      day: day,
-                      isSelected: true,
-                      isToday: isSameDay(day, DateTime.now()),
-                      hasTx: hasTx,
-                      textColor: textColor,
-                      markerColor: markerColor,
-                    );
-                  },
+                  defaultBuilder: (context, day, focusedDay) => _buildDayWidget(day, false, false),
+                  todayBuilder: (context, day, focusedDay) => _buildDayWidget(day, false, true),
+                  selectedBuilder: (context, day, focusedDay) => 
+                      _buildDayWidget(day, true, isSameDay(day, DateTime.now())),
                 ),
               ),
               const SizedBox(height: 8),
+              
+              // 2. Transaction List: Detailed records for the selected date
               Expanded(
                 child: Obx(() {
                   final txs = calController.selectedDateTransactions;
-                  if (txs.isEmpty)
-                    return const Center(child: Text("No transactions"));
+                  
+                  if (txs.isEmpty) {
+                    return Center(child: Text(AppLocalizations.of(context)!.noTransactions));
+                  }
+                  
                   return ListView.separated(
                     itemCount: txs.length,
                     separatorBuilder: (_, __) => const Divider(height: 1),
@@ -141,22 +124,18 @@ class _CalendarPageState extends State<CalendarPage> {
                       final tx = txs[index];
                       final amount = (tx['amount'] as num?)?.toDouble() ?? 0.0;
                       final type = tx['type'];
-                      final color = type == 'expense'
-                          ? Colors.red
-                          : Colors.green;
+                      final color = type == 'expense' ? Colors.red : Colors.green;
 
                       return ListTile(
                         title: Text(
                           tx['t_name'] ?? '',
                           style: TextStyle(color: textColor),
                         ),
-                        subtitle:
-                            tx['memo'] != null &&
-                                tx['memo'].toString().isNotEmpty
+                        subtitle: tx['memo'] != null && tx['memo'].toString().isNotEmpty
                             ? Text(
                                 tx['memo'],
                                 style: TextStyle(
-                                  color: textColor.withOpacity(0.7),
+                                  color: textColor.withValues(alpha: 0.7),
                                 ),
                               )
                             : null,
@@ -167,44 +146,7 @@ class _CalendarPageState extends State<CalendarPage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        onTap: () {
-                          try {
-                            // 1. Map 데이터를 안전하게 SpendingTransaction 객체로 변환
-                            final trxObject = SpendingTransaction(
-                              t_id: tx['t_id'],
-                              c_id:
-                                  tx['c_id'], // 👈 이제 핸들러에서 가져온 진짜 c_id가 들어갑니다!
-                              t_name: tx['t_name']?.toString() ?? '',
-                              amount: (tx['amount'] as num?)?.toDouble() ?? 0.0,
-                              date:
-                                  tx['date']?.toString() ??
-                                  DateTime.now().toIso8601String(),
-                              type: tx['type']?.toString() ?? 'expense',
-                              memo: tx['memo']?.toString() ?? '',
-                              isRecurring: tx['isRecurring'] == 1,
-                            );
-                            // 2. 객체 전달
-                            Get.to(
-                              () => const TransactionsDetail(),
-                              arguments: trxObject,
-                            )?.then((result) {
-                              if (result == true) {
-                                calController.loadDailyTotals();
-                                settingsController.refreshTrigger.value++;
-                              }
-                            });
-                          } catch (e) {
-                            Get.snackbar(
-                              '',
-                              AppLocalizations.of(
-                                context,
-                              )!.errorTransactionDetail,
-                              snackPosition: SnackPosition.bottom,
-                              backgroundColor: Colors.red,
-                              colorText: Colors.white,
-                            );
-                          }
-                        },
+                        onTap: () => _navigateToDetail(tx),
                       );
                     },
                   );
@@ -215,5 +157,54 @@ class _CalendarPageState extends State<CalendarPage> {
         }),
       ),
     );
+  }
+
+  /// Helper to render custom day cells based on transaction status.
+  Widget _buildDayWidget(DateTime day, bool isSelected, bool isToday) {
+    final key = calController.dateKey(day);
+    final hasTx = calController.dailyTotals.containsKey(key);
+    return CalendarBuildWidget(
+      day: day,
+      isSelected: isSelected,
+      isToday: isToday,
+      hasTx: hasTx,
+      textColor: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black,
+      markerColor: Theme.of(context).colorScheme.primary,
+    );
+  }
+
+  /// Handles navigation and ensures data consistency after modification.
+  void _navigateToDetail(Map<String, dynamic> tx) {
+    try {
+      final trxObject = SpendingTransaction(
+        t_id: tx['t_id'],
+        c_id: tx['c_id'],
+        t_name: tx['t_name']?.toString() ?? '',
+        amount: (tx['amount'] as num?)?.toDouble() ?? 0.0,
+        date: tx['date']?.toString() ?? DateTime.now().toIso8601String(),
+        type: tx['type']?.toString() ?? 'expense',
+        memo: tx['memo']?.toString() ?? '',
+        isRecurring: tx['isRecurring'] == 1,
+      );
+      
+      Get.to(
+        () => const TransactionsDetail(),
+        arguments: trxObject,
+      )?.then((result) {
+        if (result == true) {
+          // Re-load totals to update markers and trigger global UI refresh.
+          calController.loadDailyTotals();
+          settingsController.refreshTrigger.value++;
+        }
+      });
+    } catch (e) {
+      Get.snackbar(
+        '',
+        AppLocalizations.of(context)!.errorTransactionDetail,
+        snackPosition: SnackPosition.bottom,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 }

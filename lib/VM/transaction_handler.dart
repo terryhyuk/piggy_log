@@ -61,7 +61,6 @@ class TransactionHandler {
   Future<List<SpendingTransaction>> getTransactionsByCategory(int categoryId) async {
     final db = await _getDb();
     
-    // print(">>> [Transaction Trace] Querying transactions for Category: $categoryId");
     
     final result = await db.query(
       'spending_transactions',
@@ -76,8 +75,6 @@ class TransactionHandler {
   /// Updates an existing transaction record.
   Future<int> updateTransaction(SpendingTransaction trx) async {
     final db = await _getDb();
-    
-    // print(">>> [Transaction Trace] Updating Transaction ID: ${trx.t_id}");
     
     return await db.update(
       'spending_transactions',

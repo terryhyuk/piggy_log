@@ -25,6 +25,8 @@ class DashboardController extends GetxController {
   RxString startDate = "".obs;
   RxString endDate = "".obs;
 
+  bool _isAutoInserting = false;
+
   // Weekly spending trend for Bar Chart
   RxList<double> weeklyData = <double>[0, 0, 0, 0, 0, 0, 0].obs;
 
@@ -48,7 +50,7 @@ class DashboardController extends GetxController {
       refreshDashboard();
     });
 
-    refreshDashboard();
+    // refreshDashboard();
   }
 
   // Consistent color palette for categorical visualization
@@ -198,37 +200,6 @@ Future<void> loadRadarData(int index) async {
   radarDataEntries.assignAll(entries);
   radarLabels.assignAll(labels);
 }
-  // Future<void> loadRadarData(int index) async {
-  //   selectedPieIndex.value = index;
-  //   int categoryId = categoryList[index]['id'];
-
-  //   final data = await handler.getCategoryBreakdown(categoryId);
-  //   var sortedByLabel = data.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
-  //   var top5 = sortedByLabel.take(5).toList();
-
-  //   List<RadarEntry> entries = [];
-  //   List<String> labels = [];
-  //   const double chartMaxScore = 10.0; // Normalization baseline for consistent margins
-
-  //   // Maintenance of Pentagon Shape: Ensures 5 axes are always present
-  //   for (int i = 0; i < 5; i++) {
-  //     if (i < top5.length) {
-  //       double originalValue = top5[i].value;
-  //       // Apply square root scaling to balance visual gaps between high/low expenses
-  //       double scaledValue = math.sqrt(originalValue); 
-  //       double finalValue = (scaledValue / chartMaxScore) * 100;
-        
-  //       if (finalValue > 100) finalValue = 100;
-  //       entries.add(RadarEntry(value: finalValue));
-  //       labels.add(top5[i].key);
-  //     } else {
-  //       entries.add(const RadarEntry(value: 0.0));
-  //       labels.add("");
-  //     }
-  //   }
-  //   radarDataEntries.assignAll(entries);
-  //   radarLabels.assignAll(labels);
-  // }
 
   /// Aggregates a 7-day spending trend for the weekly Bar Chart.
   Future<void> loadWeeklyTrend() async {
@@ -246,29 +217,39 @@ Future<void> loadRadarData(int index) async {
   }
 
   /// Clones recurring templates into the database while handling month-end logic.
-  Future<void> _internalAutoInsert(String currentYearMonth) async {
+Future<void> _internalAutoInsert(String currentYearMonth) async {
+  if (_isAutoInserting) return;
+  _isAutoInserting = true;
+
+  try {
     final templates = await handler.getRecurringTemplates();
-    final now = DateTime.now();
 
     for (var temp in templates) {
-      bool exists = await handler.checkIfAlreadyAdded(temp['t_name'], (temp['amount'] as num).toDouble(), currentYearMonth);
+      bool exists = await handler.checkIfAlreadyAdded(
+        temp['t_name'], 
+        (temp['amount'] as num).toDouble(), 
+        currentYearMonth
+      );
+
       if (!exists) {
-        DateTime originalDate = DateTime.parse(temp['date']);
-        int lastDayOfMonth = DateTime(now.year, now.month + 1, 0).day;
-        int targetDay = originalDate.day > lastDayOfMonth ? lastDayOfMonth : originalDate.day;
+        String dayPart = temp['date'].toString().split('-').last;
         
         await handler.insertTransaction({
           'c_id': temp['c_id'],
           't_name': temp['t_name'],
           'amount': temp['amount'],
-          'date': "$currentYearMonth-${targetDay.toString().padLeft(2, '0')}",
+          'date': "$currentYearMonth-$dayPart",
           'type': temp['type'],
           'memo': '[Auto] ${temp['memo'] ?? ""}',
           'isRecurring': 1,
         });
       }
     }
+  } finally {
+    // 2. 처리가 다 끝나면 다시 문 열어주기
+    _isAutoInserting = false;
   }
+}
 
   /// Direct category lookup helpers for UI components
   String getSelectedCategoryName(int? index) => (index != null && index >= 0 && index < categoryList.length) ? categoryList[index]['name'] : "";

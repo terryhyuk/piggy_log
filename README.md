@@ -3,7 +3,7 @@
 ![Piggy Log Banner](./docs/metadata/piggy_log_image.png)
 
 <p align="center">
-  <strong>Intuitive Expense Tracking & Smart Budgeting for a Better Financial Future</strong>
+  <strong>Flutter Developer Project – Cross-Platform Expense Tracker with Multi-Language Support</strong>
 </p>
 
 <p align="center">
@@ -13,28 +13,21 @@
   <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" />
 </p>
 
-**Piggy Log** is a personal finance management application designed for intuitive expense tracking and smart budgeting. It prioritizes data privacy through local storage and provides a seamless user experience across multiple languages.
+**Piggy Log** is a professional-grade personal finance application built with **Flutter**.  
+It is designed for users who value **simplicity, data privacy (offline-first storage), and seamless usability across multiple regions**.
+
+> ⚡ **For Recruiters**: Production-ready app featuring high-performance charts, 4-language localization, and a robust local database.  
+> 🛠 **For Engineers**: Currently undergoing a strategic transition from a lightweight MVVM to a **Modular Layered Architecture** to improve scalability, maintainability, and developer experience.
 
 ---
 
 ## 🌟 Key Features
 
-* **Multi-Language Support**: Full localization for **English, Korean, Japanese, and Thai**.
-* **Budget Management**: Set and track monthly goals by category.
-* **Data Visualization**: Interactive charts for spending insights
-* **Personalization**: Customizable categories with diverse icons and color palettes.
-
----
-
-
-## 🛠 Key Libraries
-
-* **GetX** – MVVM-based state management and reactive UI updates
-* **sqflite** – Offline-first local database using SQLite
-* **fl_chart** – Interactive data visualization with animations and touch handling
-* **table_calendar** – Calendar-driven transaction browsing
-* **intl** – Localization and date/number formatting
-
+* **🌍 Global Localization** – English, Korean, Japanese, and Thai
+* **💰 Budget Management** – Set and track monthly financial goals with real-time category analysis
+* **📊 Data Visualization** – Interactive charts with `fl_chart`
+* **📅 Calendar Integration** – Browse transactions via intuitive calendar view
+* **🎨 Personalization** – Custom categories, icons, and dynamic themes
 
 ---
 
@@ -42,80 +35,84 @@
 
 [![Piggy Log Demo Video](https://img.youtube.com/vi/Ypun7lRNa_o/0.jpg)](https://www.youtube.com/watch?v=Ypun7lRNa_o)
 
-*Click the image above to watch the full demo with functional chapters.*
+*Click the image above to watch the full functional demo.*
 
 ---
 
-## 🏗 Technical Design
+## 📂 Engineering Roadmap: Architectural Evolution
 
-To ensure a scalable and robust application, I followed a structured design process from **Logical Planning** to **Physical Modeling**.
+To ensure the project scales efficiently, the app is being refactored from a lightweight MVVM into a **Modular Layered Architecture**.
 
-### 1. Logical Data Flow (System Design)
-I utilized **Miro** to map out the application's logical flow. This step was crucial for visualizing how user interactions, settings, and financial transactions are mapped to maintain clear business logic.
-
-![Logical Design](./docs/design/logical_flow.png)
-
-### 2. Database Schema (ERD)
-After finalizing the logic, I designed the **Physical Schema** using **ERDCloud**. This diagram is 100% synchronized with the SQLite implementation in the Flutter code.
-
-![Physical ERD](./docs/design/physical_db_schema.png)
-
-* **Referential Integrity**: Enforced strict **1:N relationships** between categories and transactions using Foreign Keys (`c_id`).
-* **Normalization**: Optimized the schema to eliminate data redundancy and ensure data integrity.
-* **Data Accuracy**: Leveraged SQLite-native types (**REAL** for financial precision, **TEXT** for ISO 8601 date formats) to ensure data consistency.
-
----
-
-* ### 3. System Architecture (SFD)
-To ensure clear business logic and efficient state management, I designed a **System Flow Diagram (SFD)**. This maps the reactive interactions between the UI, GetX Controllers, and SQLite Handlers.
-
-![System Flow Diagram](./docs/design/sfd_architecture.png)
-
-* **Consolidated Management**: Integrated Locale and Settings management into a single controller to improve code cohesion.
-* **Reactive Data Flow**: Implemented a global refresh trigger system to ensure data synchronization across Dashboard, Calendar, and History views.
-* **Decoupled Architecture**: Separated business logic (Controllers) from data persistence (Handlers) to maintain a clean MVVM structure.
-
----
-
-## 🎨 UI/UX & Marketing Assets
-
-* **Prototyping**: Designed high-fidelity wireframes and UI components using **Figma** to ensure a user-centric interface.
-* **App Marketing**: Created professional promotional assets using **Canva** to enhance the app's visual identity.
-
----
-
-## 🛠 Tech Stack
-
-* **Framework**: Flutter
-* **State Management**: GetX (MVVM Architecture)
-* **Database**: SQLite (via `sqflite`)
-* **IDE**: VS Code
-* **Environment**: iOS/Android Simulators
-
----
-
-## 📂 Project Structure (MVVM)
+### Phase 1 – Current Lightweight MVVM
 
 ```text
 lib/
 ├── controller/  # Reactive UI state management (GetX)
-├── l10n/        # Multi-language localization files (EN, KO, JA, TH)
-├── model/       # Data entities synchronized with DB schema
-├── view/        # UI pages and reusable widgets
-└── VM/          # ViewModels & Database Handlers
+├── l10n/        # Localization files (EN, KO, JA, TH)
+├── model/       # Data entities & mapping
+├── view/        # UI screens and shared components
+└── VM/          # ViewModels & SQLite Database Handlers
 ```
 
+Planned Modular Layered Architecture 🚀
+Directory	Responsibility	Why This Change?
+lib/state/	GetX Controllers	Isolate reactive states from business logic
+lib/services/	Logic & DB Repositories	Decouple persistence layers for easier maintenance
+lib/models/	Data Entities (PODOs)	Ensure data integrity across the app
+lib/screens/	Page-level Widgets	Simplify navigation and top-level layouts
+lib/widgets/	Atomic UI Components	Maximize code reuse and reduce redundancy
 
----
+This refactor prioritizes Separation of Concerns, making the codebase cleaner for team collaboration and future cloud-sync integrations.
 
-## 💡 Technical Challenges & Solutions
+🏗 Technical Design & Modeling
+1. Logical Data Flow (System Design)
+Mapped using Miro to visualize and ensure clear business logic before implementation.
 
-* **Challenge**: Managing consistent data types between SQLite and Dart.
-* **Solution**: Refactored the `DatabaseHandler` to strictly align with the physical schema, ensuring `REAL` types for currency to prevent rounding errors during calculations.
 
----
 
-## 📬 Contact
+2. Database Schema (ERD)
+Designed with ERDCloud to enforce strict relational integrity in SQLite.
 
-**Terry Yoon** 📧 [yonghyuk.terry.yoon@gmail.com](mailto:yonghyuk.terry.yoon@gmail.com)  
+
+
+Referential Integrity: 1:N Foreign Key constraints
+
+Precision: SQLite REAL for financial accuracy, TEXT for ISO dates
+
+⚠️ ERD will be updated after database normalization and metadata expansion
+
+3. System Flow Diagram (SFD)
+Visualizes reactive interactions between UI, GetX Controllers, and Database Handlers.
+
+
+
+⚠️ Architecture diagram will be updated post-refactor to reflect the new Service-Layered model
+
+🛠 Tech Stack
+Framework: Flutter (iOS & Android)
+
+State Management: GetX (Reactive)
+
+Database: SQLite via sqflite
+
+Charts: fl_chart
+
+Calendar: table_calendar
+
+Localization: intl
+
+Modeling Tools: Miro (Logic), ERDCloud (DB), Figma (UI), Canva (Assets)
+
+IDE: VS Code
+
+💡 Technical Challenges & Solutions
+Challenge: Maintaining consistent data types between SQLite (dynamic typing) and Dart (static typing)
+
+Solution: Refactored DatabaseHandler to implement a strict mapping layer, ensuring financial values (double) are handled without rounding errors
+
+📬 Contact
+Terry Yoon – Mobile Developer
+📧 yonghyuk.terry.yoon@gmail.com
 📍 Vancouver, BC, Canada
+
+💡 North American recruiters: This project demonstrates cross-platform Flutter development, multi-language support, clean and maintainable code, and database integration.

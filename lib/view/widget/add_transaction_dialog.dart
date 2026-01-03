@@ -241,7 +241,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     
     // Critical: Synchronizes the application state with the database persistence layer.
     await settingsController.refreshAllData(); 
-    
+
     Get.snackbar(
       widget.transactionToEdit == null ? local.categoryCreated : local.categoryUpdated,
       widget.transactionToEdit == null ? local.newCategoryAdded : local.changesSaved,

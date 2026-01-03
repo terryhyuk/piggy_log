@@ -93,7 +93,7 @@ class DashboardHandler {
     }).toList();
   }
 
-  /// Top 3 breakdown within a specific category.
+  /// Top 5 breakdown within a specific category.
   Future<Map<String, double>> getCategoryBreakdown(int categoryId) async {
     final db = await _getDb();
     final result = await db.query(
@@ -103,7 +103,7 @@ class DashboardHandler {
       whereArgs: [categoryId, 'expense'],
       groupBy: 't_name',
       orderBy: 'total DESC',
-      limit: 3,
+      limit: 5,
     );
 
     Map<String, double> map = {};

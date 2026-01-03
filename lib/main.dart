@@ -7,6 +7,7 @@ import 'package:piggy_log/controller/category_controller.dart';
 import 'package:piggy_log/controller/dashboard_controller.dart';
 import 'package:piggy_log/controller/setting_controller.dart';
 import 'package:piggy_log/controller/tabbar_controller.dart';
+import 'package:piggy_log/fake_data.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 import 'package:piggy_log/view/splashScrrenPage.dart';
 
@@ -24,7 +25,7 @@ void main() async {
     Get.put(CategoryController());
     Get.put(CalendarController());
 
-
+  // Fake_Data.fill();
   runApp(MyApp());
 }
 

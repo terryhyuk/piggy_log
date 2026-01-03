@@ -137,15 +137,15 @@ class DashboardHandler {
   }
 
   /// Get templates for recurring items.
-  Future<List<Map<String, dynamic>>> getRecurringTemplates() async {
-    final db = await _getDb();
-    return await db.query(
-      'spending_transactions',
-      where: 'isRecurring = ?',
-      whereArgs: [1],
-      groupBy: 't_name, amount',
-    );
-  }
+Future<List<Map<String, dynamic>>> getRecurringTemplates() async {
+  final db = await _getDb();
+  return await db.query(
+    'spending_transactions',
+    where: 'isRecurring = ?',
+    whereArgs: [1],
+    groupBy: 't_name', 
+  );
+}
 
   /// Duplicate check for monthly recurring tasks.
   Future<bool> checkIfAlreadyAdded(String title, double amount, String yearMonth) async {

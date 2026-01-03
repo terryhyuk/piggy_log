@@ -6,17 +6,9 @@ import 'package:piggy_log/controller/setting_controller.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 import 'package:piggy_log/view/widget/animated_piggy_message.dart';
 
-// -----------------------------------------------------------------------------
-//  * Refactoring Intent: 
-//    Advanced analytical dashboard utilizing multi-dimensional charts.
-//    Implements a 'Storytelling UX' via a sequential messaging system 
-//    (PiggyTalk) and minimalist data visualization for high readability.
-//
-//  * TODO: 
-//    - Export chart as Image/PDF for user sharing features.
-//    - Add a comparison layer (e.g., Previous Month vs Current) on the Radar Chart.
-// -----------------------------------------------------------------------------
-
+/// RadarChartPage: Provides a detailed spending analysis for a specific category.
+/// It features a Radar Chart for internal balance, an animated piggy guide,
+/// and a Bar Chart for weekly spending trends.
 class RadarChartPage extends StatefulWidget {
   const RadarChartPage({super.key});
 
@@ -28,16 +20,14 @@ class _RadarChartPageState extends State<RadarChartPage> {
   final DashboardController controller = Get.find<DashboardController>();
   final SettingController settingsController = Get.find<SettingController>();
 
-  // State Management for Character Animation
+  // Managing animation state for the piggy character
   String _currentPiggyMessage = "";
   bool _isAnimating = false;
   bool _hasFinishedTalking = false;
 
-  /// PiggyTalk Engine: Orchestrates a multi-step analysis commentary.
+  /// Rotates analysis messages sequentially to create a conversational feel.
   void _startPiggyTalk(AppLocalizations l10n) async {
-    // Prevent overlapping animation sequences.
     if (_isAnimating || _hasFinishedTalking) return;
-    
     _isAnimating = true;
 
     final messages = [
@@ -50,6 +40,7 @@ class _RadarChartPageState extends State<RadarChartPage> {
       if (mounted) {
         setState(() => _currentPiggyMessage = messages[i]);
       }
+      // Delay to allow users to read each step
       await Future.delayed(const Duration(milliseconds: 2500));
     }
 
@@ -79,24 +70,31 @@ class _RadarChartPageState extends State<RadarChartPage> {
             ? controller.categoryList[controller.selectedPieIndex.value!]['id']
             : null;
 
-        if (categoryId == null) return const Center(child: CircularProgressIndicator());
+        if (categoryId == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
         return FutureBuilder<List<Map<String, dynamic>>>(
           future: controller.handler.getCategoryDetailedList(categoryId),
           builder: (context, snapshot) {
-            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
             final detailedList = snapshot.data!;
-            if (detailedList.isEmpty) return Center(child: Text(l10n.noTransactions));
+            if (detailedList.isEmpty) {
+              return Center(child: Text(l10n.noTransactions));
+            }
 
-            // Data Transformation: Aggregates expenditure per weekday.
+            // Calculate weekly spending totals for the Bar Chart
             List<double> daySums = List.filled(7, 0.0);
             for (var t in detailedList) {
               try {
                 final date = DateTime.parse(t['date']);
+                // DateTime.weekday returns 1 (Mon) to 7 (Sun)
                 daySums[date.weekday - 1] += (t['amount'] as num).toDouble();
               } catch (e) {
-                // Ignore parsing errors for corrupted date strings.
+                debugPrint("Date Parsing Error: ${t['date']} - $e");
               }
             }
 
@@ -104,25 +102,34 @@ class _RadarChartPageState extends State<RadarChartPage> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Column(
                 children: [
+                  // Section 1: Radar Chart for Internal Balance
                   _buildSectionTitle(l10n.categoryBalance, theme),
                   const SizedBox(height: 12),
                   _buildRadarCard(theme),
 
                   const SizedBox(height: 20),
 
-                  // Mascot Interaction: Triggered automatically upon reaching data threshold.
+                  // Section 2: Animated Character Interaction
+                  // Triggers analysis when there are enough data points (10+)
                   if (detailedList.length >= 10)
                     Builder(
                       builder: (context) {
-                        if (_currentPiggyMessage.isEmpty && !_isAnimating && !_hasFinishedTalking) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) => _startPiggyTalk(l10n));
+                        if (_currentPiggyMessage.isEmpty &&
+                            !_isAnimating &&
+                            !_hasFinishedTalking) {
+                          WidgetsBinding.instance.addPostFrameCallback(
+                            (_) => _startPiggyTalk(l10n),
+                          );
                         }
-                        return AnimatedPiggyMessage(message: _currentPiggyMessage);
+                        return AnimatedPiggyMessage(
+                          message: _currentPiggyMessage,
+                        );
                       },
                     ),
 
                   const SizedBox(height: 20),
 
+                  // Section 3: Bar Chart for Weekly Spending Trend
                   _buildSectionTitle(l10n.weeklySpendingTrend, theme),
                   const SizedBox(height: 12),
                   _buildBarChartCard(theme, daySums),
@@ -137,10 +144,8 @@ class _RadarChartPageState extends State<RadarChartPage> {
     );
   }
 
-  // --- UI Architecture Components ---
-
+  /// Builds a Radar Chart Card with normalized scaling.
   Widget _buildRadarCard(ThemeData theme) {
-    /// Minimalist Radar Configuration: Ticks and default labels removed for cleaner UX.
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -153,10 +158,19 @@ class _RadarChartPageState extends State<RadarChartPage> {
           aspectRatio: 1.2,
           child: RadarChart(
             RadarChartData(
+              isMinValueAtCenter: false, // Prevents tiny values from sticking to center
               ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 0),
               gridBorderData: BorderSide(color: theme.dividerColor.withAlpha(25), width: 1),
               radarBorderData: BorderSide(color: theme.colorScheme.primary.withAlpha(76), width: 1),
               dataSets: [
+                // Background Guide: Forces the chart scale to 100
+                RadarDataSet(
+                  fillColor: Colors.transparent,
+                  borderColor: Colors.transparent,
+                  entryRadius: 0,
+                  dataEntries: List.generate(5, (_) => const RadarEntry(value: 100)),
+                ),
+                // Main Data: The actual expense balance
                 RadarDataSet(
                   dataEntries: controller.radarDataEntries,
                   borderColor: theme.colorScheme.primary,
@@ -168,10 +182,14 @@ class _RadarChartPageState extends State<RadarChartPage> {
               getTitle: (index, angle) {
                 if (index >= controller.radarLabels.length) return const RadarChartTitle(text: '');
                 String label = controller.radarLabels[index];
-                return RadarChartTitle(text: label.length > 6 ? '${label.substring(0, 5)}..' : label);
+                // Truncate labels to ensure fit within the grid
+                return RadarChartTitle(
+                  text: label.length > 6 ? '${label.substring(0, 5)}..' : label,
+                );
               },
               radarShape: RadarShape.polygon,
               tickCount: 3,
+              tickBorderData: const BorderSide(color: Colors.transparent),
             ),
           ),
         ),
@@ -179,8 +197,8 @@ class _RadarChartPageState extends State<RadarChartPage> {
     );
   }
 
+  /// Builds a Bar Chart Card representing weekly trends.
   Widget _buildBarChartCard(ThemeData theme, List<double> daySums) {
-    /// Adaptive Scaling: Dynamically adjusts maxY to prevent bar overflow.
     double maxVal = daySums.reduce((a, b) => a > b ? a : b);
     double maxY = maxVal == 0 ? 10000 : maxVal * 1.3;
 
@@ -204,7 +222,10 @@ class _RadarChartPageState extends State<RadarChartPage> {
                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
                     return BarTooltipItem(
                       settingsController.formatCurrency(rod.toY),
-                      TextStyle(color: theme.colorScheme.onSecondaryContainer, fontWeight: FontWeight.bold),
+                      TextStyle(
+                        color: theme.colorScheme.onSecondaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
                     );
                   },
                 ),
@@ -222,7 +243,10 @@ class _RadarChartPageState extends State<RadarChartPage> {
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           days[value.toInt()],
-                          style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                          ),
                         ),
                       );
                     },
@@ -257,10 +281,14 @@ class _RadarChartPageState extends State<RadarChartPage> {
     );
   }
 
+  /// Reusable section title widget for consistent UI.
   Widget _buildSectionTitle(String title, ThemeData theme) {
     return Align(
       alignment: Alignment.centerLeft,
-      child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+      child: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+      ),
     );
   }
 }

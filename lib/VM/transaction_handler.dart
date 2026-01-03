@@ -44,8 +44,6 @@ class TransactionHandler {
         "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 
     // [Trace] Verifying the final data package before DB entry
-    // print(">>> [Transaction Trace] Inserting: ${res.t_name}");
-    // print(">>> [Transaction Trace] Date Resolved: $dateStr, Amount: ${res.amount}");
 
     // 4️⃣ DB Insert using Helper Method
     return await db.insert('spending_transactions', {
@@ -109,7 +107,6 @@ class TransactionHandler {
     );
 
     final value = result.first['total'];
-    // print(">>> [Transaction Trace] Category $categoryId Total: $value");
     
     return value == null ? 0.0 : (value as num).toDouble();
   }
@@ -117,7 +114,6 @@ class TransactionHandler {
   /// Deletes a specific transaction.
   Future<void> deleteTransaction(int transactionId) async {
     final db = await _getDb();
-    // print(">>> [Transaction Trace] Deleting Transaction ID: $transactionId");
     
     await db.delete(
       'spending_transactions',

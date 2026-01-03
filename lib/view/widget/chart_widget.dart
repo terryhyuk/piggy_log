@@ -131,9 +131,16 @@ class _ChartsWidgetState extends State<ChartsWidget> {
         onTap: () async {
           if (selectedPieIndex != null) {
             dashbordcontroller.selectedPieIndex.value = selectedPieIndex;
+            
             await dashbordcontroller.loadRadarData(selectedPieIndex!);
+            
             Get.to(() => const RadarChartPage());
           }
+          // if (selectedPieIndex != null) {
+          //   dashbordcontroller.selectedPieIndex.value = selectedPieIndex;
+          //   await dashbordcontroller.loadRadarData(selectedPieIndex!);
+          //   Get.to(() => const RadarChartPage());
+          // }
         },
         borderRadius: BorderRadius.circular(12),
         child: Container(

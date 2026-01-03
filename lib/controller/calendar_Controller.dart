@@ -38,8 +38,12 @@ class CalendarController extends GetxController {
   }
 
   /// Fetches daily totals from DB to populate calendar markers (dots).
+  /// [Asynchronous Hydration] Ensures UI markers stay in sync with the DB.
   Future<void> loadDailyTotals() async {
+    // Fetch aggregated daily totals from the persistence handler
     final totals = await calenderHandler.getDailyTotals();
+    
+    // Update the observable map to trigger UI listeners
     dailyTotals.value = totals;
   }
 
@@ -49,26 +53,26 @@ class CalendarController extends GetxController {
     focusedDay.value = date;
     final key = dateKey(date);
     
-    // Fetch transactions from DB for the generated key
+    // Fetch individual transaction records for the specific date key
     final transactions = await calenderHandler.getTransactionsByDate(key);
     selectedDateTransactions.value = transactions;
 
     // Calculate the net total for the day (Income - Expense)
     double total = 0.0;
     for (var tx in transactions) {
-      // Safe type casting to prevent null-pointer or type-mismatch errors
+      // Safe type casting for SQLite 'num' types to prevent runtime errors
       final amount = (tx['amount'] as num?)?.toDouble() ?? 0.0;
       total += (tx['type'] == 'expense') ? -amount : amount;
     }
     selectedDayTotal.value = total;
   }
   
-  /// Formats amount based on global currency settings.
+  /// Formats amount based on global currency settings from SettingController.
   String formatCurrency(double amount) {
     return settingsController.formatCurrency(amount);
   }
 
-  /// Converts ISO strings to localized date formats.
+  /// Converts ISO strings to localized date formats based on user preference.
   String formatDate(String isoDate) {
     final dt = DateTime.tryParse(isoDate);
     if (dt == null) return isoDate;

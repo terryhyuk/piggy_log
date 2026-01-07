@@ -37,7 +37,7 @@ It is designed for users who value **simplicity, data privacy (offline-first sto
 ## 📲 Official App Store Preview
 
 <p align="center">
-  <img src="./assets/screenshots/app_store_preview.jpg" width="100%" alt="Piggy Log App Store Preview" />
+  <img src="./docs/matadata/app_store_preview.jpg" width="100%" alt="Piggy Log App Store Preview" />
 </p>
 
 *The UI/UX has been fully optimized for a premium financial tracking experience.* 🍎

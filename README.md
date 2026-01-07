@@ -2,6 +2,9 @@
 
 ![Piggy Log Banner](./docs/metadata/piggy_log_image.png)
 
+> 🚀 **Update (2025-12-30)**: **Official Launch!** Piggy Log is now available on the App Store and Google Play.
+> 🏗️ **Ongoing**: Currently refactoring to **Feature-based Architecture** to enhance scalability for version 1.3.0.
+
 <p align="center">
   <strong>Flutter Developer Project – Cross-Platform Expense Tracker with Multi-Language Support</strong>
 </p>
@@ -31,11 +34,22 @@ It is designed for users who value **simplicity, data privacy (offline-first sto
 
 ---
 
-## 🎬 Demo Video
+## 📲 Official App Store Preview
 
-[![Piggy Log Demo Video](https://img.youtube.com/vi/Ypun7lRNa_o/0.jpg)](https://www.youtube.com/watch?v=Ypun7lRNa_o)
+<p align="center">
+  <img src="./docs/metadata/app_store_preview.png" width="100%" alt="Piggy Log App Store Preview" />
+</p>
 
-*Click the image above to watch the full functional demo.*
+*The UI/UX has been fully optimized for a premium financial tracking experience.* 🍎
+
+---
+
+## 📲 Download Now
+
+<a href="https://apps.apple.com/app/piggy-log/id6757284836">
+  <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="50">
+</a>
+*Experience **Piggy Log** today! Check out our live production app on the App Store.*
 
 ---
 

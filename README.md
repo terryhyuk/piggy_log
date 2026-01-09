@@ -51,7 +51,7 @@ It focuses on **performance, architectural integrity, and seamless global usabil
   </a>
   &nbsp;
   <a href="https://play.google.com/store/apps/details?id=com.terry.piggyLog">
-    <img src="https://raw.githubusercontent.com/yjose/google-play-badge/master/badge-en.png" height="40">
+    <img src="https://raw.githubusercontent.com/yjose/google-play-badge/master/badge-en.png" height="50">
   </a>
 </p>
 

@@ -47,11 +47,17 @@ It focuses on **performance, architectural integrity, and seamless global usabil
 
 <p align="left">
   <a href="https://apps.apple.com/app/piggy-log/id6757284836">
-    <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="40">
+    <img 
+      src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" 
+      height="40"
+    >
   </a>
   &nbsp;
   <a href="https://play.google.com/store/apps/details?id=com.terry.piggyLog">
-    <img src="https://raw.githubusercontent.com/yjose/google-play-badge/master/badge-en.png" height="50">
+    <img 
+      src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" 
+      height="40"
+    >
   </a>
 </p>
 

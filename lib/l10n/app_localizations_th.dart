@@ -60,9 +60,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get toTalExpense => 'ค่าใช้จ่ายรวม';
 
   @override
-  String get monthlyBudget => 'งบประมาณรายเดือน';
-
-  @override
   String get setYourBudget => 'ตั้งงบประมาณของคุณ';
 
   @override
@@ -257,7 +254,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get analysisStep1 =>
-      'วิเคราะห์เสร็จแล้ว! มีข้อมูลมากกว่า 10 รายการแล้วนะ อู๊ดๆ! 🐷';
+      'วิเคราะห์เสร็จแล้ว! มีข้อมูลมากกว่า 5 รายการแล้วนะ อู๊ดๆ! 🐷';
 
   @override
   String get analysisStep2 => 'ดูแผนภูมิเรดาร์ด้านบนเพื่อเช็กสมดุลการใช้จ่าย,';
@@ -268,4 +265,62 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get weeklyTrend => 'แนวโน้มรายสัปดาห์';
+
+  @override
+  String get pleaseEnterDescription => 'กรุณากรอกรายละเอียด';
+
+  @override
+  String get pleaseEnterAmount => 'กรุณากรอกจำนวนเงิน';
+
+  @override
+  String get invalidAmount => 'กรุณากรอกตัวเลขที่ถูกต้อง';
+
+  @override
+  String get categoryNameRequired => 'กรุณากรอกชื่อหมวดหมู่';
+
+  @override
+  String get budgetUpdated => 'อัปเดตงบประมาณเรียบร้อยแล้ว';
+
+  @override
+  String get done => 'เสร็จสิ้น (Set-sin)';
+
+  @override
+  String monthlyBudgetTitle(Object month) {
+    return 'งบประมาณเดือน$month';
+  }
+
+  @override
+  String totalExpenseTitle(Object month) {
+    return 'รายจ่ายทั้งหมดเดือน$month';
+  }
+
+  @override
+  String historyMonthTitle(Object month, Object year) {
+    return 'เดือน$month $year';
+  }
+
+  @override
+  String get onboarding_cat_msg =>
+      'สร้างหมวดหมู่แล้วแตะเพื่อบันทึก!\nกดค้างไว้เพื่อแก้ไขหรือลบได้เลย! 🐷';
+
+  @override
+  String get onboarding_chart_msg =>
+      'ตรวจสอบสัดส่วนการใช้จ่าย\nได้อย่างรวดเร็วด้วยแผนภูมิวงกลม! 📊';
+
+  @override
+  String get onboarding_setting_msg =>
+      'สำรองและเรียกคืนข้อมูล\nของคุณได้อย่างปลอดภัยที่นี่! 💾';
+
+  @override
+  String get ratingTitle => 'ก๊อกๆ...? Piggy Log ใช้ดีไหมครับ?';
+
+  @override
+  String get ratingSubTitle =>
+      'ถ้าถูกใจ ช่วยให้ 5 ดาวหน่อยนะครับ... (ตื่นเต้นจัง)';
+
+  @override
+  String get ratingConfirm => 'ได้เลย! จัดให้เดี๋ยวนี้';
+
+  @override
+  String get ratingCancel => 'ไว้วันหลังนะ...';
 }

@@ -48,7 +48,14 @@
 
     <key>NSPhotoLibraryUsageDescription</key>
     <string>백업 파일을 불러오거나 저장하기 위해 저장소 접근 권한이 필요합니다.</string>
+
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
+
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
 </dict>
 </plist>

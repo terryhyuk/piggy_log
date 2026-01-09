@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.2.1+13
+version: 1.3.0+14
 
 environment:
   sdk: ^3.10.0
@@ -36,7 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # High-performance state management, dependency injection, and route management
-  get_x: ^5.0.0
+  provider: ^6.1.5+1
   
   # Local database (SQLite) for storing transaction and category data
   sqflite: ^2.4.2
@@ -70,6 +70,9 @@ dependencies:
   path_provider: ^2.1.5
   # To pick a backup file from the device storage for data restoration
   file_picker: ^10.3.8
+
+  shared_preferences: ^2.5.4
+  in_app_review: ^2.0.11
 
 dev_dependencies:
   flutter_test:

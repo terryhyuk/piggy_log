@@ -1,63 +1,51 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:get_x/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:piggy_log/VM/dashboard_handler.dart';
-import 'package:piggy_log/controller/calendar_controller.dart';
-import 'package:piggy_log/controller/category_controller.dart';
-import 'package:piggy_log/controller/dashboard_controller.dart';
-import 'package:piggy_log/controller/setting_controller.dart';
-import 'package:piggy_log/controller/tabbar_controller.dart';
-import 'package:piggy_log/fake_data.dart';
-import 'package:piggy_log/l10n/app_localizations.dart';
-import 'package:piggy_log/view/splashScrrenPage.dart';
+import 'package:piggy_log/app.dart';
+import 'package:piggy_log/core/database/database_service.dart';
+import 'package:piggy_log/core/database/repository/calendar_repository.dart';
+import 'package:piggy_log/core/database/repository/category_repository.dart';
+import 'package:piggy_log/core/database/repository/dashboard_repasitory.dart';
+import 'package:piggy_log/core/database/repository/record_repository.dart';
+import 'package:piggy_log/core/database/repository/settings_repository.dart';
+import 'package:piggy_log/providers/calendar_provider.dart';
+import 'package:piggy_log/providers/category_provider.dart';
+import 'package:piggy_log/providers/dashboard_provider.dart';
+import 'package:piggy_log/providers/record_provider.dart';
+import 'package:piggy_log/providers/settings_provider.dart';
+import 'package:piggy_log/providers/tab_provider.dart';
+import 'package:provider/provider.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
   await initializeDateFormatting();
 
-    Get.put(TabbarController());
+  // Initialize the database service and open connection
+  final dbService = DatabaseService(); 
+  await dbService.database; 
 
-  // Controllerr for setting
-  final settingsController = Get.put(SettingController());
-  await settingsController.loadSettings();
-    Get.put(DashboardController());
-    Get.put(DashboardHandler());
-    Get.put(CategoryController());
-    Get.put(CalendarController());
+  // Repositories 
+  final categoryRepo = CategoryRepository();
+  final dashboardRepo = DashboardRepository();
+  final calendarRepo = CalendarRepository();
+  final settingRepo = SettingsRepository(); 
+  final recordRepo = RecordRepository();
 
-  // Fake_Data.fill();
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final SettingController controller = Get.find<SettingController>();
-
-    return Obx(
-      () => GetMaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Piggy Log',
-        locale: controller.locale.value,
-        themeMode: controller.themeMode.value ?? ThemeMode.system,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: ThemeData(
-          useMaterial3: true,
-          colorSchemeSeed: Colors.blue,
-          brightness: Brightness.light,
+  runApp(
+    MultiProvider(
+      providers: [
+        // SettingProvider should be first as others might depend on it
+        ChangeNotifierProvider(create: (_) => SettingProvider(settingRepo)),
+        ChangeNotifierProvider(create: (_) => TabProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider(categoryRepo)),
+        ChangeNotifierProvider(
+          create: (_) => DashboardProvider(dashboardRepo, recordRepo),
         ),
-        darkTheme: ThemeData(
-          useMaterial3: true,
-          colorSchemeSeed: Colors.blue,
-          brightness: Brightness.dark,
-        ),
-        // home: Maintabbar(),
-        home: SplashScreen(),
-      ),
-    );
-  }
-
+        ChangeNotifierProvider(create: (_) => CalendarProvider(calendarRepo)),
+        ChangeNotifierProvider(create: (_) => RecordProvider(recordRepo)),
+      ],
+      child: const App(),
+    ),
+  );
 }

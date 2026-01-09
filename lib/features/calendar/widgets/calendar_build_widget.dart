@@ -1,21 +1,10 @@
 import 'package:flutter/material.dart';
 
-// -----------------------------------------------------------------------------
-//  * Refactoring Intent: 
-//    Orchestrates the visual state of individual calendar cells. 
-//    Solves overlapping state conflicts (Today vs Selected vs Event) 
-//    using a layered Stack architecture with responsive scaling.
-//
-//  * TODO: 
-//    - Abstract the 'Marker' logic into a customizable decoration builder.
-//    - Implement 'RepaintBoundary' to optimize calendar scrolling performance.
-// -----------------------------------------------------------------------------
-
 class CalendarBuildWidget extends StatelessWidget {
   final DateTime day;
   final bool isSelected;
   final bool isToday;
-  final bool hasTx; 
+  final bool hasTx;
   final Color textColor;
   final Color markerColor;
 
@@ -57,9 +46,7 @@ class CalendarBuildWidget extends StatelessWidget {
                   ? Color.lerp(Colors.transparent, primary, 0.15)!
                   : Colors.transparent,
               // High-contrast border to emphasize the current real-time date.
-              border: isToday
-                  ? Border.all(color: primary, width: 2)
-                  : null,
+              border: isToday ? Border.all(color: primary, width: 2) : null,
             ),
             alignment: Alignment.center,
             child: Text(

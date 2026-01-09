@@ -60,9 +60,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get toTalExpense => '総支出';
 
   @override
-  String get monthlyBudget => '月間予算';
-
-  @override
   String get setYourBudget => '予算を設定';
 
   @override
@@ -256,14 +253,59 @@ class AppLocalizationsJa extends AppLocalizations {
   String get weeklySpendingTrend => '曜日別支出推移';
 
   @override
-  String get analysisStep1 => '分析完了！データが10件以上集まったぶー！🐷';
+  String get analysisStep1 => '分析完了！データが5件以上集まったぶー！🐷';
 
   @override
   String get analysisStep2 => '上のレーダーチャートでバランスを確認して、';
 
   @override
-  String get analysisStep3 => '下の棒グラフで支出の多い曜日をチェックだぶー！';
+  String get analysisStep3 => '下の棒グラフで支出の多い曜日를チェックだぶー！';
 
   @override
   String get weeklyTrend => '週間の支出推移';
+
+  @override
+  String get pleaseEnterDescription => '内容を入力してください';
+
+  @override
+  String get pleaseEnterAmount => '金額を入力してください';
+
+  @override
+  String get invalidAmount => '有効な数字を入力してください';
+
+  @override
+  String get categoryNameRequired => 'カテゴリ名を入力してください';
+
+  @override
+  String get budgetUpdated => '予算が正常に更新されました';
+
+  @override
+  String get done => '完了 (かんりょう)';
+
+  @override
+  String monthlyBudgetTitle(Object month) {
+    return '$monthの予算';
+  }
+
+  @override
+  String totalExpenseTitle(Object month) {
+    return '$monthの総支出';
+  }
+
+  @override
+  String historyMonthTitle(Object month, Object year) {
+    return '$year年 $month';
+  }
+
+  @override
+  String get onboarding_cat_msg => 'カテゴリを作ってタップで入力！\n長押しで編集や削除ができますよ！ 🐷';
+
+  @override
+  String get onboarding_chart_msg => 'パイチャートで支出の割合を\nひと目で確認しましょう！ 📊';
+
+  @override
+  String get onboarding_setting_msg => 'ここでデータを安全に保存し、\nいつでも復元できます！ 💾';
+
+  @override
+  String get review => 'このアプリが気に入ったら、ぜひ評価をお願いします！';
 }

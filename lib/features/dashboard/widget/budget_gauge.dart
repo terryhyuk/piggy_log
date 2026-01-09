@@ -1,16 +1,5 @@
 import 'package:flutter/material.dart';
 
-// -----------------------------------------------------------------------------
-//  * Refactoring Intent: 
-//    A reactive progress visualizer designed for financial compliance tracking.
-//    Features a 'Context-Aware Styling' engine that synchronizes color gradients 
-//    with the mascot's emotional states (Safe/Warning/Critical).
-//
-//  * TODO: 
-//    - Implement a 'Pulse' animation when usage exceeds 100% for better affordance.
-//    - Consider adding a 'Target Marker' overlay to indicate fixed savings goals.
-// -----------------------------------------------------------------------------
-
 class BudgetGauge extends StatelessWidget {
   final double currentSpend;
   final double targetBudget;

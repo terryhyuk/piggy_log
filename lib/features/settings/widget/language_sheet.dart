@@ -5,10 +5,6 @@ import '../../../l10n/app_localizations.dart';
 //  * Refactoring Intent: 
 //    Provides a modal interface for real-time locale switching. 
 //    Designed to support dynamic i18n updates with a clean selection UI.
-//
-//  * TODO: 
-//    - Move hardcoded language lists to a global configuration or assets file.
-//    - Implement a 'LanguageManager' service to centralize locale logic.
 // -----------------------------------------------------------------------------
 
 class LanguageSheet extends StatelessWidget {

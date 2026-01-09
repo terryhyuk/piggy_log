@@ -204,12 +204,6 @@ abstract class AppLocalizations {
   /// **'Total Expense'**
   String get toTalExpense;
 
-  /// No description provided for @monthlyBudget.
-  ///
-  /// In en, this message translates to:
-  /// **'Monthly Budget'**
-  String get monthlyBudget;
-
   /// No description provided for @setYourBudget.
   ///
   /// In en, this message translates to:
@@ -219,7 +213,7 @@ abstract class AppLocalizations {
   /// No description provided for @noTransactions.
   ///
   /// In en, this message translates to:
-  /// **'No transactions found.'**
+  /// **'No Transactions'**
   String get noTransactions;
 
   /// No description provided for @recentTranscations.
@@ -543,13 +537,13 @@ abstract class AppLocalizations {
   /// No description provided for @exportSuccess.
   ///
   /// In en, this message translates to:
-  /// **'exportSuccess'**
+  /// **'Export Success'**
   String get exportSuccess;
 
   /// No description provided for @restoreSuccess.
   ///
   /// In en, this message translates to:
-  /// **'restoreSuccess'**
+  /// **'Restore Success'**
   String get restoreSuccess;
 
   /// No description provided for @categoryNameAlreadyExists.
@@ -597,7 +591,7 @@ abstract class AppLocalizations {
   /// No description provided for @analysisStep1.
   ///
   /// In en, this message translates to:
-  /// **'Analysis Complete! 10+ records found! 🐷'**
+  /// **'Analysis Complete! 5+ records found! 🐷'**
   String get analysisStep1;
 
   /// No description provided for @analysisStep2.
@@ -617,6 +611,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Weekly Spending Trend'**
   String get weeklyTrend;
+
+  /// No description provided for @pleaseEnterDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a description'**
+  String get pleaseEnterDescription;
+
+  /// No description provided for @pleaseEnterAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an amount'**
+  String get pleaseEnterAmount;
+
+  /// No description provided for @invalidAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid number'**
+  String get invalidAmount;
+
+  /// No description provided for @categoryNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Category name is required'**
+  String get categoryNameRequired;
+
+  /// Message shown when the monthly budget is successfully saved
+  ///
+  /// In en, this message translates to:
+  /// **'Budget updated successfully'**
+  String get budgetUpdated;
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
+  /// No description provided for @monthlyBudgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{month} Budget'**
+  String monthlyBudgetTitle(Object month);
+
+  /// No description provided for @totalExpenseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{month} Total Expense'**
+  String totalExpenseTitle(Object month);
+
+  /// No description provided for @historyMonthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{month} {year}'**
+  String historyMonthTitle(Object month, Object year);
+
+  /// No description provided for @onboarding_cat_msg.
+  ///
+  /// In en, this message translates to:
+  /// **'Create categories and tap to log!\nLong press to edit or delete them! 🐷'**
+  String get onboarding_cat_msg;
+
+  /// No description provided for @onboarding_chart_msg.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your spending ratio\nat a glance with the pie chart! 📊'**
+  String get onboarding_chart_msg;
+
+  /// No description provided for @onboarding_setting_msg.
+  ///
+  /// In en, this message translates to:
+  /// **'Safely backup and restore\nyour data right here! 💾'**
+  String get onboarding_setting_msg;
+
+  /// No description provided for @review.
+  ///
+  /// In en, this message translates to:
+  /// **'If you like this app, please leave a rating!'**
+  String get review;
 }
 
 class _AppLocalizationsDelegate

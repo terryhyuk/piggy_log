@@ -2,35 +2,34 @@
 
 ![Piggy Log Banner](./docs/metadata/piggy_log_image.png)
 
-> 🚀 **Update (2025-12-30)**: **Official Launch!** Piggy Log is now available on the App Store and Google Play.
-> 🏗️ **Ongoing**: Currently refactoring to **Feature-based Architecture** to enhance scalability for version 1.3.0.
+> 🚀 **Update (2026-01-09)**: **Major Version 1.3.0 Released!**
+> 🏗️ **Key Milestone**: Successfully migrated from GetX to **Provider** and implemented a **Feature-based Architecture**. Added In-App Review system and a new Onboarding flow.
 
 <p align="center">
-  <strong>Flutter Developer Project – Cross-Platform Expense Tracker with Multi-Language Support</strong>
+  <strong>Flutter Developer Project – Professional Expense Tracker with Modular Architecture</strong>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" />
   <img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" />
-  <img src="https://img.shields.io/badge/GetX-892CA0?style=for-the-badge&logo=getx&logoColor=white" />
+  <img src="https://img.shields.io/badge/Provider-0175C2?style=for-the-badge&logo=flutter&logoColor=white" />
   <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" />
 </p>
 
-**Piggy Log** is a professional-grade personal finance application built with **Flutter**.  
-It is designed for users who value **simplicity, data privacy (offline-first storage), and seamless usability across multiple regions**.
+**Piggy Log** is a production-grade personal finance application. 
+It focuses on **performance, architectural integrity, and seamless global usability**.
 
-> ⚡ **For Recruiters**: Production-ready app featuring high-performance charts, 4-language localization, and a robust local database.  
-> 🛠 **For Engineers**: Currently undergoing a strategic transition from a lightweight MVVM to a **Modular Layered Architecture** to improve scalability, maintainability, and developer experience.
+> 🛠 **Engineering Note**: Version 1.3.0 marks a strategic architectural pivot. We moved away from GetX to a **Provider-based Modular Architecture** to achieve better testability, clearer separation of concerns, and alignment with Flutter's best practices.
 
 ---
 
-## 🌟 Key Features
+## 🌟 What's New in v1.3.0
 
-* **🌍 Global Localization** – English, Korean, Japanese, and Thai
-* **💰 Budget Management** – Set and track monthly financial goals with real-time category analysis
-* **📊 Data Visualization** – Interactive charts with `fl_chart`
-* **📅 Calendar Integration** – Browse transactions via intuitive calendar view
-* **🎨 Personalization** – Custom categories, icons, and dynamic themes
+* **🏗️ Architecture Overhaul** – Complete migration to **Provider** and **Feature-based folder structure**.
+* **👋 New Onboarding Experience** – Improved first-time user journey with an intuitive guide.
+* **⭐ In-App Review System** – Integrated native review prompts to enhance user engagement.
+* **🌍 4-Language Localization** – Full support for English, Korean, Japanese, and Thai.
+* **📊 Enhanced Data Analytics** – Refined Radar Charts and budget tracking logic for higher precision.
 
 ---
 
@@ -46,87 +45,70 @@ It is designed for users who value **simplicity, data privacy (offline-first sto
 
 ## 📲 Download Now
 
-<a href="https://apps.apple.com/app/piggy-log/id6757284836">
-  <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="50">
-</a>
-*Experience **Piggy Log** today! Check out our live production app on the App Store.*
+<p align="left">
+  <a href="https://apps.apple.com/app/piggy-log/id6757284836">
+    <img 
+      src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" 
+      height="40"
+    >
+  </a>
+  &nbsp;
+  <a href="https://play.google.com/store/apps/details?id=com.terry.piggyLog">
+    <img 
+      src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" 
+      height="55"
+    >
+  </a>
+</p>
+
+*Experience **Piggy Log** today! Check out our live production app on both the App Store and Google Play.*
+
 
 ---
 
-## 📂 Engineering Roadmap: Architectural Evolution
+## 📂 Engineering Roadmap: Feature-Based Architecture
 
-To ensure the project scales efficiently, the app is being refactored from a lightweight MVVM into a **Modular Layered Architecture**.
-
-### Phase 1 – Current Lightweight MVVM
+Since v1.3.0, the project follows a **Feature-Based Architecture**, grouping code by functional modules to maximize maintainability and scalability.
 
 ```text
 lib/
-├── controller/  # Reactive UI state management (GetX)
-├── l10n/        # Localization files (EN, KO, JA, TH)
-├── model/       # Data entities & mapping
-├── view/        # UI screens and shared components
-└── VM/          # ViewModels & SQLite Database Handlers
+├── core/                # Shared infrastructure
+│   ├── catalog/         # Category-related assets (colors, icons)
+│   ├── database/        # SQLite persistence layer
+│   ├── utils/           # Global helpers (App review, snackbars)
+│   └── widget/          # Common UI components (Dialogs, splash)
+├── data/models/         # Pure Data Entities (Budget, Record, etc.)
+├── features/            # Feature-centric modules
+│   ├── calendar/        # Calendar view & logic
+│   ├── dashboard/       # Main overview & analytics
+│   ├── onboarding/      # New user guide experience
+│   └── settings/        # App config & reviews
+├── providers/           # App-wide state management (Provider)
+├── l10n/                # Localization (EN, KO, JA, TH)
+├── app.dart             # Root widget & theme configuration
+└── main.dart            # Entry point
 ```
+🏗 Technical Design (Update In-Progress)
+Logical Data Flow: Refactoring system design to align with Provider-based state management.
 
-Planned Modular Layered Architecture 🚀
-Directory	Responsibility	Why This Change?
-lib/state/	GetX Controllers	Isolate reactive states from business logic
-lib/services/	Logic & DB Repositories	Decouple persistence layers for easier maintenance
-lib/models/	Data Entities (PODOs)	Ensure data integrity across the app
-lib/screens/	Page-level Widgets	Simplify navigation and top-level layouts
-lib/widgets/	Atomic UI Components	Maximize code reuse and reduce redundancy
+Database Schema (ERD): Updating to reflect 1.3.0 normalization. (Scheduled for completion: Monday).
 
-This refactor prioritizes Separation of Concerns, making the codebase cleaner for team collaboration and future cloud-sync integrations.
-
-🏗 Technical Design & Modeling
-1. Logical Data Flow (System Design)
-Mapped using Miro to visualize and ensure clear business logic before implementation.
-
-
-
-2. Database Schema (ERD)
-Designed with ERDCloud to enforce strict relational integrity in SQLite.
-
-
-
-Referential Integrity: 1:N Foreign Key constraints
-
-Precision: SQLite REAL for financial accuracy, TEXT for ISO dates
-
-⚠️ ERD will be updated after database normalization and metadata expansion
-
-3. System Flow Diagram (SFD)
-Visualizes reactive interactions between UI, GetX Controllers, and Database Handlers.
-
-
-
-⚠️ Architecture diagram will be updated post-refactor to reflect the new Service-Layered model
+---
 
 🛠 Tech Stack
 Framework: Flutter (iOS & Android)
 
-State Management: GetX (Reactive)
+State Management: Provider
 
-Database: SQLite via sqflite
+Database: SQLite (sqflite)
 
 Charts: fl_chart
 
-Calendar: table_calendar
+Special Features: in_app_review, table_calendar, intl
 
-Localization: intl
-
-Modeling Tools: Miro (Logic), ERDCloud (DB), Figma (UI), Canva (Assets)
-
-IDE: VS Code
-
-💡 Technical Challenges & Solutions
-Challenge: Maintaining consistent data types between SQLite (dynamic typing) and Dart (static typing)
-
-Solution: Refactored DatabaseHandler to implement a strict mapping layer, ensuring financial values (double) are handled without rounding errors
+Modeling Tools: Miro, ERDCloud, Figma
 
 📬 Contact
-Terry Yoon – Mobile Developer
-📧 yonghyuk.terry.yoon@gmail.com
-📍 Vancouver, BC, Canada
+Terry Yoon – Mobile Developer 📧 yonghyuk.terry.yoon@gmail.com 📍 Vancouver, BC, Canada
 
-💡 North American recruiters: This project demonstrates cross-platform Flutter development, multi-language support, clean and maintainable code, and database integration.
+💡 North American recruiters: This project demonstrates cross-platform development, strategic architectural migration, multi-language support, and professional-grade database integration.

@@ -15,7 +15,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   final PageController _controller = PageController();
   int _currentPage = 0;
 
-  // 🐷 Animation controller for the bouncing piggy
+  // Animation controller for the bouncing piggy
   late AnimationController _bounceController;
 
   @override

@@ -312,5 +312,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'Safely backup and restore\nyour data right here! 💾';
 
   @override
-  String get review => 'If you like this app, please leave a rating!';
+  String get ratingTitle => 'Knock knock...? is Piggy Log useful?';
+
+  @override
+  String get ratingSubTitle =>
+      'If you like it, could you give me 5 stars? (Fingers crossed!)';
+
+  @override
+  String get ratingConfirm => 'Sure! I\'d love to!';
+
+  @override
+  String get ratingCancel => 'Maybe later...';
 }

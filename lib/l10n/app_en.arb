@@ -103,5 +103,8 @@
   "onboarding_cat_msg": "Create categories and tap to log!\nLong press to edit or delete them! 🐷",
   "onboarding_chart_msg": "Check your spending ratio\nat a glance with the pie chart! 📊",
   "onboarding_setting_msg": "Safely backup and restore\nyour data right here! 💾",
-  "review": "If you like this app, please leave a rating!"
+  "ratingTitle": "Knock knock...? is Piggy Log useful?",
+  "ratingSubTitle": "If you like it, could you give me 5 stars? (Fingers crossed!)",
+  "ratingConfirm": "Sure! I'd love to!",
+  "ratingCancel": "Maybe later..."
 }

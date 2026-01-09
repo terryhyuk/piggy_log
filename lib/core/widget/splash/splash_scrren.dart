@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:lottie/lottie.dart';
-import 'package:piggy_log/screens/onbording/onboarding_screen.dart';
+import 'package:piggy_log/features/onbording/onboarding_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:piggy_log/core/widget/navigation/main_navigation.dart';
 
@@ -24,7 +24,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkFirstRun() async {
     final prefs = await SharedPreferences.getInstance();
-    // 'isFirstRun'이 null이면(처음이면) true를 기본값으로 사용
     bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
 
     if (isFirstRun) {

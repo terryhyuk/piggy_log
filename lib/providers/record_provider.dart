@@ -91,4 +91,6 @@ class RecordProvider with ChangeNotifier {
       );
     }
   }
+  
+  Future<int> getTotalCount() => _repository.getTotalRecordCount();
 }

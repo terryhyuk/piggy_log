@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:piggy_log/core/constants/category_icons.dart';
+import 'package:piggy_log/core/catalog/category/category_icons.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 
 class IconPickerSheet extends StatefulWidget {

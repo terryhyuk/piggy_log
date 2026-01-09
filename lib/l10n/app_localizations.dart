@@ -684,11 +684,29 @@ abstract class AppLocalizations {
   /// **'Safely backup and restore\nyour data right here! 💾'**
   String get onboarding_setting_msg;
 
-  /// No description provided for @review.
+  /// No description provided for @ratingTitle.
   ///
   /// In en, this message translates to:
-  /// **'If you like this app, please leave a rating!'**
-  String get review;
+  /// **'Knock knock...? is Piggy Log useful?'**
+  String get ratingTitle;
+
+  /// No description provided for @ratingSubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'If you like it, could you give me 5 stars? (Fingers crossed!)'**
+  String get ratingSubTitle;
+
+  /// No description provided for @ratingConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Sure! I\'d love to!'**
+  String get ratingConfirm;
+
+  /// No description provided for @ratingCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe later...'**
+  String get ratingCancel;
 }
 
 class _AppLocalizationsDelegate

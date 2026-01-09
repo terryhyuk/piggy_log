@@ -102,5 +102,8 @@
   "onboarding_cat_msg": "カテゴリを作ってタップで入力！\n長押しで編集や削除ができますよ！ 🐷",
   "onboarding_chart_msg": "パイチャートで支出の割合を\nひと目で確認しましょう！ 📊",
   "onboarding_setting_msg": "ここでデータを安全に保存し、\nいつでも復元できます！ 💾",
-  "review": "このアプリが気に入ったら、ぜひ評価をお願いします！"
+  "ratingTitle": "トントン...? ピギーログ, 使いやすいかな？",
+  "ratingSubTitle": "もしよかったら、星5つお願いします... (ドキドキ)",
+  "ratingConfirm": "もちろん！今すぐ！",
+  "ratingCancel": "また今度..."
 }

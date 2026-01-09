@@ -1,46 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:get_x/get.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 import 'package:piggy_log/features/dashboard/presentation/monthly_history.dart';
-
-// -----------------------------------------------------------------------------
-//  * Refactoring Intent: 
-//    Financial compliance monitor that provides real-time budget status.
-//    Implements a 'Alert-driven UI' pattern where visual elements react 
-//    dynamically to spending thresholds (Over-budget state).
-//
-//  * TODO: 
-//    - Add a progress bar (LinearProgressIndicator) to visualize budget consumption.
-//    - Move 'isOverBudget' logic to the controller for better state consistency.
-// -----------------------------------------------------------------------------
 
 class BudgetSummary extends StatelessWidget {
   final double budget;
   final double currentSpend; 
   final VoidCallback onBudgetTap;
   final String Function(double) formatCurrency;
+  final String title;
 
   const BudgetSummary({
     super.key,
     required this.budget,
     required this.currentSpend,
     required this.onBudgetTap,
-    required this.formatCurrency,
+    required this.formatCurrency, 
+    required this. title,
   });
 
   @override
   Widget build(BuildContext context) {
-    /// Evaluation Logic: Identifies critical budget violations.
     final bool isOverBudget = budget > 0 && currentSpend > budget;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // Navigation Header: Entry point to historical data review.
         GestureDetector(
-          onTap: () => Get.to(() => const MonthlyHistory()),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const MonthlyHistory()),
+            );
+          },
           child: Text(
-            AppLocalizations.of(context)!.monthlyBudget,
+            title,
             style: const TextStyle(
               fontSize: 16, 
               fontWeight: FontWeight.bold, 
@@ -76,7 +69,6 @@ class BudgetSummary extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16, 
                     fontWeight: FontWeight.bold,
-                    /// Reactive Styling: Visual shift to Red for immediate recognition.
                     color: isOverBudget ? Colors.red : null,
                   ),
                 ),

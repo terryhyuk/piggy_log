@@ -1,22 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:get_x/get.dart';
-import 'package:piggy_log/core/db/monthly_budget_handler.dart';
-import 'package:piggy_log/features/dashboard/controller/dashboard_controller.dart';
-import 'package:piggy_log/features/dashboard/widget/budgetpigwidget.dart';
-import 'package:piggy_log/features/settings/controller/setting_controller.dart';
+import 'package:intl/intl.dart';
+import 'package:piggy_log/core/utils/app_snackbar.dart';
+import 'package:piggy_log/providers/dashboard_provider.dart';
+import 'package:piggy_log/providers/settings_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:piggy_log/features/dashboard/widget/budget_piggy_widget.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 import 'package:piggy_log/features/dashboard/widget/budget_gauge.dart';
 import 'package:piggy_log/features/dashboard/widget/budget_summary.dart';
 import 'package:piggy_log/features/dashboard/widget/chart_widget.dart';
 import 'package:piggy_log/features/dashboard/widget/expense_summary.dart';
-import 'package:piggy_log/features/dashboard/widget/recent_transactions_list.dart';
-
-// -----------------------------------------------------------------------------
-//  * Refactoring Intent: 
-//    The central landing hub of Piggy Log. It orchestrates real-time state 
-//    updates between the DashboardController and UI components. 
-//    Optimized for high-scannability and reactive visual feedback.
-// -----------------------------------------------------------------------------
+import 'package:piggy_log/features/dashboard/widget/recent_records_list.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -26,162 +20,168 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  // Dependency Injection: Accessing specialized controllers for state management
-  final DashboardController dashbordcontroller = Get.find<DashboardController>();
-  final SettingController settingsController = Get.find<SettingController>();
-  final MonthlyBudgetHandler monthlyBudgetHandler = MonthlyBudgetHandler();
-
-  int? selectedPieIndex;
-
   @override
   void initState() {
     super.initState();
-    // Synchronizes the data layer with the persistence storage on startup.
-    dashbordcontroller.refreshDashboard();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DashboardProvider>().refreshDashboard();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    final dashProvider = context.watch<DashboardProvider>();
+    final setProvider = context.watch<SettingProvider>();
+
+    // --- [Dynamic Month Label Logic] ---
+    final currentDateTime = dashProvider.startDate.isNotEmpty
+        ? DateTime.parse(dashProvider.startDate)
+        : DateTime.now();
+
+    final now = DateTime.now();
+    final bool isPastMonth =
+        currentDateTime.year < now.year ||
+        (currentDateTime.year == now.year && currentDateTime.month < now.month);
+
+    final String localeCode =
+        setProvider.locale?.languageCode ??
+        Localizations.localeOf(context).languageCode;
+
+    final String monthLabel = DateFormat.MMMM(
+      localeCode,
+    ).format(currentDateTime);
+
+    double currentPercent = (dashProvider.monthlyBudget > 0)
+        ? (dashProvider.totalExpense / dashProvider.monthlyBudget)
+        : 0.0;
 
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Obx(() {
-          // Reactive Trigger: Ensures UI re-renders whenever observable values change.
-          settingsController.refreshTrigger.value;
-          dashbordcontroller.dataRefreshTrigger.value;
-
-          // Consumption Ratio: Calculates the current financial health percentage.
-          double currentPercent = (dashbordcontroller.monthlyBudget.value > 0)
-              ? (dashbordcontroller.totalExpense.value /
-                    dashbordcontroller.monthlyBudget.value)
-              : 0.0;
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // --- Section 1: Financial Status Card ---
-              Container(
-                padding: const EdgeInsets.all(22),
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(28),
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.shadowColor.withValues(alpha: 0.04),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ExpenseSummary(
-                          expense: dashbordcontroller.totalExpense.value,
-                          onTap: () => _showDateRangePicker(context),
-                          formatCurrency: _formatCurrency,
-                        ),
-                        BudgetSummary(
-                          budget: dashbordcontroller.monthlyBudget.value,
-                          currentSpend: dashbordcontroller.totalExpense.value,
-                          onBudgetTap: _showBudgetDialog,
-                          formatCurrency: _formatCurrency,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        SizedBox(
-                          width: 90,
-                          height: 90,
-                          child: BudgetPigWidget(percent: currentPercent),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: BudgetGauge(
-                              currentSpend: dashbordcontroller.totalExpense.value,
-                              targetBudget: dashbordcontroller.monthlyBudget.value,
-                            ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.shadowColor.withValues(alpha: 0.04),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      //"1월 총 지출" / "January Total Expense"
+                      ExpenseSummary(
+                        title: l10n.totalExpenseTitle(monthLabel),
+                        expense: dashProvider.totalExpense,
+                        onTap: () => _showDateRangePicker(context),
+                        formatCurrency: (val) =>
+                            setProvider.formatCurrency(val),
+                      ),
+                      // "1월 예산" / "January Budget"
+                      BudgetSummary(
+                        title: l10n.monthlyBudgetTitle(monthLabel),
+                        budget: dashProvider.monthlyBudget,
+                        currentSpend: dashProvider.totalExpense,
+                        onBudgetTap: () {
+                          if (!isPastMonth) {
+                            _showBudgetDialog(dashProvider, setProvider);
+                          }
+                        },
+                        formatCurrency: (val) =>
+                            setProvider.formatCurrency(val),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        width: 90,
+                        height: 90,
+                        child: BudgetPigWidget(percent: currentPercent),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: BudgetGauge(
+                            currentSpend: dashProvider.totalExpense,
+                            targetBudget: dashProvider.monthlyBudget,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              Padding(
-                padding: const EdgeInsets.only(left: 4, bottom: 12),
-                child: Text(
-                  AppLocalizations.of(context)!.spendingAnalysis,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                      ),
+                    ],
                   ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+            Padding(
+              padding: const EdgeInsets.only(left: 4, bottom: 12),
+              child: Text(
+                l10n.spendingAnalysis,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                 ),
               ),
-
-              // --- Section 2: Analytical Charts ---
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                  border: Border.all(
-                    color: theme.dividerColor.withValues(alpha: 0.05),
+            ),
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
                   ),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(20),
-                  child: ChartsWidget(),
+                ],
+                border: Border.all(
+                  color: theme.dividerColor.withValues(alpha: 0.05),
                 ),
               ),
-
-              const SizedBox(height: 32),
-
-              // --- Section 3: Ledger History (Recent Transactions) ---
-              RecentTransactionsList(
-                transactions: dashbordcontroller.recentTransactions,
-                formatDate: settingsController.formatDate,
-                formatCurrency: _formatCurrency,
+              child: const Padding(
+                padding: EdgeInsets.all(20),
+                child: ChartsWidget(),
               ),
-            ],
-          );
-        }),
+            ),
+            const SizedBox(height: 32),
+            RecentTransactionsList(
+              transactions: dashProvider.recentTransactions,
+              formatDate: (date) => setProvider.formatDate(date),
+              formatCurrency: (val) => setProvider.formatCurrency(val),
+            ),
+          ],
+        ),
       ),
     );
   }
-
   // --- Logic Helpers ---
 
-  /// Formats numeric values into localized currency strings via SettingController.
-  String _formatCurrency(dynamic amount) {
-    final value = (amount as num?)?.toDouble() ?? 0.0;
-    return settingsController.formatCurrency(value);
-  }
-
-  /// Triggers a modal to update the target monthly budget.
-  Future<void> _showBudgetDialog() async {
+  /// Triggers a modal to update the target monthly budget via Provider.
+  Future<void> _showBudgetDialog(
+    DashboardProvider dash,
+    SettingProvider settings,
+  ) async {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final currentBudget = dashbordcontroller.monthlyBudget.value;
+    final currentBudget = dash.monthlyBudget;
 
     final TextEditingController dialogController = TextEditingController(
       text: currentBudget == 0 ? "" : currentBudget.toString(),
@@ -194,8 +194,8 @@ class _DashboardState extends State<Dashboard> {
         content: TextField(
           controller: dialogController,
           autofocus: true,
+          // [Logic] Restrict to numeric input
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          textInputAction: TextInputAction.done,
           decoration: InputDecoration(
             hintText: l10n.enterMonthlyBudget,
             suffixIcon: Icon(Icons.edit, color: theme.colorScheme.primary),
@@ -210,10 +210,24 @@ class _DashboardState extends State<Dashboard> {
             ),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(
-              context,
-              double.tryParse(dialogController.text.trim()),
-            ),
+            onPressed: () {
+              final String input = dialogController.text.trim();
+
+              // [Logic] If empty, treat as 0.0 automatically
+              if (input.isEmpty) {
+                Navigator.pop(context, 0.0);
+                return;
+              }
+
+              final double? parsed = double.tryParse(input);
+              if (parsed == null || parsed < 0) {
+                // Only show error for invalid characters or negative values
+                AppSnackBar.show(context, l10n.invalidAmount, isError: true);
+                return;
+              }
+
+              Navigator.pop(context, parsed);
+            },
             child: Text(
               l10n.save,
               style: TextStyle(
@@ -227,16 +241,22 @@ class _DashboardState extends State<Dashboard> {
     );
 
     if (result != null) {
-      final now = DateTime.now();
-      final yearMonth = "${now.year}-${now.month.toString().padLeft(2, '0')}";
+      final currentDateTime = dash.startDate.isNotEmpty
+          ? DateTime.parse(dash.startDate)
+          : DateTime.now();
 
-      await monthlyBudgetHandler.saveMonthlyBudget(yearMonth, result);
-      await settingsController.refreshAllData();
-      dashbordcontroller.refreshDashboard();
+      final yearMonth = DateFormat('yyyy-MM').format(currentDateTime);
+      
+      await dash.dashboardRepository.saveMonthlyBudget(yearMonth, result);
+      await dash.refreshDashboard();
+
+      if (mounted) {
+        AppSnackBar.show(context, l10n.budgetUpdated);
+      }
     }
   }
 
-  /// Filters financial data by a custom date range selected by the user.
+  /// Filters financial data by a custom date range.
   Future<void> _showDateRangePicker(BuildContext context) async {
     final range = await showDateRangePicker(
       context: context,
@@ -245,14 +265,10 @@ class _DashboardState extends State<Dashboard> {
     );
 
     if (range != null) {
-      String start = range.start.toString().split(' ')[0];
-      String end = range.end.toString().split(' ')[0];
-
-      // Update observable dates to trigger dependent data re-fetches.
-      dashbordcontroller.startDate.value = start;
-      dashbordcontroller.endDate.value = end;
-
-      await dashbordcontroller.refreshDashboard();
+      final dashProvider = context.read<DashboardProvider>();
+      dashProvider.startDate = DateFormat('yyyy-MM-dd').format(range.start);
+      dashProvider.endDate = DateFormat('yyyy-MM-dd').format(range.end);
+      await dashProvider.refreshDashboard();
     }
   }
 }

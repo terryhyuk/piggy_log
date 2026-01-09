@@ -1,16 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:piggy_log/features/categort/controller/category_icons.dart';
+import 'package:piggy_log/core/constants/category_icons.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
-
-// -----------------------------------------------------------------------------
-//  * Refactoring Intent: 
-//    Provides an optimized grid interface for category icon selection. 
-//    Focuses on rendering performance and searchable state management.
-//
-//  * TODO: 
-//    - Implement 'Debouncing' for the search filter to minimize UI rebuilds.
-//    - Migrate icon metadata to a local JSON/Asset for better decoupling.
-// -----------------------------------------------------------------------------
 
 class IconPickerSheet extends StatefulWidget {
   const IconPickerSheet({super.key});
@@ -27,7 +17,6 @@ class _IconPickerSheetState extends State<IconPickerSheet> {
   @override
   void initState() {
     super.initState();
-    // Pre-loading icon collection for immediate display.
     allIcons = CategoryIcons.icons;
     filteredIcons = List.from(allIcons);
   }
@@ -47,14 +36,15 @@ class _IconPickerSheetState extends State<IconPickerSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Section
           Row(
             children: [
               Text(
                 AppLocalizations.of(context)!.searchIcons,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ) ?? const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                style:
+                    theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ) ??
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
               const Spacer(),
               IconButton(
@@ -65,22 +55,27 @@ class _IconPickerSheetState extends State<IconPickerSheet> {
           ),
           const SizedBox(height: 10),
 
-          // Icon Grid: Uses Builder for efficient memory management via lazy loading.
           Expanded(
             child: GridView.builder(
               itemCount: filteredIcons.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4, 
+                crossAxisCount: 4,
                 childAspectRatio: 1,
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
               ),
               itemBuilder: (context, index) {
                 final iconData = filteredIcons[index];
+                // Accessing IconData from the original map structure
+                final IconData icon = iconData['icon'];
 
                 return GestureDetector(
                   onTap: () {
-                    Navigator.pop(context, iconData);
+                    Navigator.pop(context, {
+                      'icon_codepoint': icon.codePoint,
+                      'icon_font_family': icon.fontFamily,
+                      'icon_font_package': icon.fontPackage,
+                    });
                   },
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -92,7 +87,7 @@ class _IconPickerSheetState extends State<IconPickerSheet> {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          iconData['icon'],
+                          icon,
                           size: 26,
                           color: theme.colorScheme.onSurface,
                         ),
@@ -109,7 +104,6 @@ class _IconPickerSheetState extends State<IconPickerSheet> {
     );
   }
 
-  /// Filters the icon list based on user input.
   void filterIcons(String query) {
     filteredIcons = allIcons
         .where(

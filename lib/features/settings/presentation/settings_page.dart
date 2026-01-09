@@ -1,41 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:get_x/get.dart';
-import 'package:intl/intl.dart';
-import 'package:piggy_log/core/db/settings_handler.dart';
-import 'package:piggy_log/features/settings/controller/setting_controller.dart';
+import 'package:piggy_log/providers/settings_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
-import 'package:piggy_log/features/settings/model/settings.dart';
 
-// -----------------------------------------------------------------------------
-//  * SettingsPage - User Preferences & Data Management
-//  * -----------------------------------------------------------------------------
-//  * [Description]
-//  * Central hub for managing application-wide preferences.
-//  * Features a high-accessibility UI with full-card touch targets 
-//  * for all selection menus.
-//  -----------------------------------------------------------------------------
-
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends State<SettingsPage> {
-  late Settings settings;
-  bool isLoaded = false;
-
-  @override
-  void initState() {
-    super.initState();
-    loadSettings();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (!isLoaded) return const Center(child: CircularProgressIndicator());
     final l10n = AppLocalizations.of(context)!;
+    
+    final provider = context.watch<SettingProvider>();
+    final settings = provider.settings;
+
+    // Loading state handling
+    if (settings == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -49,7 +30,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildCardWrapper(
             context,
             child: PopupMenuButton<String>(
-              onSelected: _changeLanguage,
+              onSelected: (code) => provider.setLanguage(code),
               position: PopupMenuPosition.under,
               offset: const Offset(200, 0), 
               itemBuilder: (_) => [
@@ -71,7 +52,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildCardWrapper(
             context,
             child: PopupMenuButton<String>(
-              onSelected: _changeMode,
+              onSelected: (mode) => provider.setThemeMode(mode),
               position: PopupMenuPosition.under,
               offset: const Offset(200, 0),
               itemBuilder: (_) => [
@@ -81,7 +62,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
               child: ListTile(
                 title: Text(l10n.theme),
-                subtitle: Text(settings.theme_mode),
+                subtitle: Text(settings.themeMode),
                 trailing: const Icon(Icons.chevron_right),
               ),
             ),
@@ -91,7 +72,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildCardWrapper(
             context,
             child: PopupMenuButton<String>(
-              onSelected: _changeCurrency,
+              onSelected: (code) => provider.setCurrency(code),
               position: PopupMenuPosition.under,
               offset: const Offset(200, 0),
               itemBuilder: (_) => [
@@ -104,7 +85,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
               child: ListTile(
                 title: Text(l10n.currency),
-                subtitle: Text(settings.currency_code),
+                subtitle: Text(settings.currencyCode),
                 trailing: const Icon(Icons.chevron_right),
               ),
             ),
@@ -114,7 +95,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildCardWrapper(
             context,
             child: PopupMenuButton<String>(
-              onSelected: _changeDateFormat,
+              onSelected: (format) => provider.setDateFormat(format),
               position: PopupMenuPosition.under,
               offset: const Offset(200, 0),
               itemBuilder: (_) => [
@@ -125,21 +106,21 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
               child: ListTile(
                 title: Text(l10n.dateformat),
-                subtitle: Text(settings.date_format),
+                subtitle: Text(settings.dateFormat),
                 trailing: const Icon(Icons.chevron_right),
               ),
             ),
           ),
 
-          // 5. Data Persistence & Backup Management
+          // 5. Data Management (Backup/Restore)
           _buildCardWrapper(
             context,
             child: PopupMenuButton<String>(
               onSelected: (value) {
                 if (value == 'export') {
-                  Get.find<SettingController>().exportBackup();
+                  provider.exportBackup(context);
                 } else if (value == 'import') {
-                  Get.find<SettingController>().importBackupdialog();
+                  provider.importBackup(context);
                 }
               },
               position: PopupMenuPosition.under,
@@ -178,7 +159,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  /// Custom wrapper that standardizes card aesthetics and maximizes the touch area.
   Widget _buildCardWrapper(BuildContext context, {required Widget child}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -188,7 +168,7 @@ class _SettingsPageState extends State<SettingsPage> {
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -200,71 +180,5 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
     );
-  }
-
-  /// Fetches and hydrates preference state from the local database.
-  Future<void> loadSettings() async {
-    final handler = SettingsHandler();
-    final result = await handler.getSettings();
-
-    if (result == null) {
-      final locale = WidgetsBinding.instance.platformDispatcher.locale;
-      final format = NumberFormat.simpleCurrency(locale: locale.toString());
-
-      settings = Settings(
-        id: 1, language: 'system', currency_code: 'system',
-        currency_symbol: format.currencySymbol,
-        date_format: 'yyyy-MM-dd', theme_mode: 'system',
-      );
-      await handler.insertDefaultSettings();
-    } else {
-      settings = result;
-    }
-    isLoaded = true;
-    if (mounted) setState(() {});
-  }
-
-  Future<void> _changeLanguage(String code) async {
-    settings.language = code;
-    await SettingsHandler().updateSettings(settings);
-    Get.find<SettingController>().setLanguage(code);
-    setState(() {});
-  }
-
-  Future<void> _changeMode(String themeMode) async {
-    settings.theme_mode = themeMode;
-    await SettingsHandler().updateSettings(settings);
-    Get.find<SettingController>().setThemeMode(themeMode);
-    setState(() {});
-  }
-
-  Future<void> _changeCurrency(String currencyCode) async {
-    final currencies = {
-      'USD': {'symbol': '\$', 'code': 'USD'},
-      'CAD': {'symbol': '\$', 'code': 'CAD'},
-      'KRW': {'symbol': '₩', 'code': 'KRW'},
-      'JPY': {'symbol': '¥', 'code': 'JPY'},
-      'THB': {'symbol': '฿', 'code': 'THB'},
-    };
-    if (currencyCode == 'system') {
-      final locale = WidgetsBinding.instance.platformDispatcher.locale;
-      final format = NumberFormat.simpleCurrency(locale: locale.toString());
-      settings.currency_code = 'system';
-      settings.currency_symbol = format.currencySymbol;
-    } else {
-      final data = currencies[currencyCode]!;
-      settings.currency_symbol = data['symbol']!;
-      settings.currency_code = data['code']!;
-    }
-    await SettingsHandler().updateSettings(settings);
-    Get.find<SettingController>().setCurrency(currencyCode);
-    setState(() {});
-  }
-
-  Future<void> _changeDateFormat(String format) async {
-    settings.date_format = format;
-    await SettingsHandler().updateSettings(settings);
-    Get.find<SettingController>().setDateFormat(format);
-    setState(() {});
   }
 }

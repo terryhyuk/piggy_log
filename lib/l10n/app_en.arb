@@ -1,4 +1,5 @@
 {
+  "@@locale": "en",
   "cancel": "Cancel",
   "save": "Save",
   "edit": "Edit",
@@ -16,7 +17,6 @@
   "changesSaved": "Changes saved",
   "noTransactionsFound": "No transactions found",
   "toTalExpense": "Total Expense",
-  "monthlyBudget": "Monthly Budget",
   "setYourBudget": "Set Your Budget",
   "noTransactions": "No Transactions",
   "recentTranscations": "Recent Transactions",
@@ -55,7 +55,7 @@
   "selectColor": "Select Color",
   "transaction": "Transaction",
   "totalExpense": "Total Expense",
-  "recentTransactions": "Recent Transactions", 
+  "recentTransactions": "Recent Transactions",
   "enterMonthlyBudget": "Enter Monthly Budget",
   "dateformat": "Date Format",
   "errorTransactionDetail": "Failed to open transaction detail.",
@@ -71,20 +71,37 @@
   "importDesc": "Restore data from a backup file.",
   "warning": "Warning",
   "restoreWarning": "Importing will delete all current data and replace it with the file's data. Do you want to proceed?",
-  "cancel": "Cancel",
   "confirm": "Confirm",
-  "exportSuccess": "exportSuccess",
-  "restoreSuccess": "restoreSuccess",
+  "exportSuccess": "Export Success",
+  "restoreSuccess": "Restore Success",
   "categoryNameAlreadyExists": "Category Name Already Exists",
   "checkTitleAndAmount": "Please check the description and amount.",
   "description": "description",
-  "noTransactions": "No transactions found.",
   "viewAnalysis": "View Analysis",
   "spendingAnalysis": "Spending Analysis",
   "categoryBalance": "Category Balance",
   "weeklySpendingTrend": "Weekly Spending Trend",
-  "analysisStep1": "Analysis Complete! 10+ records found! 🐷",
+  "analysisStep1": "Analysis Complete! 5+ records found! 🐷",
   "analysisStep2": "Check the Radar Chart above for your balance,",
   "analysisStep3": "and the Bar Chart below for your weekly peak spending!",
-  "weeklyTrend": "Weekly Spending Trend"
+  "weeklyTrend": "Weekly Spending Trend",
+  "pleaseEnterDescription": "Please enter a description",
+  "pleaseEnterAmount": "Please enter an amount",
+  "invalidAmount": "Please enter a valid number",
+  "categoryNameRequired": "Category name is required",
+  "budgetUpdated": "Budget updated successfully",
+  "@budgetUpdated": {
+    "description": "Message shown when the monthly budget is successfully saved"
+  },
+
+  "done": "Done",
+
+  "monthlyBudgetTitle": "{month} Budget",
+  "totalExpenseTitle": "{month} Total Expense",
+  "historyMonthTitle": "{month} {year}",
+
+  "onboarding_cat_msg": "Create categories and tap to log!\nLong press to edit or delete them! 🐷",
+  "onboarding_chart_msg": "Check your spending ratio\nat a glance with the pie chart! 📊",
+  "onboarding_setting_msg": "Safely backup and restore\nyour data right here! 💾",
+  "review": "If you like this app, please leave a rating!"
 }

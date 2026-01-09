@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:get_x/get.dart';
-import 'package:piggy_log/features/categort/controller/category.dart';
+import 'package:piggy_log/data/models/category_model.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 
 class BuildHeader extends StatelessWidget {
-  final Category category;
+  final CategoryModel category; 
   final VoidCallback onAddTap;
 
   const BuildHeader({
@@ -16,6 +15,7 @@ class BuildHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return SafeArea(
       child: Padding(
@@ -29,12 +29,12 @@ class BuildHeader extends StatelessWidget {
                 child: IconButton(
                   alignment: Alignment.centerLeft,
                   icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-                  onPressed: () => Get.back(),
+                  onPressed: () => Navigator.of(context).pop(),
                 ),
               ),
               Expanded(
                 child: Text(
-                  category.c_name,
+                  category.name,
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -51,7 +51,7 @@ class BuildHeader extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     padding: const EdgeInsets.only(left: 8),
                     child: Text(
-                      '+ ${AppLocalizations.of(context)!.add}',
+                      '+ ${l10n.add}',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

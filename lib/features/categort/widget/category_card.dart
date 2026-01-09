@@ -1,22 +1,9 @@
-
-
-// -----------------------------------------------------------------------------
-//  * Refactoring Intent: 
-//    An interactive category grid item featuring micro-interactions and 
-//    adaptive UI depth. Utilizes conditional styling for theme-specific 
-//    shadow rendering.
-//
-//  * TODO: 
-//    - Abstract the 'Edit Overlay' into a reusable badge component.
-//    - Optimize shadow performance by using 'RepaintBoundary' if grid grows.
-// -----------------------------------------------------------------------------
-
 import 'package:flutter/material.dart';
-import 'package:piggy_log/features/categort/controller/category.dart';
+import 'package:piggy_log/data/models/category_model.dart';
 import 'package:piggy_log/features/categort/widget/animated_shake.dart';
 
 class CategoryCard extends StatelessWidget {
-  final Category category;
+  final CategoryModel category; 
   final bool isEditMode;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
@@ -37,13 +24,12 @@ class CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color = Color(int.parse(category.color, radix: 16));
-
+    
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
       child: Stack(
         children: [
-          // Main Card Body: Implements custom shadow depth for elevated UX.
           Positioned.fill(
             child: AnimatedShake(
               isActive: isEditMode,
@@ -53,7 +39,6 @@ class CategoryCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: theme.brightness == Brightness.dark
                       ? [
-                          // [Dark Mode] Subtle elevation using low-alpha black shadows.
                           BoxShadow(
                             color: Colors.black.withAlpha((0.1 * 255).round()),
                             offset: const Offset(0, 2),
@@ -61,7 +46,6 @@ class CategoryCard extends StatelessWidget {
                           ),
                         ]
                       : [
-                          // [Light Mode] Multi-layered shadows to mimic a 'floating' aesthetic.
                           BoxShadow(
                             color: Colors.black.withAlpha((0.15 * 255).round()),
                             offset: const Offset(0, 5),
@@ -90,7 +74,7 @@ class CategoryCard extends StatelessWidget {
             ),
           ),
 
-          // Edit/Delete Action Overlays (Visible in Edit Mode).
+          // Action overlays
           if (isEditMode)
             Positioned(
               right: 4,
@@ -99,11 +83,11 @@ class CategoryCard extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.edit),
-                    onPressed: onEditPress?.call,
+                    onPressed: onEditPress,
                   ),
                   IconButton(
                     icon: const Icon(Icons.close, size: 20),
-                    onPressed: onDeletePress?.call,
+                    onPressed: onDeletePress,
                   ),
                 ],
               ),

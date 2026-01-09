@@ -60,13 +60,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toTalExpense => 'Total Expense';
 
   @override
-  String get monthlyBudget => 'Monthly Budget';
-
-  @override
   String get setYourBudget => 'Set Your Budget';
 
   @override
-  String get noTransactions => 'No transactions found.';
+  String get noTransactions => 'No Transactions';
 
   @override
   String get recentTranscations => 'Recent Transactions';
@@ -230,10 +227,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirm => 'Confirm';
 
   @override
-  String get exportSuccess => 'exportSuccess';
+  String get exportSuccess => 'Export Success';
 
   @override
-  String get restoreSuccess => 'restoreSuccess';
+  String get restoreSuccess => 'Restore Success';
 
   @override
   String get categoryNameAlreadyExists => 'Category Name Already Exists';
@@ -257,7 +254,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weeklySpendingTrend => 'Weekly Spending Trend';
 
   @override
-  String get analysisStep1 => 'Analysis Complete! 10+ records found! 🐷';
+  String get analysisStep1 => 'Analysis Complete! 5+ records found! 🐷';
 
   @override
   String get analysisStep2 => 'Check the Radar Chart above for your balance,';
@@ -268,4 +265,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get weeklyTrend => 'Weekly Spending Trend';
+
+  @override
+  String get pleaseEnterDescription => 'Please enter a description';
+
+  @override
+  String get pleaseEnterAmount => 'Please enter an amount';
+
+  @override
+  String get invalidAmount => 'Please enter a valid number';
+
+  @override
+  String get categoryNameRequired => 'Category name is required';
+
+  @override
+  String get budgetUpdated => 'Budget updated successfully';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String monthlyBudgetTitle(Object month) {
+    return '$month Budget';
+  }
+
+  @override
+  String totalExpenseTitle(Object month) {
+    return '$month Total Expense';
+  }
+
+  @override
+  String historyMonthTitle(Object month, Object year) {
+    return '$month $year';
+  }
+
+  @override
+  String get onboarding_cat_msg =>
+      'Create categories and tap to log!\nLong press to edit or delete them! 🐷';
+
+  @override
+  String get onboarding_chart_msg =>
+      'Check your spending ratio\nat a glance with the pie chart! 📊';
+
+  @override
+  String get onboarding_setting_msg =>
+      'Safely backup and restore\nyour data right here! 💾';
+
+  @override
+  String get review => 'If you like this app, please leave a rating!';
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:piggy_log/core/utils/app_review_helper.dart';
 import 'package:piggy_log/core/utils/app_snackbar.dart';
 import 'package:piggy_log/providers/dashboard_provider.dart';
+import 'package:piggy_log/providers/record_provider.dart';
 import 'package:piggy_log/providers/settings_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:piggy_log/features/dashboard/widget/budget_piggy_widget.dart';
@@ -30,6 +32,17 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    final recordProvider = context.read<RecordProvider>();
+    final count = await recordProvider.getTotalCount();
+    
+    if (context.mounted) {
+      await AppReviewHelper.checkAndShowRating(context, count);
+    }
+  });
+
+  
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
 

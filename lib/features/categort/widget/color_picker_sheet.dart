@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
-import '../../../core/constants/category_colors.dart';
+import 'package:piggy_log/core/catalog/category/category_colors.dart';
 
 // -----------------------------------------------------------------------------
 //  * Refactoring Intent: 

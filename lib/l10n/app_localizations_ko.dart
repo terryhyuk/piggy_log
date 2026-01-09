@@ -308,5 +308,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get onboarding_setting_msg => '여기서 데이터를 안전하게 저장하고\n언제든 불러올 수 있답니다! 💾';
 
   @override
-  String get review => '이 앱이 마음에 들면 별점을 부탁드릴게요!';
+  String get ratingTitle => '똑똑...? 혹시 피기로그 쓸만해? ';
+
+  @override
+  String get ratingSubTitle => '괜찮다면 별점 5개 부탁해... (두근두근)';
+
+  @override
+  String get ratingConfirm => '응! 당장 줄게!';
+
+  @override
+  String get ratingCancel => '나중에 할게...';
 }

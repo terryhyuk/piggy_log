@@ -307,5 +307,14 @@ class AppLocalizationsJa extends AppLocalizations {
   String get onboarding_setting_msg => 'ここでデータを安全に保存し、\nいつでも復元できます！ 💾';
 
   @override
-  String get review => 'このアプリが気に入ったら、ぜひ評価をお願いします！';
+  String get ratingTitle => 'トントン...? ピギーログ, 使いやすいかな？';
+
+  @override
+  String get ratingSubTitle => 'もしよかったら、星5つお願いします... (ドキドキ)';
+
+  @override
+  String get ratingConfirm => 'もちろん！今すぐ！';
+
+  @override
+  String get ratingCancel => 'また今度...';
 }

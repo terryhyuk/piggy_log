@@ -108,4 +108,10 @@ Future<bool> checkDuplicateRecord(String name, double amount, String yearMonth) 
   
   return maps.isNotEmpty;
 }
+
+Future<int> getTotalRecordCount() async {
+  final db = await _db;
+  final result = await db.rawQuery('SELECT COUNT(*) as count FROM records');
+  return (result.first['count'] as int?) ?? 0;
+}
 }

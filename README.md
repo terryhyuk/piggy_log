@@ -45,10 +45,17 @@ It focuses on **performance, architectural integrity, and seamless global usabil
 
 ## 📲 Download Now
 
-<a href="https://apps.apple.com/app/piggy-log/id6757284836">
-  <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="50">
-</a>
+<p align="left">
+  <a href="https://apps.apple.com/app/piggy-log/id6757284836">
+    <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="50">
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://play.google.com/store/apps/details?id=com.terry.piggyLog">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" height="50">
+  </a>
+</p>
 
+*Experience **Piggy Log** today! Check out our live production app on both the App Store and Google Play.*
 ---
 
 ## 📂 Engineering Roadmap: Feature-Based Architecture

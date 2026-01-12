@@ -111,17 +111,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectDate => 'Select Date';
 
   @override
-  String get deleteTransaction => 'Delete Transaction';
+  String get deleteTransaction => 'Delete records';
 
   @override
   String get deleteTransactionConfirm =>
-      'Are you sure you want to delete this transaction?';
+      'Are you sure you want to delete this records?';
 
   @override
-  String get addTransaction => 'Add Transaction';
+  String get addTransaction => 'Add records';
 
   @override
-  String get editTransaction => 'Edit Transaction';
+  String get editTransaction => 'Edit records';
 
   @override
   String get settings => 'Settings';
@@ -145,19 +145,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseEnterTitle => 'Please enter title';
 
   @override
-  String get recurringTransaction => 'Recurring Transaction';
+  String get recurringTransaction => 'Recurring records';
 
   @override
   String get searchIcons => 'Search Icons';
 
   @override
-  String get confirmDeleteTransaction => 'Confirm Delete Transaction';
+  String get confirmDeleteTransaction => 'Confirm Delete records';
 
   @override
-  String get transactionUpdated => 'Transaction Updated';
+  String get transactionUpdated => 'records Updated';
 
   @override
-  String get transactionCreated => 'Transaction Created';
+  String get transactionCreated => 'records Created';
 
   @override
   String get selectCategory => 'Select Category';
@@ -169,7 +169,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectColor => 'Select Color';
 
   @override
-  String get transaction => 'Transaction';
+  String get transaction => 'records';
 
   @override
   String get totalExpense => 'Total Expense';
@@ -184,7 +184,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dateformat => 'Date Format';
 
   @override
-  String get errorTransactionDetail => 'Failed to open transaction detail.';
+  String get errorTransactionDetail => 'Failed to open records detail.';
 
   @override
   String get pleaseEnterCategoryName => 'Please enter a category name';

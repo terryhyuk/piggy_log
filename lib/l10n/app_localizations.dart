@@ -309,25 +309,25 @@ abstract class AppLocalizations {
   /// No description provided for @deleteTransaction.
   ///
   /// In en, this message translates to:
-  /// **'Delete Transaction'**
+  /// **'Delete records'**
   String get deleteTransaction;
 
   /// No description provided for @deleteTransactionConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to delete this transaction?'**
+  /// **'Are you sure you want to delete this records?'**
   String get deleteTransactionConfirm;
 
   /// No description provided for @addTransaction.
   ///
   /// In en, this message translates to:
-  /// **'Add Transaction'**
+  /// **'Add records'**
   String get addTransaction;
 
   /// No description provided for @editTransaction.
   ///
   /// In en, this message translates to:
-  /// **'Edit Transaction'**
+  /// **'Edit records'**
   String get editTransaction;
 
   /// No description provided for @settings.
@@ -375,7 +375,7 @@ abstract class AppLocalizations {
   /// No description provided for @recurringTransaction.
   ///
   /// In en, this message translates to:
-  /// **'Recurring Transaction'**
+  /// **'Recurring records'**
   String get recurringTransaction;
 
   /// No description provided for @searchIcons.
@@ -387,19 +387,19 @@ abstract class AppLocalizations {
   /// No description provided for @confirmDeleteTransaction.
   ///
   /// In en, this message translates to:
-  /// **'Confirm Delete Transaction'**
+  /// **'Confirm Delete records'**
   String get confirmDeleteTransaction;
 
   /// No description provided for @transactionUpdated.
   ///
   /// In en, this message translates to:
-  /// **'Transaction Updated'**
+  /// **'records Updated'**
   String get transactionUpdated;
 
   /// No description provided for @transactionCreated.
   ///
   /// In en, this message translates to:
-  /// **'Transaction Created'**
+  /// **'records Created'**
   String get transactionCreated;
 
   /// No description provided for @selectCategory.
@@ -423,7 +423,7 @@ abstract class AppLocalizations {
   /// No description provided for @transaction.
   ///
   /// In en, this message translates to:
-  /// **'Transaction'**
+  /// **'records'**
   String get transaction;
 
   /// No description provided for @totalExpense.
@@ -453,7 +453,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorTransactionDetail.
   ///
   /// In en, this message translates to:
-  /// **'Failed to open transaction detail.'**
+  /// **'Failed to open records detail.'**
   String get errorTransactionDetail;
 
   /// No description provided for @pleaseEnterCategoryName.

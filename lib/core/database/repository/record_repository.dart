@@ -20,7 +20,7 @@ class RecordRepository {
     return maps.map((e) => RecordModel.fromMap(e)).toList();
   }
 
-  /// Inserts a new transaction record
+  /// Inserts a new records record
   Future<int> insertRecord(RecordModel record) async {
     final db = await _db;
     return await db.insert(
@@ -38,7 +38,7 @@ class RecordRepository {
     );
   }
 
-  /// Updates an existing transaction record
+  /// Updates an existing records record
   Future<int> updateRecord(RecordModel record) async {
     final db = await _db;
     return await db.update(
@@ -56,7 +56,7 @@ class RecordRepository {
     );
   }
 
-  /// Deletes a specific transaction record
+  /// Deletes a specific records record
   Future<int> deleteRecord(int id) async {
     final db = await _db;
     return await db.delete(

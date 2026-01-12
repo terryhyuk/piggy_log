@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piggy_log/core/widget/card/record_card.dart';
 import 'package:piggy_log/providers/settings_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
@@ -29,7 +30,6 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     
     final calProvider = context.watch<CalendarProvider>();
@@ -83,16 +83,22 @@ class _CalendarPageState extends State<CalendarPage> {
             ),
             const SizedBox(height: 8),
 
-            // Transaction List Section
+            // records List Section
             Expanded(
               child: calProvider.selectedDateTransactions.isEmpty
                   ? Center(child: Text(l10n.noTransactions))
-                  : ListView.builder(
+                  : 
+                  ListView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       itemCount: calProvider.selectedDateTransactions.length,
                       itemBuilder: (context, index) {
                         final tx = calProvider.selectedDateTransactions[index];
-                        return _buildTransactionCard(tx, theme, settings);
+                        return RecordCard(
+                          trx: tx, 
+                          formatDate: (data) => settings.formatDate(data), 
+                          formatCurrency: (val) => settings.formatCurrency(val),
+                          onTap:  ()=> _navigateToDetail(tx),
+                          );
                       },
                     ),
             ),
@@ -105,63 +111,6 @@ class _CalendarPageState extends State<CalendarPage> {
   // Helper for date keys inside the view layer
   String _formatDateKey(DateTime date) {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
-  }
-
-  Widget _buildTransactionCard(
-    Map<String, dynamic> tx,
-    ThemeData theme,
-    SettingProvider settings,
-  ) {
-    final amount = (tx['amount'] as num?)?.toDouble() ?? 0.0;
-    final isExpense = tx['type'] == 'expense';
-    final String memo = tx['memo']?.toString() ?? '';
-
-    return Card(
-      elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: theme.dividerColor.withAlpha(25)),
-      ),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: theme.colorScheme.primaryContainer.withAlpha(76),
-          child: Icon(
-            IconData(
-              tx['icon_codepoint'] ?? 58714,
-              fontFamily: tx['icon_font_family'] ?? 'MaterialIcons',
-              fontPackage: tx['icon_font_package'],
-            ),
-            size: 20,
-            color: theme.colorScheme.primary,
-          ),
-        ),
-        title: Text(
-          tx['name'] ?? 'No Name',
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        subtitle: memo.isNotEmpty
-            ? Text(
-                memo,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: theme.colorScheme.onSurfaceVariant.withAlpha(178),
-                  fontSize: 12,
-                ),
-              )
-            : null,
-        trailing: Text(
-          settings.formatCurrency(amount),
-          style: TextStyle(
-            color: isExpense ? Colors.redAccent : Colors.green,
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-          ),
-        ),
-        onTap: () => _navigateToDetail(tx),
-      ),
-    );
   }
 
   Widget _buildDayWidget(

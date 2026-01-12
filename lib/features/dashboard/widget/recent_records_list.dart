@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piggy_log/core/widget/card/record_card.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
 
 class RecentTransactionsList extends StatelessWidget {
@@ -15,7 +16,6 @@ class RecentTransactionsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,66 +27,14 @@ class RecentTransactionsList extends StatelessWidget {
         const SizedBox(height: 8),
 
         ...transactions.map((trx) {
-          final String? hex = trx['color'];
-  Color color;
-  
-  if (hex != null && hex.isNotEmpty) {
-    try {
-      color = Color(int.parse(hex, radix: 16));
-    } catch (e) {
-      // Fallback color in case of parsing error
-      color = theme.colorScheme.primary;
-    }
-  } else {
-    color = theme.colorScheme.primary;
-  }
+          return  RecordCard(
+            trx: trx, 
+            formatDate: formatDate, 
+            formatCurrency: 
+            formatCurrency,
+            );
+          
 
-  final Color bgColor = color.withValues(alpha: 0.1);
-
-  // [Icon Handling] Reconstructing IconData from DB metadata
-  final int code = trx['icon_codepoint'] ?? 0;
-  final IconData icon = (code != 0)
-      ? IconData(
-          code,
-          fontFamily: trx['icon_font_family'],
-          fontPackage: trx['icon_font_package'],
-        )
-      : Icons.category;
-
-          return Card(
-            elevation: 0,
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1)),
-            ),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: bgColor,
-                child: Icon(icon, size: 20, color: color),
-              ),
-              title: Text(
-                trx['name'] ?? 'No Name',
-                style: const TextStyle(fontWeight: FontWeight.w500),
-              ),
-              subtitle: Text(
-                formatDate(DateTime.parse(trx['date'])),
-                style: TextStyle(
-                  color: theme.colorScheme.onSurfaceVariant, 
-                  fontSize: 12,
-                ),
-              ),
-              trailing: Text(
-                formatCurrency((trx['amount'] as num).toDouble()),
-                style: TextStyle(
-                  color: trx['type'] == 'expense' 
-                      ? Colors.redAccent 
-                      : Colors.green,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          );
         }),
       ],
     );

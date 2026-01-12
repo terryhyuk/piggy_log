@@ -154,6 +154,31 @@ class SettingsPage extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 40),
+          Center(
+            child: Column(
+              children: [
+                Text(
+                  "Version ${provider.appVersion.split('+')[0]}",
+                  style: TextStyle(
+                    color: Theme.of(context).disabledColor.withAlpha(130),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "© 2026 All Rights Reserved", 
+                  style: TextStyle(
+                    color: Theme.of(context).disabledColor.withAlpha(110),
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 40),
         ],
       ),
     );
@@ -163,16 +188,23 @@ class SettingsPage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Container(
-        decoration: BoxDecoration(
+decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              // 다크모드일 때는 그림자를 거의 안 보이게 처리 (사장님 센스!)
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Colors.black.withAlpha(13)
+                  : Colors.transparent, 
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
+          // 다크모드에서 카드가 너무 묻히면 얇은 테두리를 추가하는 것도 방법이야!
+          border: Theme.of(context).brightness == Brightness.dark
+              ? Border.all(color: Colors.white.withAlpha(25), width: 0.5)
+              : null,
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),

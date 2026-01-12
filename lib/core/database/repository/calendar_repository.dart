@@ -23,7 +23,7 @@ class CalendarRepository {
     };
   }
 
-  /// Retrieves transaction records for a specific date.
+  /// Retrieves records records for a specific date.
   Future<List<Map<String, dynamic>>> getTransactionsByDate(String date) async {
     final db = await _db;
     return await db.query(

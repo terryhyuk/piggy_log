@@ -24,7 +24,7 @@ class CalendarProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Selects a date and fetches all related transaction details
+  /// Selects a date and fetches all related records details
   Future<void> selectDate(DateTime date) async {
     selectedDay = date;
     focusedDay = date;
@@ -34,7 +34,7 @@ class CalendarProvider with ChangeNotifier {
     final transactions = await repository.getTransactionsByDate(key);
     final categories = await repository.getAllCategories();
 
-    // Mapping transaction data with category details
+    // Mapping records data with category details
     selectedDateTransactions = transactions.map((tx) {
       final category = categories.firstWhere(
         (c) => c['id'] == tx['category_id'],
@@ -46,7 +46,8 @@ class CalendarProvider with ChangeNotifier {
         'category_name': category['name'] ?? 'Unknown',
         'icon_codepoint': category['icon_codepoint'],
         'icon_font_family': category['icon_font_family'],
-        'category_color': category['color'],
+        'icon_font_package': category['icon_font_package'],
+        'color': category['color'],
       };
     }).toList();
 

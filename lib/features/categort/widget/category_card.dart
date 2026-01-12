@@ -3,7 +3,7 @@ import 'package:piggy_log/data/models/category_model.dart';
 import 'package:piggy_log/features/categort/widget/animated_shake.dart';
 
 class CategoryCard extends StatelessWidget {
-  final CategoryModel category; 
+  final CategoryModel category;
   final bool isEditMode;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
@@ -24,7 +24,7 @@ class CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color = Color(int.parse(category.color, radix: 16));
-    
+
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
@@ -40,24 +40,30 @@ class CategoryCard extends StatelessWidget {
                   boxShadow: theme.brightness == Brightness.dark
                       ? [
                           BoxShadow(
-                            color: Colors.black.withAlpha((0.1 * 255).round()),
+                            color: Colors.black.withAlpha(50),
                             offset: const Offset(0, 2),
                             blurRadius: 4,
                           ),
                         ]
                       : [
                           BoxShadow(
-                            color: Colors.black.withAlpha((0.15 * 255).round()),
+                            color: Colors.black.withAlpha(38),
                             offset: const Offset(0, 5),
                             blurRadius: 12,
                             spreadRadius: 1,
                           ),
                           BoxShadow(
-                            color: Colors.white.withAlpha((0.6 * 255).round()),
+                            color: Colors.white.withAlpha(153),
                             offset: const Offset(0, -2),
                             blurRadius: 4,
                           ),
                         ],
+                  border: theme.brightness == Brightness.dark
+                      ? Border.all(
+                          color: Colors.white.withAlpha(20),
+                          width: 0.8,
+                        )
+                      : null,
                 ),
                 child: Center(
                   child: Icon(

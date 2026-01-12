@@ -59,7 +59,7 @@ class CalendarBuildWidget extends StatelessWidget {
             ),
           ),
 
-          // Event Marker: Provides non-intrusive feedback for transaction data.
+          // Event Marker: Provides non-intrusive feedback for records data.
           if (hasTx)
             Positioned(
               bottom: cellSize * 0.12,

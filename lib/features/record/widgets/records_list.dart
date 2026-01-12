@@ -90,7 +90,7 @@ class _TransactionListState extends State<RecordsList> {
                 label: 'Edit',
               ),
 
-              // [Delete] Remove transaction with confirmation
+              // [Delete] Remove records with confirmation
               SlidableAction(
                 onPressed: (_) async {
                   bool? confirmed = await showDialog<bool>(

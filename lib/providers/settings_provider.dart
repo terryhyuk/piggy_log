@@ -22,11 +22,14 @@ class SettingProvider with ChangeNotifier {
   NumberFormat? currencyFormat;
   DateFormat? dateFormat;
 
+  String appVersion = "";
+
   SettingProvider(this._repository) {
     Future.microtask(() => loadSettings());
   }
 
   Future<void> loadSettings() async {
+    appVersion = await _repository.getAppVersion();
     settings = await _repository.getSettings();
 
     if (settings == null) {

@@ -1,8 +1,8 @@
 // [monthly_history.dart] 🍎
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:piggy_log/core/database/repository/dashboard_repasitory.dart';
-import 'package:piggy_log/core/database/repository/record_repository.dart';
+import 'package:piggy_log/providers/dashboard_provider.dart';
+import 'package:piggy_log/providers/record_provider.dart';
 import 'package:piggy_log/providers/settings_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:piggy_log/l10n/app_localizations.dart';
@@ -15,8 +15,9 @@ class MonthlyHistory extends StatefulWidget {
 }
 
 class _MonthlyHistoryState extends State<MonthlyHistory> {
-  late final DashboardRepository _dashboardRepository;
-  late final RecordRepository _recordRepository;
+  late final DashboardProvider _dashboardProvider;
+  late final RecordProvider _recordProvider;
+
   
   List<Map<String, dynamic>> _historyData = [];
   bool _isLoading = true;
@@ -25,63 +26,62 @@ class _MonthlyHistoryState extends State<MonthlyHistory> {
   void initState() {
     super.initState();
     // Initialize repositories properly from context
-    _dashboardRepository = context.read<DashboardRepository>();
-    _recordRepository = context.read<RecordRepository>();
+    _dashboardProvider = context.read<DashboardProvider>();
+    _recordProvider = context.read<RecordProvider>();
     
     _loadHistory();
   }
 
-  Future<void> _loadHistory() async {
-    if (!mounted) return;
-    _isLoading = true;
-    setState(() {});
+Future<void> _loadHistory() async {
+  if (!mounted) return;
+  setState(() => _isLoading = true);
 
-    try {
-      // Fetch all records from the budget table
-      final budgets = await _dashboardRepository.getAllMonthlyBudgets();
-      List<Map<String, dynamic>> combinedList = [];
+  try {
+    final budgets = await _dashboardProvider
+        .dashboardRepository
+        .getAllMonthlyBudgets();
 
-      for (var b in budgets) {
-        String ym = b['year_month']; // e.g., "2026-01"
-        
-        // Parse year and month to find the end date
-        final parts = ym.split('-');
-        int year = int.parse(parts[0]);
-        int month = int.parse(parts[1]);
+    List<Map<String, dynamic>> combinedList = [];
 
-        String startDate = "$ym-01";
-        
-        // Calculate the last day of the month
-        DateTime lastDay = DateTime(year, month + 1, 0);
-        String endDate = "$ym-${lastDay.day.toString().padLeft(2, '0')}";
+    for (var b in budgets) {
+      final ym = b['year_month'];
 
-        // Get actual expenses for that specific period from RecordRepository
-        double expense = await _recordRepository.getMonthlyTotalExpense(
-          start: startDate,
-          end: endDate,
-        );
+      final parts = ym.split('-');
+      final year = int.parse(parts[0]);
+      final month = int.parse(parts[1]);
 
-        combinedList.add({
-          'month': ym,
-          'budget': (b['target_amount'] as num).toDouble(),
-          'expense': expense,
-        });
-      }
+      final startDate = "$ym-01";
+      final lastDay = DateTime(year, month + 1, 0);
+      final endDate =
+          "$ym-${lastDay.day.toString().padLeft(2, '0')}";
 
-      // Sort by month (newest first)
-      combinedList.sort((a, b) => b['month'].compareTo(a['month']));
+      final expense = await _recordProvider
+          .recordRepository
+          .getMonthlyTotalExpense(
+            start: startDate,
+            end: endDate,
+          );
 
-      if (mounted) {
-        setState(() {
-          _historyData = combinedList;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      debugPrint("Error loading history: $e");
-      if (mounted) setState(() => _isLoading = false);
+      combinedList.add({
+        'month': ym,
+        'budget': (b['target_amount'] as num).toDouble(),
+        'expense': expense,
+      });
     }
+
+    combinedList.sort((a, b) => b['month'].compareTo(a['month']));
+
+    if (!mounted) return;
+    setState(() {
+      _historyData = combinedList;
+      _isLoading = false;
+    });
+  } catch (e, st) {
+    debugPrint("Error loading history: $e\n$st");
+    if (mounted) setState(() => _isLoading = false);
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

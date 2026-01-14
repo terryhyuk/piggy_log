@@ -11,10 +11,13 @@ class RecordProvider with ChangeNotifier {
   final RecordRepository _repository;
   List<RecordModel> _records = [];
   bool _isAutoInserting = false;
+  
 
   RecordProvider(this._repository);
 
   List<RecordModel> get records => _records;
+RecordRepository get recordRepository => _repository;
+
 
   Future<void> fetchRecords(int categoryId) async {
     _records = await _repository.getRecordsByCategoryId(categoryId);

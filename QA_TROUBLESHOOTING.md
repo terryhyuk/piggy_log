@@ -114,7 +114,7 @@ Root Cause: The NumberFormat.currency constructor defaulted to the system locale
 
 Resolution: Implemented dynamic formatting logic to explicitly evaluate the currency code and force decimalDigits to 0 for zero-decimal environments.
 
-Dart
+```xml
 // [Before] Static formatting regardless of currency type
 currencyFormat = NumberFormat.currency(locale: localeStr, symbol: symbol); // Result: ₩1,200.00
 
@@ -125,6 +125,8 @@ currencyFormat = NumberFormat.currency(
   symbol: symbol, 
   decimalDigits: decimalDigits, // Explicitly control decimal places
 ); // Result: ₩1,200
+```
+
 🛡️ #12. Runtime Null Safety in Currency Data Mapping
 Context: 런타임 널 안정성
 
@@ -134,7 +136,8 @@ Root Cause: A data map key mismatch occurred where the UI provided an input toke
 
 Resolution: Synchronized the data model matrices and implemented safe null-coalescing mappers (??) to guarantee solid fallback paths under structural runtime anomalies.
 
-Dart
+
+```xml
 // [Before] Missing data key and unsafe null assertion
 final currencies = { 'USD': {...}, 'KRW': {...} }; 
 final data = currencies[currencyCode]!; // CRASH when currencyCode is 'THB'
@@ -146,6 +149,8 @@ final currencies = {
   'KRW': {...} 
 };
 final data = currencies[currencyCode] ?? currencies['USD']!; // Robust fallback protection
+```
+
 🔀 #13. Structural Refactoring: Ternary to Switch Expressions
 Context: 구조적 개선 및 예외 케이스 처리
 

@@ -2,19 +2,28 @@
 
 ![Piggy Log Banner](./docs/metadata/piggy_log_image.png)
 
-> 🚀 **Major Milestone**: Strategic architectural migration from GetX to **Provider** and implementation of a **4-Layered Architecture**.
+> 🚀 **Quality & Architecture Milestone**: Strategic structural migration from GetX to **Provider** to resolve complex state synchronization anomalies and lock long-term regression stability.
 
-**Piggy Log** is a production-grade personal finance application available on [App Store](https://apps.apple.com/app/piggy-log/id6757284836) and [Google Play](https://play.google.com/store/apps/details?id=com.terry.piggyLog). It focuses on **data integrity, architectural scalability, and global usability.**
+**Piggy Log** is a production-grade personal finance application available on [App Store](https://apps.apple.com/app/piggy-log/id6757284836) and [Google Play](https://play.google.com/store/apps/details?id=com.terry.piggyLog). It focuses on **data integrity, strict exception handling, and seamless localized usability.**
+
+---
+
+## 🔍 QA Focus: 13+ Core Troubleshooting Cases
+
+To ensure production-level stability and full data synchronization, a rigorous test execution and defect tracking workflow was maintained. 
+
+📑 **[Click Here to Read the Full 13+ Technical Defect Logs & QA Verification Log](./QA_TROUBLESHOOTING.md)**
+*(Features documentation on state lifecycle mismatches, memory leaks, dynamic locale formatting, and database normalization).*
 
 ---
 
 ## 🏗️ Architectural Evolution: Why We Migrated
 
-Version 1.3.0 marks a significant pivot in the project's engineering philosophy. After visualizing the system's complexity, we replaced GetX with **Provider** to achieve:
+Version 1.3.0 marks a critical adjustment in the system's engineering philosophy. After detecting implicit state leaks and timing anomalies during regression sweeps, we replaced GetX with **Provider** to achieve:
 
-* **Predictable State Management**: Moving from implicit dependency injection to an explicit, compiler-safe structure.
-* **Separation of Concerns**: Implementing a 4-layered architecture to decouple business logic from the UI.
-* **Maintenance Efficiency**: Reducing technical debt by simplifying complex data flows and improving traceability.
+* **Predictable State Auditing**: Shifting from implicit runtime injection to a compiler-safe, traceable explicit model dependency layout.
+* **Separation of Concerns**: Implementing a 4-layered pattern (`Service` → `Repository` → `Provider` → `View`) to isolate core computational tracking rules from UI components.
+* **Defect Prevention**: Eliminating overlapping asynchronous rendering loops and stabilizing data persistence pipelines.
 
 ---
 
@@ -29,55 +38,43 @@ Version 1.3.0 marks a significant pivot in the project's engineering philosophy.
   </a>
 </p>
 
-*Experience **Piggy Log** today! Check out our live production app on both the App Store and Google Play.*
-
----
 ---
 
-## 🛠️ Technical Design Documents
+## 🛠️ Technical Verification & Blueprints
 
-Click the links below to view the detailed design blueprints of Piggy Log.
+These blueprints represent the target reference models used to audit data flows and ensure relational constraints during functional verification phases.
 
 ### 1. [Logical Architecture](./docs/logical_architecture.png)
-* **Pattern**: 4-Layered Architecture (`Service` → `Repository` → `Provider` → `View`).
-* **Highlight**: Visualizes how global configuration (Settings) reactively influences the entire UI system through a centralized state.
+* **QA Scope**: Maps out the 4-Layered structure to trace how global setting mutations explicitly propagate down the active display components.
 
 ### 2. [Conceptual ERD](./docs/conceptual_ERD.png)
-* **Focus**: High-level business logic and entity relationships (`Category`, `Record`, `Budget`).
-* **Purpose**: Defined the initial data blueprint to ensure solid and accurate financial tracking logic.
+* **QA Scope**: High-level system requirements tracking to confirm the relational integrity of financial business matrices (`Category` ↔ `Record` ↔ `Budget`).
 
 ### 3. [Physical DB Schema](./docs/physical_db_schema.png)
-* **Implementation**: SQLite (sqflite) schema with strict data typing and Foreign Key constraints.
-* **Optimization**: Designed for high-performance local data persistence and robust relational data integrity.
+* **QA Scope**: SQLite constraint validation schema checking data types, null boundaries, and foreign key stability.
 
 ---
 
-## 📂 Project Roadmap & Structure
-
-The project follows a **Feature-Based Architecture**, grouping code by functional modules to maximize scalability and developer experience.
+## 📂 System Topography
 
 ```text
 lib/
-├── core/                # Infrastructure (Database, Global Utils, Shared Widgets)
-├── data/                # Data Layer (Models, Physical Data Entities)
-├── features/            # Feature-centric modules (Calendar, Dashboard, Onboarding)
-├── providers/           # App-wide State Management (Logic & ViewModels)
-├── l10n/                # Localization (EN, KO, JA, TH)
-└── main.dart            # Entry Point & Theme Configuration
+├── core/                # Infrastructure (Database, Global Utils, Shared Checklists)
+├── data/                # Data Layer (Models, Object Parsers, Entity Schemes)
+├── features/            # Contextual Modules (Defect Scopes: Calendar, Dashboard)
+├── providers/           # Shared ViewModels (Central Source of Truth for Verification)
+├── l10n/                # Localization Matrices (EN, KO, JA, TH Test Bed)
+└── main.dart            # System Initialization & Environment Profiles
 ```
 
-🌟 Key Features
-🌍 Global Localization: Full support for English, Korean, Japanese, and Thai.
 
-📊 Visual Analytics: Refined Radar Charts and budget tracking using fl_chart.
+🌟 Production Validation Summary
+🌍 Robust Localization (l10n): Verified text expansion boundaries for variable string lengths across English, Korean, Japanese, and Thai layout setups.
 
-⭐ Production Quality: Integrated native In-App Review system and intuitive Onboarding flow.
+📊 Data Visualization: Calibrated color rendering charts against Dark Mode assets to maintain WCAG-compliant readability.
 
-💾 Solid Persistence: Professional-grade SQLite integration for reliable and secure data storage.
+💾 Relational Persistence: Hardened local storage setups against unhandled database mapping values to guarantee 0% pointer runtime failures.
 
-📬 Contact & Developer
-Terry Yoon – Mobile Developer
-
+📬 Contact
+Terry Yoon – QA Engineer / Mobile Specialist
 📧 yonghyuk.terry.yoon@gmail.com | 📍 Vancouver, BC, Canada
-
-This project demonstrates a transition from rapid prototyping to professional software engineering standards.

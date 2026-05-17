@@ -114,7 +114,7 @@ Root Cause: The NumberFormat.currency constructor defaulted to the system locale
 
 Resolution: Implemented dynamic formatting logic to explicitly evaluate the currency code and force decimalDigits to 0 for zero-decimal environments.
 
-```xml
+```dart
 // [Before] Static formatting regardless of currency type
 currencyFormat = NumberFormat.currency(locale: localeStr, symbol: symbol); // Result: ₩1,200.00
 
@@ -127,28 +127,25 @@ currencyFormat = NumberFormat.currency(
 ); // Result: ₩1,200
 ```
 
-🛡️ #12. Runtime Null Safety in Currency Data Mapping
-Context: 런타임 널 안정성
+### 🛡️ #12. Runtime Null Safety in Currency Data Mapping
+* **Context:** 런타임 널 안정성
+* **Defect:** The application crashed instantly via a Null Pointer Exception when users selected a newly introduced localization tracking configuration like "Thai Baht (THB)".
+* **Root Cause:** A data map key mismatch occurred where the UI provided an input token that did not exist in the back-end controller asset map yet, causing a crash due to an unsafe `!` (null assertion) operator.
+* **Resolution:** Synchronized the data model matrices and implemented safe null-coalescing mappers (`??`) to guarantee solid fallback paths under structural runtime anomalies.
 
-Defect: The application crashed instantly via a Null Pointer Exception when users selected a newly introduced localization tracking configuration like "Thai Baht (THB)".
-
-Root Cause: A data map key mismatch occurred where the UI provided an input token that did not exist in the back-end controller asset map yet, causing a crash due to an unsafe ! (null assertion) operator.
-
-Resolution: Synchronized the data model matrices and implemented safe null-coalescing mappers (??) to guarantee solid fallback paths under structural runtime anomalies.
-
-
-```xml
-// [Before] Missing data key and unsafe null assertion
+```dart
+// ❌ [BEFORE] Missing data key and unsafe null assertion
 final currencies = { 'USD': {...}, 'KRW': {...} }; 
 final data = currencies[currencyCode]!; // CRASH when currencyCode is 'THB'
 
-// [After] Synchronized data map with null safety fallback
+// ⭕ [AFTER] Synchronized data map with null safety fallback
 final currencies = { 
   'USD': {...}, 
   'THB': {'symbol': '฿', 'code': 'THB'}, 
   'KRW': {...} 
 };
-final data = currencies[currencyCode] ?? currencies['USD']!; // Robust fallback protection
+// Robust fallback protection using null-coalescing operator
+final data = currencies[currencyCode] ?? currencies['USD']!;
 ```
 
 🔀 #13. Structural Refactoring: Ternary to Switch Expressions

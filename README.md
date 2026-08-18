@@ -40,19 +40,19 @@ Version 1.3.0 marks a critical adjustment in the system's engineering philosophy
 
 ---
 
-### 1. [Logical Architecture](./docs/logical_architecture.png)
+### 1. [Logical Architecture](./docs/design/logical_architecture.png)
 
 * **QA Scope**: Maps out the 4-Layered structure to trace how global setting mutations explicitly propagate down the active display components.
 
 
 
-### 2. [Conceptual ERD](./docs/conceptual_ERD.png)
+### 2. [Conceptual ERD](./docs/design/conceptual_ERD.png)
 
 * **QA Scope**: High-level system requirements tracking to confirm the relational integrity of financial business matrices (`Category` ↔ `Record` ↔ `Budget`).
 
 
 
-### 3. [Physical DB Schema](./docs/physical_db_schema.png)
+### 3. [Physical DB Schema](./docs/design/physical_db_schema.png)
 
 * **QA Scope**: SQLite constraint validation schema checking data types, null boundaries, and foreign key stability.
 
